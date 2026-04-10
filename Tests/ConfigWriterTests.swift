@@ -58,3 +58,20 @@ import Foundation
     let result = try String(contentsOf: tmp, encoding: .utf8)
     #expect(result.contains("theme = new"))
 }
+
+@Test func replaceTOMLSectionCreatesFileIfMissing() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+
+    let path = tmpDir.appendingPathComponent("new.toml").path
+    // 文件不存在时应创建并写入内容
+    try ConfigWriter.replaceTOMLSection(
+        in: path,
+        sectionPrefix: "[theme]",
+        newContent: "[theme]\nname = \"test\""
+    )
+
+    let content = try String(contentsOfFile: path, encoding: .utf8)
+    #expect(content.contains("[theme]"))
+    #expect(content.contains("name = \"test\""))
+}

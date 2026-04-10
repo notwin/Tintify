@@ -72,7 +72,16 @@ enum ConfigWriter {
     ///   sectionPrefix: The section header prefix to match (e.g. "[theme]").
     ///   newContent: The replacement text including the section header.
     static func replaceTOMLSection(in path: String, sectionPrefix: String, newContent: String) throws {
-        let fileContent = try String(contentsOfFile: path, encoding: .utf8)
+        let fileContent: String
+        if FileManager.default.fileExists(atPath: path) {
+            fileContent = try String(contentsOfFile: path, encoding: .utf8)
+        } else {
+            let parentDir = (path as NSString).deletingLastPathComponent
+            if !FileManager.default.fileExists(atPath: parentDir) {
+                try FileManager.default.createDirectory(atPath: parentDir, withIntermediateDirectories: true)
+            }
+            fileContent = ""
+        }
         var lines = fileContent.components(separatedBy: "\n")
 
         let startIdx = lines.firstIndex { $0.hasPrefix(sectionPrefix) }
