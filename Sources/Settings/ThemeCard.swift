@@ -118,6 +118,7 @@ struct ThemeCard: View {
                 )
         )
         .cornerRadius(8)
+        .contentShape(Rectangle())
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.2)) {
                 isHovered = hovering

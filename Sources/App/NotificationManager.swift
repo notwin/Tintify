@@ -9,16 +9,29 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     /// History of apply results for the ResultsPane.
     private(set) var history: [ApplyResult] = []
 
+    /// Whether UNUserNotificationCenter is available (requires a valid bundle).
+    private let notificationsAvailable: Bool
+
     private override init() {
+        // UNUserNotificationCenter crashes without a bundle identifier (SPM debug builds)
+        notificationsAvailable = Bundle.main.bundleIdentifier != nil
         super.init()
-        let center = UNUserNotificationCenter.current()
-        center.delegate = self
-        center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
+
+        if notificationsAvailable {
+            let center = UNUserNotificationCenter.current()
+            center.delegate = self
+            center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        }
     }
 
     /// Send a notification and record the result in history.
     func notify(result: ApplyResult) {
         history.insert(result, at: 0)
+
+        guard notificationsAvailable else {
+            NSLog("[Tintify] \(result.summary) (notifications unavailable without bundle)")
+            return
+        }
 
         let content = UNMutableNotificationContent()
 
