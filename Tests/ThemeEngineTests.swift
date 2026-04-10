@@ -24,7 +24,7 @@ import Foundation
     try engine.apply(theme: theme)
 
     let ghosttyResult = try String(contentsOfFile: ghosttyConfig, encoding: .utf8)
-    #expect(ghosttyResult.contains("theme = catppuccin-mocha"))
+    #expect(ghosttyResult.contains("theme = Catppuccin Mocha"))
 
     let zshrcResult = try String(contentsOfFile: zshrc, encoding: .utf8)
     #expect(zshrcResult.contains("BAT_THEME"))

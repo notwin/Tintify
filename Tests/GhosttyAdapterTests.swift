@@ -12,7 +12,7 @@ import Foundation
     try adapter.apply(theme: mocha, configPath: tmp.path)
 
     let result = try String(contentsOf: tmp, encoding: .utf8)
-    #expect(result.contains("theme = catppuccin-mocha"))
+    #expect(result.contains("theme = Catppuccin Mocha"))
     #expect(!result.contains("theme = old-theme"))
     #expect(result.contains("font-size = 14"))
 }
@@ -26,7 +26,7 @@ import Foundation
     try adapter.apply(theme: mocha, configPath: tmp.path)
 
     let result = try String(contentsOf: tmp, encoding: .utf8)
-    #expect(result.contains("theme = catppuccin-mocha"))
+    #expect(result.contains("theme = Catppuccin Mocha"))
 }
 
 @Test func ghosttyAdapterToolName() {

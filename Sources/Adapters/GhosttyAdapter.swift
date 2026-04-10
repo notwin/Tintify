@@ -19,7 +19,7 @@ struct GhosttyAdapter: ToolAdapter {
         try ConfigWriter.replaceLine(
             in: path,
             prefix: "theme = ",
-            newLine: "theme = \(theme.id)"
+            newLine: "theme = \(theme.name)"
         )
     }
 }
