@@ -47,3 +47,19 @@ import Foundation
     let list = manager.listBackups()
     #expect(list.count == 10)
 }
+
+@Test func listBackupsParsesDatesFromId() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let configFile = tmpDir.appendingPathComponent("config.txt")
+    try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+    try "content".write(to: configFile, atomically: true, encoding: .utf8)
+
+    let manager = BackupManager(backupRoot: tmpDir.appendingPathComponent("backups").path)
+    _ = try manager.backup(files: [configFile.path])
+
+    let list = manager.listBackups()
+    #expect(list.count == 1)
+
+    let timeDiff = abs(list[0].date.timeIntervalSinceNow)
+    #expect(timeDiff < 5)
+}

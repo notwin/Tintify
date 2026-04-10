@@ -76,13 +76,30 @@ final class BackupManager {
     func listBackups() -> [BackupInfo] {
         guard let items = try? fm.contentsOfDirectory(atPath: backupRoot) else { return [] }
 
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd-HHmmss-SSS"
+
         return items.sorted().reversed().compactMap { name in
             let path = (backupRoot as NSString).appendingPathComponent(name)
             var isDir: ObjCBool = false
             guard fm.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else {
                 return nil
             }
-            return BackupInfo(id: name, date: Date(), path: path)
+
+            // 从备份 ID 解析日期，格式: "yyyyMMdd-HHmmss-SSS-xxxxxxxx"
+            // 取前 19 个字符作为日期部分
+            let dateString = String(name.prefix(19))
+            let date: Date
+            if let parsed = dateFormatter.date(from: dateString) {
+                date = parsed
+            } else if let attrs = try? fm.attributesOfItem(atPath: path),
+                      let modDate = attrs[.modificationDate] as? Date {
+                date = modDate
+            } else {
+                date = Date()
+            }
+
+            return BackupInfo(id: name, date: date, path: path)
         }
     }
 
