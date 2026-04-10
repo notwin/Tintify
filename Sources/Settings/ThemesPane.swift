@@ -28,7 +28,8 @@ struct ThemesPane: View {
                             theme: theme,
                             isActive: theme.id == settings.currentThemeId
                         ) {
-                            ThemeEngine().apply(theme: theme)
+                            let result = ThemeEngine().apply(theme: theme)
+                            NotificationManager.shared.notify(result: result)
                         }
                     }
                 }

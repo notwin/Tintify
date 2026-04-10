@@ -27,7 +27,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 ? AppSettings.shared.darkThemeId
                 : AppSettings.shared.lightThemeId
             guard let theme = ThemeRegistry.shared.theme(id: themeId) else { return }
-            ThemeEngine().apply(theme: theme)
+            let result = ThemeEngine().apply(theme: theme)
+            NotificationManager.shared.notify(result: result)
             self?.menuBarManager.rebuildMenu()
         }
     }
