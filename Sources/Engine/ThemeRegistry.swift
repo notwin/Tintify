@@ -40,7 +40,8 @@ final class ThemeRegistry {
                     overlay2: "#9399b2", overlay1: "#7f849c", overlay0: "#6c7086",
                     surface2: "#585b70", surface1: "#45475a", surface0: "#313244",
                     base: "#1e1e2e", mantle: "#181825", crust: "#11111b"
-                )
+                ),
+                toolNames: [:]  // name 和各工具一致
             ),
             Theme(
                 id: "catppuccin-macchiato",
@@ -55,11 +56,12 @@ final class ThemeRegistry {
                     overlay2: "#939ab7", overlay1: "#8087a2", overlay0: "#6e738d",
                     surface2: "#5b6078", surface1: "#494d64", surface0: "#363a4f",
                     base: "#24273a", mantle: "#1e2030", crust: "#181926"
-                )
+                ),
+                toolNames: [:]
             ),
             Theme(
                 id: "catppuccin-frappe",
-                name: "Catppuccin Frappé",
+                name: "Catppuccin Frappe",  // 无重音，Ghostty 和 bat 都不认 é
                 appearance: .dark,
                 palette: Palette(
                     rosewater: "#f2d5cf", flamingo: "#eebebe", pink: "#f4b8e4", mauve: "#ca9ee6",
@@ -70,7 +72,8 @@ final class ThemeRegistry {
                     overlay2: "#949cbb", overlay1: "#838ba7", overlay0: "#737994",
                     surface2: "#626880", surface1: "#51576d", surface0: "#414559",
                     base: "#303446", mantle: "#292c3c", crust: "#232634"
-                )
+                ),
+                toolNames: [:]
             ),
             Theme(
                 id: "catppuccin-latte",
@@ -85,7 +88,8 @@ final class ThemeRegistry {
                     overlay2: "#7c7f93", overlay1: "#8c8fa1", overlay0: "#9ca0b0",
                     surface2: "#acb0be", surface1: "#bcc0cc", surface0: "#ccd0da",
                     base: "#eff1f5", mantle: "#e6e9ef", crust: "#dce0e8"
-                )
+                ),
+                toolNames: [:]
             ),
 
             // ── Tokyo Night ─────────────────────────────────────────
@@ -102,7 +106,12 @@ final class ThemeRegistry {
                     overlay2: "#565f89", overlay1: "#414868", overlay0: "#3b4261",
                     surface2: "#33374c", surface1: "#292e42", surface0: "#24283b",
                     base: "#1a1b26", mantle: "#16161e", crust: "#13131a"
-                )
+                ),
+                toolNames: [
+                    "ghostty": "TokyoNight",       // Ghostty 无空格
+                    "bat": "ansi",                  // bat 没内置 Tokyo Night，用 ansi 回退
+                    "delta": "ansi",
+                ]
             ),
             Theme(
                 id: "tokyo-night-light",
@@ -117,7 +126,12 @@ final class ThemeRegistry {
                     overlay2: "#6e7191", overlay1: "#8990b3", overlay0: "#9699a3",
                     surface2: "#b4b5b9", surface1: "#c4c8da", surface0: "#d5d6db",
                     base: "#d5d6db", mantle: "#e1e2e7", crust: "#e9e9ec"
-                )
+                ),
+                toolNames: [
+                    "ghostty": "TokyoNight Day",    // Ghostty 叫 Day 不叫 Light
+                    "bat": "ansi",
+                    "delta": "ansi",
+                ]
             ),
 
             // ── Nord ────────────────────────────────────────────────
@@ -134,7 +148,8 @@ final class ThemeRegistry {
                     overlay2: "#4c566a", overlay1: "#434c5e", overlay0: "#3b4252",
                     surface2: "#434c5e", surface1: "#3b4252", surface0: "#2e3440",
                     base: "#2e3440", mantle: "#292e39", crust: "#242933"
-                )
+                ),
+                toolNames: [:]
             ),
 
             // ── Gruvbox ─────────────────────────────────────────────
@@ -151,7 +166,11 @@ final class ThemeRegistry {
                     overlay2: "#a89984", overlay1: "#928374", overlay0: "#7c6f64",
                     surface2: "#504945", surface1: "#3c3836", surface0: "#32302f",
                     base: "#282828", mantle: "#1d2021", crust: "#1a1a1a"
-                )
+                ),
+                toolNames: [
+                    "bat": "gruvbox-dark",      // bat 用小写连字符
+                    "delta": "gruvbox-dark",
+                ]
             ),
             Theme(
                 id: "gruvbox-light",
@@ -166,7 +185,11 @@ final class ThemeRegistry {
                     overlay2: "#7c6f64", overlay1: "#928374", overlay0: "#a89984",
                     surface2: "#d5c4a1", surface1: "#ebdbb2", surface0: "#f2e5bc",
                     base: "#fbf1c7", mantle: "#f9f5d7", crust: "#f2e5bc"
-                )
+                ),
+                toolNames: [
+                    "bat": "gruvbox-light",
+                    "delta": "gruvbox-light",
+                ]
             ),
 
             // ── Dracula ─────────────────────────────────────────────
@@ -183,7 +206,8 @@ final class ThemeRegistry {
                     overlay2: "#6272a4", overlay1: "#565a6e", overlay0: "#44475a",
                     surface2: "#44475a", surface1: "#383a4a", surface0: "#313241",
                     base: "#282a36", mantle: "#22232e", crust: "#1c1d27"
-                )
+                ),
+                toolNames: [:]
             ),
         ]
     }

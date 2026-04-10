@@ -7,9 +7,15 @@ struct Theme: Identifiable, Codable, Hashable {
     let name: String
     let appearance: Appearance
     let palette: Palette
+    let toolNames: [String: String]  // tool -> 该工具期望的主题名
 
     enum Appearance: String, Codable, Hashable {
         case dark, light
+    }
+
+    /// 获取指定工具的主题名，不存在则回退到 name
+    func nameForTool(_ tool: String) -> String {
+        toolNames[tool] ?? name
     }
 }
 

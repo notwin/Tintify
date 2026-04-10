@@ -18,7 +18,7 @@ struct BatAdapter: ToolAdapter {
     ///   configPath: Optional override path.
     func apply(theme: Theme, configPath: String? = nil) throws {
         let path = configPath ?? resolvedPath
-        let batLine = "export BAT_THEME=\"\(theme.name)\""
+        let batLine = "export BAT_THEME=\"\(theme.nameForTool(toolName))\""
 
         // Read existing marker block content to preserve other adapters' lines.
         let existing = Self.readExistingMarkerContent(from: path)

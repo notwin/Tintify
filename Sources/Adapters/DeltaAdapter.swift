@@ -17,7 +17,7 @@ struct DeltaAdapter: ToolAdapter {
     func apply(theme: Theme, configPath: String? = nil) throws {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-        process.arguments = ["config", "--global", "delta.syntax-theme", theme.name]
+        process.arguments = ["config", "--global", "delta.syntax-theme", theme.nameForTool(toolName)]
         try process.run()
         process.waitUntilExit()
 
