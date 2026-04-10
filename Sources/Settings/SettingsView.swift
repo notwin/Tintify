@@ -7,6 +7,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     case general = "通用"
     case tools = "工具"
     case themes = "主题"
+    case results = "应用记录"
     case backup = "备份"
     case about = "关于"
 
@@ -17,6 +18,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
         case .general: return "paintpalette"
         case .tools: return "wrench.and.screwdriver"
         case .themes: return "theatermasks"
+        case .results: return "list.clipboard"
         case .backup: return "externaldrive"
         case .about: return "info.circle"
         }
@@ -40,6 +42,7 @@ struct SettingsView: View {
             case .general: GeneralPane()
             case .tools: ToolsPane()
             case .themes: ThemesPane()
+            case .results: ResultsPane()
             case .backup: BackupPane()
             case .about: AboutPane()
             }
