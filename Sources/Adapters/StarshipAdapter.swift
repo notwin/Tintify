@@ -25,6 +25,9 @@ struct StarshipAdapter: ToolAdapter {
             newLine: "palette = \"\(paletteName)\""
         )
 
+        // Remove all existing [palettes.*] sections to avoid accumulation.
+        try Self.removeAllPaletteSections(in: path)
+
         // Build the palette section with all 26 colors.
         let p = theme.palette
         let section = """
@@ -62,5 +65,35 @@ struct StarshipAdapter: ToolAdapter {
             sectionPrefix: "[palettes.\(paletteName)]",
             newContent: section
         )
+    }
+
+    /// Remove all [palettes.*] sections from the TOML file.
+    private static func removeAllPaletteSections(in path: String) throws {
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        let content = try String(contentsOfFile: path, encoding: .utf8)
+        var lines = content.components(separatedBy: "\n")
+
+        var i = 0
+        while i < lines.count {
+            if lines[i].hasPrefix("[palettes.") {
+                // Remove from this header to the next top-level section or EOF
+                var end = i + 1
+                while end < lines.count && !lines[end].hasPrefix("[") {
+                    end += 1
+                }
+                lines.removeSubrange(i..<end)
+                // Don't increment i — check the same index again
+            } else {
+                i += 1
+            }
+        }
+
+        // Remove trailing blank lines
+        while lines.last?.isEmpty == true && lines.count > 1 {
+            lines.removeLast()
+        }
+
+        try lines.joined(separator: "\n")
+            .write(toFile: path, atomically: true, encoding: .utf8)
     }
 }
