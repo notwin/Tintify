@@ -23,7 +23,7 @@ protocol ToolAdapter {
 extension ToolAdapter {
     /// Path resolved from user overrides or the adapter default.
     var resolvedPath: String {
-        AppSettings.shared.toolPaths[toolName] ?? defaultConfigPath
+        AppSettings.shared.resolvedPath(for: toolName) ?? defaultConfigPath
     }
 
     /// Default installation check: the resolved config file exists.

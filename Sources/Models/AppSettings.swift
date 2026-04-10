@@ -37,4 +37,10 @@ final class AppSettings: ObservableObject {
         self.launchAtLogin = UserDefaults.standard.object(forKey: "launchAtLogin") as? Bool ?? true
         self.toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
     }
+
+    /// 获取指定工具的配置路径，自动展开 ~
+    func resolvedPath(for toolName: String) -> String? {
+        guard let path = toolPaths[toolName] else { return nil }
+        return (path as NSString).expandingTildeInPath
+    }
 }
