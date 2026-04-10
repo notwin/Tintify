@@ -80,6 +80,11 @@ struct LazygitAdapter: ToolAdapter {
                 lines.append(contentsOf: guiSection.components(separatedBy: "\n"))
             }
 
+            // Remove leading blank lines
+            while lines.first?.isEmpty == true {
+                lines.removeFirst()
+            }
+
             try lines.joined(separator: "\n")
                 .write(toFile: path, atomically: true, encoding: .utf8)
         } else {
