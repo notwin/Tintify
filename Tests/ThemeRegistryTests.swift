@@ -23,3 +23,21 @@ import Testing
     #expect(dark.count >= 6)
     #expect(light.count >= 3)
 }
+
+@Test func themeHasCategoryAndDescription() {
+    let theme = ThemeRegistry.shared.theme(id: "catppuccin-mocha")!
+    #expect(theme.category == .popular)
+    #expect(!theme.description.isEmpty)
+    #expect(theme.compatibility == .full)
+}
+
+@Test func themesGroupedByCategory() {
+    let grouped = ThemeRegistry.shared.themes(for: .popular)
+    #expect(grouped.count >= 5)
+}
+
+@Test func trendingThemesHaveAnsiPartial() {
+    let trending = ThemeRegistry.shared.themes(for: .trending)
+    let ansiThemes = trending.filter { $0.compatibility == .ansiPartial }
+    #expect(ansiThemes.count >= 7)
+}

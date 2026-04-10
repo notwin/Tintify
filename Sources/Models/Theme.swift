@@ -1,13 +1,31 @@
 // Sources/Models/Theme.swift
 import Foundation
 
+/// Theme category for grouping in the UI.
+enum ThemeCategory: String, Codable, Hashable, CaseIterable {
+    case popular = "热门推荐"
+    case timeless = "经典永恒"
+    case trending = "新锐之选"
+}
+
+/// Tool compatibility level.
+enum ThemeCompatibility: String, Codable, Hashable {
+    case full          // 所有工具都有原生命名主题
+    case ansiPartial   // bat/delta 使用 ansi 回退
+}
+
 /// A color theme consisting of 26 named palette colors and metadata.
 struct Theme: Identifiable, Codable, Hashable {
     let id: String
     let name: String
     let appearance: Appearance
     let palette: Palette
-    let toolNames: [String: String]  // tool -> 该工具期望的主题名
+    let toolNames: [String: String]
+    let category: ThemeCategory
+    let description: String
+    let stars: String?
+    let compatibility: ThemeCompatibility
+    let variants: [String]?
 
     enum Appearance: String, Codable, Hashable {
         case dark, light
