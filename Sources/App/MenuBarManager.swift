@@ -93,7 +93,7 @@ final class MenuBarManager: NSObject {
     @objc private func themeSelected(_ sender: NSMenuItem) {
         guard let themeId = sender.representedObject as? String,
               let theme = registry.theme(id: themeId) else { return }
-        try? engine.apply(theme: theme)
+        engine.apply(theme: theme)
         rebuildMenu()
     }
 

@@ -28,7 +28,7 @@ struct ThemesPane: View {
                             theme: theme,
                             isActive: theme.id == settings.currentThemeId
                         ) {
-                            try? ThemeEngine().apply(theme: theme)
+                            ThemeEngine().apply(theme: theme)
                         }
                     }
                 }

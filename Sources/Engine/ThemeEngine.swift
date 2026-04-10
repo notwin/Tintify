@@ -34,22 +34,41 @@ final class ThemeEngine {
     }
 
     /// Apply a theme to every adapter, backing up affected config files first.
-    ///
-    /// Args:
-    ///     theme: The theme to apply across all tools.
-    ///
-    /// Raises:
-    ///     Any file-system or adapter error encountered during application.
-    func apply(theme: Theme) throws {
+    @discardableResult
+    func apply(theme: Theme) -> ApplyResult {
+        // Backup — best effort
         let configPaths = adapters.map { pathOverrides[$0.toolName] ?? $0.defaultConfigPath }
         let uniquePaths = Array(Set(configPaths))
-        _ = try backupManager.backup(files: uniquePaths)
+        _ = try? backupManager.backup(files: uniquePaths)
+
+        var toolResults: [ToolResult] = []
 
         for adapter in adapters {
-            let path = pathOverrides[adapter.toolName]
-            try adapter.apply(theme: theme, configPath: path)
+            let path = pathOverrides[adapter.toolName] ?? adapter.defaultConfigPath
+            do {
+                try adapter.apply(theme: theme, configPath: pathOverrides[adapter.toolName])
+                toolResults.append(ToolResult(
+                    toolName: adapter.toolName,
+                    status: .success,
+                    message: nil,
+                    configPath: path
+                ))
+            } catch {
+                toolResults.append(ToolResult(
+                    toolName: adapter.toolName,
+                    status: .failed,
+                    message: error.localizedDescription,
+                    configPath: path
+                ))
+            }
         }
 
         AppSettings.shared.currentThemeId = theme.id
+
+        return ApplyResult(
+            theme: theme,
+            timestamp: Date(),
+            toolResults: toolResults
+        )
     }
 }
