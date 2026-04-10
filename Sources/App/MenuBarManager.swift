@@ -102,8 +102,24 @@ final class MenuBarManager: NSObject {
         rebuildMenu()
     }
 
+    private var settingsWindow: NSWindow?
+
     @objc private func openSettings() {
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        if let window = settingsWindow, window.isVisible {
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+        } else {
+            let hostingController = NSHostingController(rootView: SettingsView())
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "Tintify Settings"
+            window.setContentSize(NSSize(width: 650, height: 450))
+            window.styleMask = [.titled, .closable, .miniaturizable]
+            window.center()
+            window.isReleasedWhenClosed = false  // 关闭时不销毁，下次能复用
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+            settingsWindow = window
+        }
         NSApp.activate(ignoringOtherApps: true)
     }
 

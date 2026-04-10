@@ -7,8 +7,9 @@ struct TintifyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
+        // 空 scene — 纯菜单栏 app，设置窗口由 MenuBarManager 手动管理
         Settings {
-            SettingsView()
+            EmptyView()
         }
     }
 }
@@ -29,5 +30,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try? ThemeEngine().apply(theme: theme)
             self?.menuBarManager.rebuildMenu()
         }
+    }
+
+    /// 关闭最后一个窗口时不退出 app（菜单栏 app 应该继续运行）
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
     }
 }
