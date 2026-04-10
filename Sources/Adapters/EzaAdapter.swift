@@ -6,7 +6,7 @@ struct EzaAdapter: ToolAdapter {
     let toolName = "eza"
 
     var defaultConfigPath: String {
-        NSHomeDirectory() + "/.config/eza/theme.yml"
+        NSHomeDirectory() + "/Library/Application Support/eza/theme.yml"
     }
 
     /// Write full YAML theme file with colors mapped from the palette.
@@ -25,6 +25,12 @@ struct EzaAdapter: ToolAdapter {
         try FileManager.default.createDirectory(
             atPath: dir, withIntermediateDirectories: true
         )
+
+        // Remove symlink if present so we write a real file, not overwrite the link target.
+        let fm = FileManager.default
+        if let _ = try? fm.destinationOfSymbolicLink(atPath: path) {
+            try fm.removeItem(atPath: path)
+        }
 
         let yaml = buildYAML(palette: p)
         try yaml.write(toFile: path, atomically: true, encoding: .utf8)
@@ -45,7 +51,7 @@ struct EzaAdapter: ToolAdapter {
                 foreground: "\(p.text)"
               directory:
                 foreground: "\(p.blue)"
-                bold: true
+                is_bold: true
               symlink:
                 foreground: "\(p.teal)"
               pipe:
@@ -60,10 +66,10 @@ struct EzaAdapter: ToolAdapter {
                 foreground: "\(p.yellow)"
               executable:
                 foreground: "\(p.green)"
-                bold: true
+                is_bold: true
               mount_point:
                 foreground: "\(p.blue)"
-                bold: true
+                is_bold: true
 
             perms:
               user_read:
@@ -104,7 +110,7 @@ struct EzaAdapter: ToolAdapter {
                 foreground: "\(p.red)"
               number_huge:
                 foreground: "\(p.red)"
-                bold: true
+                is_bold: true
               unit_byte:
                 foreground: "\(p.subtext0)"
               unit_kilo:
@@ -129,7 +135,7 @@ struct EzaAdapter: ToolAdapter {
                 foreground: "\(p.overlay0)"
               conflicted:
                 foreground: "\(p.red)"
-                bold: true
+                is_bold: true
 
             date:
               hour_old:

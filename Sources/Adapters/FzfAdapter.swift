@@ -25,8 +25,7 @@ struct FzfAdapter: ToolAdapter {
             --color=bg+:\(p.surface0),bg:\(p.base),spinner:\(p.rosewater),hl:\(p.red) \\
             --color=fg:\(p.text),header:\(p.red),info:\(p.mauve),pointer:\(p.rosewater) \\
             --color=marker:\(p.lavender),fg+:\(p.text),prompt:\(p.mauve),hl+:\(p.red) \\
-            --color=selected-bg:\(p.surface1) \\
-            --color=border:\(p.overlay0),label:\(p.text)"
+            --color=border:\(p.overlay0)"
             """
 
         // Read existing marker block content to preserve other adapters' lines.

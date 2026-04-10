@@ -51,6 +51,12 @@ struct LazygitAdapter: ToolAdapter {
                   - "\(p.text)"
                 searchingActiveBorderColor:
                   - "\(p.mauve)"
+                optionsTextColor:
+                  - "\(p.subtext1)"
+                inactiveViewSelectedLineBgColor:
+                  - "\(p.surface1)"
+                selectedRangeBgColor:
+                  - "\(p.surface1)"
             """
 
         if FileManager.default.fileExists(atPath: path) {
