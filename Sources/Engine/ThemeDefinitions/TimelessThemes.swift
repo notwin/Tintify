@@ -15,7 +15,7 @@ enum TimelessThemes {
                 overlay2: "#75715e", overlay1: "#6a6a5e", overlay0: "#49483e",
                 surface2: "#49483e", surface1: "#3e3d32", surface0: "#34342a",
                 base: "#272822", mantle: "#221f22", crust: "#1a1a1a"),
-            toolNames: ["ghostty": "Monokai Pro", "bat": "Monokai Extended", "delta": "Monokai Extended", "wezterm": "Monokai (terminal.sexy)"],
+            toolNames: ["ghostty": "Monokai Pro", "bat": "Monokai Extended", "delta": "Monokai Extended", "wezterm": "MonokaiPro (Gogh)"],
             category: .timeless,
             description: "Sublime Text 经典配色，鲜艳温暖的代名词", stars: nil,
             compatibility: .full, variants: nil),
