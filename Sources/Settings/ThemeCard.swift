@@ -1,14 +1,14 @@
 // Sources/Settings/ThemeCard.swift
 import SwiftUI
 
-/// A theme card with default state and hover-expanded details.
+/// A theme card showing preview, metadata, and apply button — always fully expanded.
 struct ThemeCard: View {
     let theme: Theme
     let isActive: Bool
     let onApply: (Theme) -> Void
 
-    @State private var isHovered = false
     @State private var previewVariantId: String?
+    @State private var isHovered = false
 
     private var displayTheme: Theme {
         if let variantId = previewVariantId {
@@ -18,115 +18,106 @@ struct ThemeCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // 色板预览条
-            HStack(spacing: 3) {
-                ForEach([
-                    displayTheme.palette.red, displayTheme.palette.peach,
-                    displayTheme.palette.yellow, displayTheme.palette.green,
-                    displayTheme.palette.blue, displayTheme.palette.mauve,
-                    displayTheme.palette.lavender, displayTheme.palette.text,
-                ], id: \.self) { hex in
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color(hex: hex))
-                        .frame(height: 8)
+        HStack(alignment: .top, spacing: 12) {
+            // 左侧：代码预览
+            CodePreview(palette: displayTheme.palette)
+                .frame(width: 200)
+
+            // 右侧：信息 + 操作
+            VStack(alignment: .leading, spacing: 6) {
+                // 主题名 + 应用按钮
+                HStack {
+                    Text(displayTheme.name)
+                        .font(.body.bold())
+                    Spacer()
+                    if isActive {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                    }
+                    Button("应用") {
+                        onApply(displayTheme)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
                 }
-            }
 
-            // 主题名
-            Text(displayTheme.name)
-                .font(.caption.bold())
+                // 推荐理由
+                Text(theme.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
-            // 推荐理由
-            Text(theme.description)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
-
-            // Hover 展开区域
-            if isHovered {
-                VStack(alignment: .leading, spacing: 6) {
-                    // 终端代码预览
-                    CodePreview(palette: displayTheme.palette)
-
-                    // Stars + 兼容性
-                    HStack(spacing: 8) {
-                        if let stars = theme.stars {
-                            Label(stars, systemImage: "star.fill")
-                                .font(.caption2)
-                                .foregroundStyle(.yellow)
-                        }
-                        Label(
-                            theme.compatibility == .full ? "全工具兼容" : "部分 ANSI 回退",
-                            systemImage: theme.compatibility == .full ? "checkmark.seal.fill" : "exclamationmark.triangle.fill"
-                        )
-                        .font(.caption2)
-                        .foregroundStyle(theme.compatibility == .full ? .green : .orange)
+                // 色板预览条
+                HStack(spacing: 4) {
+                    ForEach([
+                        displayTheme.palette.red, displayTheme.palette.peach,
+                        displayTheme.palette.yellow, displayTheme.palette.green,
+                        displayTheme.palette.blue, displayTheme.palette.mauve,
+                        displayTheme.palette.lavender, displayTheme.palette.text,
+                    ], id: \.self) { hex in
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color(hex: hex))
+                            .frame(height: 10)
                     }
+                }
 
-                    // 风格标签
+                // Stars + 兼容性 + 标签
+                HStack(spacing: 8) {
+                    if let stars = theme.stars {
+                        Label(stars, systemImage: "star.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow)
+                    }
+                    Label(
+                        theme.compatibility == .full ? "全工具兼容" : "部分 ANSI 回退",
+                        systemImage: theme.compatibility == .full ? "checkmark.seal.fill" : "exclamationmark.triangle.fill"
+                    )
+                    .font(.caption2)
+                    .foregroundStyle(theme.compatibility == .full ? .green : .orange)
+
+                    TagView(text: theme.appearance == .dark ? "暗色" : "浅色")
+                }
+
+                // 变体切换
+                if let variants = theme.variants, !variants.isEmpty {
                     HStack(spacing: 4) {
-                        TagView(text: theme.appearance == .dark ? "暗色" : "浅色")
-                        TagView(text: theme.category.rawValue)
-                    }
-
-                    // 变体切换
-                    if let variants = theme.variants, !variants.isEmpty {
-                        HStack(spacing: 4) {
-                            VariantButton(
-                                title: theme.name,
-                                isSelected: previewVariantId == nil
-                            ) {
-                                previewVariantId = nil
-                            }
-                            ForEach(variants, id: \.self) { variantId in
-                                if let variant = ThemeRegistry.shared.theme(id: variantId) {
-                                    VariantButton(
-                                        title: variant.name,
-                                        isSelected: previewVariantId == variantId
-                                    ) {
-                                        previewVariantId = variantId
-                                    }
+                        VariantButton(
+                            title: theme.name,
+                            isSelected: previewVariantId == nil
+                        ) {
+                            previewVariantId = nil
+                        }
+                        ForEach(variants, id: \.self) { variantId in
+                            if let variant = ThemeRegistry.shared.theme(id: variantId) {
+                                VariantButton(
+                                    title: variant.name,
+                                    isSelected: previewVariantId == variantId
+                                ) {
+                                    previewVariantId = variantId
                                 }
                             }
                         }
                     }
                 }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-
-            // 应用按钮
-            HStack {
-                Spacer()
-                Button("应用") {
-                    onApply(displayTheme)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-
-                if isActive {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                }
             }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isActive ? Color.accentColor.opacity(0.08) : Color.clear)
+        .background(isActive ? Color.accentColor.opacity(0.15) : Color(.controlBackgroundColor))
         .overlay(
             RoundedRectangle(cornerRadius: 8)
                 .stroke(
-                    isActive ? Color.accentColor : Color.secondary.opacity(0.2),
+                    isActive ? Color.accentColor : Color(NSColor.separatorColor),
                     lineWidth: isActive ? 2 : 1
                 )
         )
         .cornerRadius(8)
-        .contentShape(Rectangle())
+        .shadow(color: .black.opacity(isHovered ? 0.1 : 0.04), radius: isHovered ? 6 : 2, y: isHovered ? 2 : 1)
         .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(.easeInOut(duration: 0.15)) {
                 isHovered = hovering
             }
         }
+        .contentShape(Rectangle())
     }
 }
 
