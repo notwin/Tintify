@@ -3,3 +3,6 @@
 *.dmg
 *.app
 .dmg-staging/
+CLAUDE.md
+.claude/
+docs/superpowers/
