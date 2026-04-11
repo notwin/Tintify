@@ -40,7 +40,7 @@ final class MenuBarManager: NSObject {
 
         // Info: 工具数量
         let infoItem = NSMenuItem()
-        infoItem.title = "\(engine.adapters.count) tools synced"
+        infoItem.title = "已配置 \(engine.adapters.count) 个工具"
         infoItem.isEnabled = false
         menu.addItem(infoItem)
 
@@ -86,7 +86,7 @@ final class MenuBarManager: NSObject {
 
         // Follow System Appearance
         let followItem = NSMenuItem(
-            title: "Follow System Appearance",
+            title: "跟随系统外观",
             action: #selector(toggleFollowSystem(_:)),
             keyEquivalent: ""
         )
@@ -98,7 +98,7 @@ final class MenuBarManager: NSObject {
 
         // Settings
         let settingsItem = NSMenuItem(
-            title: "Settings...",
+            title: "设置...",
             action: #selector(openSettings),
             keyEquivalent: ","
         )
@@ -107,7 +107,7 @@ final class MenuBarManager: NSObject {
 
         // Quit
         let quitItem = NSMenuItem(
-            title: "Quit Tintify",
+            title: "退出 Tintify",
             action: #selector(quit),
             keyEquivalent: "q"
         )
@@ -151,7 +151,9 @@ final class MenuBarManager: NSObject {
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Tintify Settings"
             window.setContentSize(NSSize(width: 800, height: 600))
-            window.styleMask = [.titled, .closable, .miniaturizable]
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+            window.minSize = NSSize(width: 700, height: 500)
+            window.maxSize = NSSize(width: 1200, height: 900)
             window.center()
             window.isReleasedWhenClosed = false  // 关闭时不销毁，下次能复用
             window.makeKeyAndOrderFront(nil)
