@@ -1,17 +1,17 @@
 // Sources/Settings/ThemesPane.swift
 import SwiftUI
 
-/// Theme gallery pane with grouped cards and collapsible sections.
+/// Theme gallery pane with category tabs, search, and filter.
 struct ThemesPane: View {
     @ObservedObject private var settings = AppSettings.shared
     private let registry = ThemeRegistry.shared
 
-    @State private var expandedSections: Set<ThemeCategory> = Set(ThemeCategory.allCases)
+    @State private var selectedCategory: ThemeCategory = .popular
     @State private var searchText: String = ""
     @State private var appearanceFilter: Theme.Appearance? = nil
 
-    private func filteredThemes(for category: ThemeCategory) -> [Theme] {
-        var themes = registry.themes(for: category)
+    private var filteredThemes: [Theme] {
+        var themes = registry.themes(for: selectedCategory)
         if let filter = appearanceFilter {
             themes = themes.filter { $0.appearance == filter }
         }
@@ -26,61 +26,69 @@ struct ThemesPane: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                VStack(spacing: 4) {
-                    Image(systemName: "theatermasks")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.purple)
-                    Text("主题")
-                        .font(.title2.bold())
-                    Text("\(registry.allThemes.count) 个内置主题，按分组浏览")
-                        .font(.caption)
+        VStack(spacing: 0) {
+            // 分类 Tab 栏
+            HStack(spacing: 0) {
+                ForEach(ThemeCategory.allCases, id: \.self) { category in
+                    let count = registry.themes(for: category).count
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            selectedCategory = category
+                        }
+                    } label: {
+                        VStack(spacing: 4) {
+                            Text("\(category.rawValue)")
+                                .font(.caption.bold())
+                            Text("\(count)")
+                                .font(.system(size: 10))
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(selectedCategory == category ? Color.accentColor.opacity(0.12) : Color.clear)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .background(Color.secondary.opacity(0.06))
+
+            Divider()
+
+            // 搜索 + 过滤栏
+            HStack(spacing: 8) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
+                    TextField("搜索主题名...", text: $searchText)
+                        .textFieldStyle(.plain)
                 }
-                .padding(.bottom, 8)
+                .padding(6)
+                .background(Color.secondary.opacity(0.1))
+                .cornerRadius(6)
 
-                // 搜索 + 过滤栏
-                HStack(spacing: 8) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundStyle(.secondary)
-                        TextField("搜索主题名...", text: $searchText)
-                            .textFieldStyle(.plain)
-                    }
-                    .padding(6)
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(6)
-
-                    Picker("", selection: $appearanceFilter) {
-                        Text("全部").tag(Theme.Appearance?.none)
-                        Text("Dark").tag(Theme.Appearance?.some(.dark))
-                        Text("Light").tag(Theme.Appearance?.some(.light))
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 180)
+                Picker("", selection: $appearanceFilter) {
+                    Text("全部").tag(Theme.Appearance?.none)
+                    Text("Dark").tag(Theme.Appearance?.some(.dark))
+                    Text("Light").tag(Theme.Appearance?.some(.light))
                 }
+                .pickerStyle(.segmented)
+                .frame(width: 180)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
 
-                let hasResults = ThemeCategory.allCases.contains { !filteredThemes(for: $0).isEmpty }
-
-                if hasResults {
-                    ForEach(ThemeCategory.allCases, id: \.self) { category in
-                        let themes = filteredThemes(for: category)
-                        if !themes.isEmpty {
-                            ThemeSectionView(
-                                category: category,
-                                themes: themes,
-                                currentThemeId: settings.currentThemeId,
-                                isExpanded: expandedSections.contains(category),
-                                onToggle: {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        if expandedSections.contains(category) {
-                                            expandedSections.remove(category)
-                                        } else {
-                                            expandedSections.insert(category)
-                                        }
-                                    }
-                                },
+            // 主题列表
+            ScrollView {
+                if filteredThemes.isEmpty {
+                    Text("无匹配主题")
+                        .foregroundStyle(.secondary)
+                        .padding(40)
+                } else {
+                    VStack(spacing: 12) {
+                        ForEach(filteredThemes) { theme in
+                            ThemeCard(
+                                theme: theme,
+                                isActive: theme.id == settings.currentThemeId,
                                 onApply: { theme in
                                     let result = ThemeEngine().apply(theme: theme)
                                     NotificationManager.shared.notify(result: result)
@@ -88,54 +96,9 @@ struct ThemesPane: View {
                             )
                         }
                     }
-                } else {
-                    Text("无匹配主题")
-                        .foregroundStyle(.secondary)
-                        .padding(40)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
                 }
-            }
-            .padding(24)
-        }
-    }
-}
-
-/// A collapsible section of theme cards.
-struct ThemeSectionView: View {
-    let category: ThemeCategory
-    let themes: [Theme]
-    let currentThemeId: String
-    let isExpanded: Bool
-    let onToggle: () -> Void
-    let onApply: (Theme) -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Button(action: onToggle) {
-                HStack {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                        .frame(width: 12)
-                    Text(category.rawValue)
-                        .font(.headline)
-                    Text("(\(themes.count))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 180))], spacing: 12) {
-                    ForEach(themes) { theme in
-                        ThemeCard(
-                            theme: theme,
-                            isActive: theme.id == currentThemeId,
-                            onApply: onApply
-                        )
-                    }
-                }
-                .transition(.opacity)
             }
         }
     }
