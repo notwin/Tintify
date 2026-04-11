@@ -7,37 +7,31 @@ struct BackupPane: View {
     @State private var backups: [BackupInfo] = []
     @State private var showRestoreAlert = false
     @State private var selectedBackup: BackupInfo?
+    @State private var restoreMessage: String?
     private let manager = BackupManager()
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                VStack(spacing: 4) {
-                    Image(systemName: "externaldrive")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.green)
-                    Text("备份")
-                        .font(.title2.bold())
-                    Text("应用主题前自动备份，可一键还原")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.bottom, 8)
+                PaneHeader(icon: "externaldrive", color: .green, title: "备份", subtitle: "应用主题前自动备份，可一键还原")
 
                 if backups.isEmpty {
-                    Text("暂无备份")
-                        .foregroundStyle(.secondary)
-                        .padding(40)
+                    EmptyStateView(
+                        icon: "externaldrive",
+                        title: "暂无备份",
+                        subtitle: "切换主题时会自动创建备份"
+                    )
                 } else {
                     GroupBox {
                         VStack(spacing: 0) {
                             ForEach(Array(backups.enumerated()), id: \.element.id) { idx, backup in
                                 if idx > 0 { Divider() }
                                 HStack {
-                                    VStack(alignment: .leading) {
-                                        Text(backup.id).font(.body.monospaced())
-                                        Text(backup.date.formatted())
-                                            .font(.caption)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(backup.date.friendlyString)
+                                            .font(.body)
+                                        Text(backup.id)
+                                            .font(.caption.monospaced())
                                             .foregroundStyle(.secondary)
                                     }
                                     Spacer()
@@ -53,6 +47,13 @@ struct BackupPane: View {
                         }
                     }
                 }
+
+                if let message = restoreMessage {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(message.contains("成功") ? .green : .red)
+                        .padding(.top, 4)
+                }
             }
             .padding(24)
         }
@@ -61,7 +62,12 @@ struct BackupPane: View {
             Button("取消", role: .cancel) {}
             Button("还原", role: .destructive) {
                 if let backup = selectedBackup {
-                    try? manager.restore(backupId: backup.id)
+                    do {
+                        try manager.restore(backupId: backup.id)
+                        restoreMessage = "还原成功"
+                    } catch {
+                        restoreMessage = "还原失败：\(error.localizedDescription)"
+                    }
                 }
             }
         } message: {
