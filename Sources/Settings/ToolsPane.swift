@@ -17,6 +17,7 @@ struct ToolsPane: View {
         ("zsh-syntax-highlighting", "~/.zshrc"),
         ("tmux", "~/.tmux.conf"),
         ("vim", "~/.vimrc"),
+        ("wezterm", "~/.wezterm.lua"),
     ]
 
     var body: some View {
