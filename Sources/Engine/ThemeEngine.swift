@@ -9,10 +9,24 @@ final class ThemeEngine {
     let backupManager: BackupManager
     let pathOverrides: [String: String]
 
+    /// All available adapter constructors — adapters are created on demand.
+    static let adapterFactories: [() -> ToolAdapter] = [
+        { GhosttyAdapter() },
+        { StarshipAdapter() },
+        { BatAdapter() },
+        { FzfAdapter() },
+        { DeltaAdapter() },
+        { EzaAdapter() },
+        { LazygitAdapter() },
+        { ZshHighlightAdapter() },
+        { TmuxAdapter() },
+        { VimAdapter() },
+    ]
+
     /// Create a new engine.
     ///
     /// Args:
-    ///     adapters: Tool adapters to apply themes to. Defaults to all built-in adapters.
+    ///     adapters: Tool adapters to apply themes to. Defaults to all built-in adapters (lazy-created).
     ///     backupManager: Manager used to snapshot configs before writing.
     ///     pathOverrides: Per-tool config path overrides keyed by ``ToolAdapter/toolName``.
     init(
@@ -20,18 +34,7 @@ final class ThemeEngine {
         backupManager: BackupManager = BackupManager(),
         pathOverrides: [String: String] = [:]
     ) {
-        self.adapters = adapters ?? [
-            GhosttyAdapter(),
-            StarshipAdapter(),
-            BatAdapter(),
-            FzfAdapter(),
-            DeltaAdapter(),
-            EzaAdapter(),
-            LazygitAdapter(),
-            ZshHighlightAdapter(),
-            TmuxAdapter(),
-            VimAdapter(),
-        ]
+        self.adapters = adapters ?? Self.adapterFactories.map { $0() }
         self.backupManager = backupManager
         self.pathOverrides = pathOverrides
     }
