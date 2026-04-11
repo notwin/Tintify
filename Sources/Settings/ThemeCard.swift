@@ -48,12 +48,13 @@ struct ThemeCard: View {
 
                 // 色板预览条
                 HStack(spacing: 4) {
-                    ForEach([
+                    let swatches = [
                         displayTheme.palette.red, displayTheme.palette.peach,
                         displayTheme.palette.yellow, displayTheme.palette.green,
                         displayTheme.palette.blue, displayTheme.palette.mauve,
                         displayTheme.palette.lavender, displayTheme.palette.text,
-                    ], id: \.self) { hex in
+                    ]
+                    ForEach(Array(swatches.enumerated()), id: \.offset) { _, hex in
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color(hex: hex))
                             .frame(height: 10)
