@@ -56,6 +56,44 @@ struct GeneralPane: View {
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
                 }
+
+                GroupBox {
+                    VStack(spacing: 0) {
+                        Button {
+                            ConfigManager.exportConfig()
+                        } label: {
+                            HStack {
+                                Label("导出配置", systemImage: "square.and.arrow.up")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+
+                        Divider()
+
+                        Button {
+                            ConfigManager.importConfig()
+                        } label: {
+                            HStack {
+                                Label("导入配置", systemImage: "square.and.arrow.down")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                    }
+                }
             }
             .padding(24)
         }
