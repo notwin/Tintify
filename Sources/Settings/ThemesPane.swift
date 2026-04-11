@@ -46,6 +46,7 @@ struct ThemesPane: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                         .background(selectedCategory == category ? Color.accentColor.opacity(0.12) : Color.clear)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
