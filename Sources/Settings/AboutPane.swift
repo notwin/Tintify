@@ -1,5 +1,6 @@
 // Sources/Settings/AboutPane.swift
 
+import AppKit
 import SwiftUI
 
 /// About pane showing app info, supported tools, and links.
@@ -62,9 +63,19 @@ struct AboutPane: View {
 
                 GroupBox {
                     VStack(spacing: 0) {
-                        LinkRow(icon: "globe", title: "GitHub 仓库", subtitle: "查看源代码和文档")
+                        Button {
+                            NSWorkspace.shared.open(URL(string: "https://github.com/notwin/Tintify")!)
+                        } label: {
+                            LinkRow(icon: "globe", title: "GitHub 仓库", subtitle: "查看源代码和文档")
+                        }
+                        .buttonStyle(.plain)
                         Divider()
-                        LinkRow(icon: "ladybug", title: "反馈问题", subtitle: "报告 Bug 或提交功能建议")
+                        Button {
+                            NSWorkspace.shared.open(URL(string: "https://github.com/notwin/Tintify/issues")!)
+                        } label: {
+                            LinkRow(icon: "ladybug", title: "反馈问题", subtitle: "报告 Bug 或提交功能建议")
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
 

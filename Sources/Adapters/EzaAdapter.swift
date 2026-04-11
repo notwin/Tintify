@@ -28,7 +28,8 @@ struct EzaAdapter: ToolAdapter {
 
         // Remove symlink if present so we write a real file, not overwrite the link target.
         let fm = FileManager.default
-        if let _ = try? fm.destinationOfSymbolicLink(atPath: path) {
+        if let target = try? fm.destinationOfSymbolicLink(atPath: path) {
+            NSLog("[Tintify] eza: replacing symlink at \(path) (was -> \(target))")
             try fm.removeItem(atPath: path)
         }
 

@@ -13,10 +13,10 @@ extension Date {
         } else if interval < 3600 {
             return "\(Int(interval / 60)) 分钟前"
         } else if Calendar.current.isDateInToday(self) {
-            formatter.dateFormat = "今天 HH:mm"
+            formatter.dateFormat = "'今天' HH:mm"
             return formatter.string(from: self)
         } else if Calendar.current.isDateInYesterday(self) {
-            formatter.dateFormat = "昨天 HH:mm"
+            formatter.dateFormat = "'昨天' HH:mm"
             return formatter.string(from: self)
         } else {
             formatter.dateFormat = "MM-dd HH:mm"
