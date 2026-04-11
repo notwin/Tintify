@@ -46,6 +46,9 @@ struct ThemeCard: View {
             // Hover 展开区域
             if isHovered {
                 VStack(alignment: .leading, spacing: 6) {
+                    // 终端代码预览
+                    CodePreview(palette: displayTheme.palette)
+
                     // Stars + 兼容性
                     HStack(spacing: 8) {
                         if let stars = theme.stars {
