@@ -21,6 +21,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var appearanceMonitor: SystemAppearanceMonitor?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Show onboarding for first-time users
+        if !AppSettings.shared.onboardingCompleted {
+            showOnboarding()
+        }
         menuBarManager.setup()
         UpdateManager.shared.checkForUpdate()
         appearanceMonitor = SystemAppearanceMonitor { [weak self] isDark in
@@ -38,5 +42,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 关闭最后一个窗口时不退出 app（菜单栏 app 应该继续运行）
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return false
+    }
+
+    private func showOnboarding() {
+        let onboardingView = OnboardingView {
+            // Close onboarding window when done
+            NSApplication.shared.windows
+                .first { $0.title == "Tintify 欢迎" }?
+                .close()
+        }
+
+        let hostingController = NSHostingController(rootView: onboardingView)
+        let window = NSWindow(contentViewController: hostingController)
+        window.title = "Tintify 欢迎"
+        window.setContentSize(NSSize(width: 480, height: 560))
+        window.styleMask = [.titled, .closable]
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }

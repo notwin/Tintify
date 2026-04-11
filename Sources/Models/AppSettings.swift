@@ -34,6 +34,10 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(Array(disabledTools), forKey: "disabledTools") }
     }
 
+    @Published var onboardingCompleted: Bool {
+        didSet { UserDefaults.standard.set(onboardingCompleted, forKey: "onboardingCompleted") }
+    }
+
     private init() {
         self.currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"
         self.darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
@@ -42,6 +46,11 @@ final class AppSettings: ObservableObject {
         self.toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
         self.previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
         self.disabledTools = Set(UserDefaults.standard.stringArray(forKey: "disabledTools") ?? [])
+        self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
+        // Existing users who already have a theme set don't need onboarding
+        if !self.onboardingCompleted && UserDefaults.standard.string(forKey: "currentThemeId") != nil {
+            self.onboardingCompleted = true
+        }
     }
 
     /// 获取指定工具的配置路径，自动展开 ~
