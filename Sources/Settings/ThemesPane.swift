@@ -75,8 +75,8 @@ struct ThemesPane: View {
 
                 Picker("", selection: $appearanceFilter) {
                     Text("全部").tag(Theme.Appearance?.none)
-                    Text("Dark").tag(Theme.Appearance?.some(.dark))
-                    Text("Light").tag(Theme.Appearance?.some(.light))
+                    Text("暗色").tag(Theme.Appearance?.some(.dark))
+                    Text("浅色").tag(Theme.Appearance?.some(.light))
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 180)
@@ -87,9 +87,11 @@ struct ThemesPane: View {
             // 主题列表
             ScrollView {
                 if filteredThemes.isEmpty {
-                    Text("无匹配主题")
-                        .foregroundStyle(.secondary)
-                        .padding(40)
+                    EmptyStateView(
+                        icon: "magnifyingglass",
+                        title: "无匹配主题",
+                        subtitle: "试试调整搜索词或过滤条件"
+                    )
                 } else {
                     VStack(spacing: 12) {
                         ForEach(filteredThemes) { theme in
