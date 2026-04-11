@@ -5,84 +5,84 @@ import Foundation
 enum OriginalThemes {
     static let all: [Theme] = [
         // ── Neon City ───────────────────────────────────────────
-        // 灵感来源：SynthWave '84
-        // 80 年代合成波美学，粉紫霓虹 + 明亮青色，高饱和高对比
+        // 灵感：Cyberdream + SynthWave '84
+        // 纯白前景 + 高饱和霓虹强调色，粉紫青三色交织的赛博朋克美学
         Theme(
             id: "neon-city",
             name: "Neon City",
             appearance: .dark,
             palette: Palette(
-                rosewater: "#ff7edb", flamingo: "#ff6bcb", pink: "#ff2daf", mauve: "#c792ea",
-                red: "#fe4450", maroon: "#e53e5c", peach: "#f78c6c", yellow: "#fede5d",
-                green: "#72f1b8", teal: "#03edf9", sky: "#03edf9", sapphire: "#36d7f7",
-                blue: "#6796e6", lavender: "#c5a3ff",
-                text: "#f0f0f0", subtext1: "#d4d4d8", subtext0: "#aeaeb5",
-                overlay2: "#7e7e8a", overlay1: "#5e5e6a", overlay0: "#48485a",
-                surface2: "#38384a", surface1: "#2d2d3f", surface0: "#242436",
-                base: "#1b1b2f", mantle: "#161626", crust: "#10101e"
+                rosewater: "#ff7edb", flamingo: "#ff6bcb", pink: "#ff2daf", mauve: "#bd5eff",
+                red: "#ff6e5e", maroon: "#e8555a", peach: "#ffbd5e", yellow: "#f1ff5e",
+                green: "#5eff6c", teal: "#5ef1ff", sky: "#5ef1ff", sapphire: "#5ea1ff",
+                blue: "#5ea1ff", lavender: "#c5a3ff",
+                text: "#ffffff", subtext1: "#d4d4dc", subtext0: "#ababba",
+                overlay2: "#7e7e8e", overlay1: "#5a5a6e", overlay0: "#46465a",
+                surface2: "#363648", surface1: "#2c2c3e", surface0: "#232336",
+                base: "#16181a", mantle: "#111114", crust: "#0c0c0f"
             ),
             toolNames: [
                 "bat": "ansi",
                 "delta": "ansi",
             ],
             category: .original,
-            description: "80 年代合成波霓虹，粉紫青的梦幻迷离",
+            description: "纯白霓虹赛博朋克，高对比的荧光色彩爆发",
             stars: nil,
             compatibility: .ansiPartial,
             variants: ["neon-city-matrix", "neon-city-ember"]
         ),
 
         // ── Neon City Matrix ────────────────────────────────────
-        // 灵感来源：Cyberpunk-Neon by Roboron3042
-        // 深海蓝底色，青色前景，品红/紫色点缀，真正的黑客美学
+        // 灵感：Cyberdream 的高对比 + 绿色主导的赛博矩阵
+        // 白色前景，绿/青色为主强调色，紫色为辅，深黑底色
         Theme(
             id: "neon-city-matrix",
             name: "Neon City Matrix",
             appearance: .dark,
             palette: Palette(
-                rosewater: "#ea00d9", flamingo: "#d400c4", pink: "#ea00d9", mauve: "#711c91",
-                red: "#ff0055", maroon: "#d40044", peach: "#f57800", yellow: "#f7c318",
-                green: "#0abdc6", teal: "#0abdc6", sky: "#00e8c6", sapphire: "#008fb3",
-                blue: "#123e7c", lavender: "#9b59b6",
-                text: "#0abdc6", subtext1: "#08a0aa", subtext0: "#068088",
-                overlay2: "#055a60", overlay1: "#044a50", overlay0: "#033a40",
-                surface2: "#022a30", surface1: "#011e26", surface0: "#01161e",
-                base: "#000b1e", mantle: "#000816", crust: "#00050e"
+                rosewater: "#80ffea", flamingo: "#6be8d4", pink: "#e135ff", mauve: "#a16aff",
+                red: "#ff5555", maroon: "#e04848", peach: "#ffb86c", yellow: "#f1fa8c",
+                green: "#50fa7b", teal: "#80ffea", sky: "#80ffea", sapphire: "#5ebbff",
+                blue: "#6272e6", lavender: "#b4a0ff",
+                text: "#f0f0f0", subtext1: "#c8c8d0", subtext0: "#a0a0ae",
+                overlay2: "#707080", overlay1: "#555566", overlay0: "#404052",
+                surface2: "#303042", surface1: "#262638", surface0: "#1e1e30",
+                base: "#0a0a14", mantle: "#06060e", crust: "#030308"
             ),
             toolNames: [
                 "bat": "ansi",
                 "delta": "ansi",
             ],
             category: .original,
-            description: "深海黑客美学，青色数据流穿透暗蓝深渊",
+            description: "数字矩阵风，翡翠绿与电光紫的暗夜交响",
             stars: nil,
             compatibility: .ansiPartial,
             variants: ["neon-city", "neon-city-ember"]
         ),
 
         // ── Neon City Ember ─────────────────────────────────────
-        // 灵感来源：Amber CRT 终端 + Blade Runner
-        // 纯黑底色，琥珀色前景，模拟老式 CRT 荧光屏的温暖辉光
+        // 灵感：SilkCircuit + Blade Runner 暖色调
+        // 浅灰白前景，橙/金/琥珀为主强调色，紫粉为辅，深棕底色
         Theme(
             id: "neon-city-ember",
             name: "Neon City Ember",
             appearance: .dark,
             palette: Palette(
-                rosewater: "#e8a060", flamingo: "#d48850", pink: "#cc6688", mauve: "#9977aa",
-                red: "#c5301a", maroon: "#a82816", peach: "#e97801", yellow: "#dba400",
-                green: "#13a10e", teal: "#3a8a5c", sky: "#3a96dd", sapphire: "#2878aa",
-                blue: "#0037da", lavender: "#8866aa",
-                text: "#e97801", subtext1: "#c86800", subtext0: "#a05800",
-                overlay2: "#7a4800", overlay1: "#5c3800", overlay0: "#442a00",
-                surface2: "#2e1e00", surface1: "#221600", surface0: "#1a1000",
-                base: "#0c0c0c", mantle: "#080808", crust: "#040404"
+                rosewater: "#ff9e80", flamingo: "#ff8a70", pink: "#ff6090", mauve: "#cc88dd",
+                red: "#ff5544", maroon: "#e04a3a", peach: "#ff8830", yellow: "#ffcc44",
+                green: "#88cc66", teal: "#66bbaa", sky: "#66aadd", sapphire: "#5588cc",
+                blue: "#5580cc", lavender: "#aa88dd",
+                text: "#e8e0d8", subtext1: "#c4bab0", subtext0: "#a09890",
+                overlay2: "#7a7068", overlay1: "#605850", overlay0: "#4a4038",
+                surface2: "#382e26", surface1: "#2e2420", surface0: "#261e1a",
+                base: "#1a1410", mantle: "#14100c", crust: "#0e0a08"
             ),
             toolNames: [
                 "bat": "ansi",
                 "delta": "ansi",
             ],
             category: .original,
-            description: "琥珀 CRT 终端，80 年代磷光屏的温暖余晖",
+            description: "赛博废土余烬，琥珀与暖金在深棕夜色中燃烧",
             stars: nil,
             compatibility: .ansiPartial,
             variants: ["neon-city", "neon-city-matrix"]
