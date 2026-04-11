@@ -37,7 +37,7 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
 
         if result.failedCount == 0 {
             content.title = "已切换到 \(result.theme.name)"
-            content.body = "\(result.successCount)/\(result.toolResults.count) 工具已更新"
+            content.body = "\(result.successCount)/\(result.toolResults.count) 工具已更新 · 新终端窗口自动生效"
             content.sound = .default
         } else if result.successCount == 0 {
             content.title = "主题切换失败"
@@ -45,7 +45,7 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             content.sound = .defaultCritical
         } else {
             content.title = "已切换到 \(result.theme.name)"
-            content.body = "\(result.summary)"
+            content.body = "\(result.summary) · 新终端窗口自动生效"
             content.sound = .default
         }
 
