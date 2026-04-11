@@ -28,32 +28,38 @@ struct ThemesPane: View {
     var body: some View {
         VStack(spacing: 0) {
             // 分类 Tab 栏
-            HStack(spacing: 0) {
+            HStack(spacing: 6) {
                 ForEach(ThemeCategory.allCases, id: \.self) { category in
                     let count = registry.themes(for: category).count
+                    let isSelected = selectedCategory == category
                     Button {
                         withAnimation(.easeInOut(duration: 0.15)) {
                             selectedCategory = category
                         }
                     } label: {
-                        VStack(spacing: 4) {
-                            Text("\(category.rawValue)")
-                                .font(.caption.bold())
+                        HStack(spacing: 4) {
+                            Text(category.rawValue)
+                                .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                                .foregroundStyle(isSelected ? .primary : .secondary)
                             Text("\(count)")
-                                .font(.system(size: 10))
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(isSelected ? .white : .secondary)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.2))
+                                .cornerRadius(4)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(selectedCategory == category ? Color.accentColor.opacity(0.12) : Color.clear)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(isSelected ? Color.accentColor.opacity(0.1) : Color.clear)
+                        .cornerRadius(6)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .background(Color.secondary.opacity(0.06))
-
-            Divider()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
 
             // 搜索 + 过滤栏
             HStack(spacing: 8) {
