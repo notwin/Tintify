@@ -8,22 +8,14 @@ struct ResultsPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                VStack(spacing: 4) {
-                    Image(systemName: "list.clipboard")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.orange)
-                    Text("应用记录")
-                        .font(.title2.bold())
-                    Text("查看每次主题切换的详细结果")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.bottom, 8)
+                PaneHeader(icon: "list.clipboard", color: .orange, title: "应用记录", subtitle: "查看每次主题切换的详细结果")
 
                 if history.isEmpty {
-                    Text("暂无应用记录")
-                        .foregroundStyle(.secondary)
-                        .padding(40)
+                    EmptyStateView(
+                        icon: "list.clipboard",
+                        title: "暂无应用记录",
+                        subtitle: "切换主题后这里会显示详细结果"
+                    )
                 } else {
                     ForEach(Array(history.enumerated()), id: \.element.id) { idx, result in
                         ResultCard(result: result, isExpanded: idx == 0)
@@ -47,7 +39,7 @@ struct ResultCard: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(result.theme.name)
                             .font(.headline)
-                        Text(result.timestamp.formatted(date: .abbreviated, time: .standard))
+                        Text(result.timestamp.friendlyString)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
