@@ -15,7 +15,7 @@ struct GhosttyAdapter: ToolAdapter {
     ///   theme: The theme to apply.
     ///   configPath: Optional override path.
     func apply(theme: Theme, configPath: String? = nil) throws {
-        let path = configPath ?? resolvedPath
+        let path = configPath ?? defaultConfigPath
         try ConfigWriter.replaceLine(
             in: path,
             prefix: "theme = ",

@@ -17,7 +17,7 @@ struct BatAdapter: ToolAdapter {
     ///   theme: The theme to apply.
     ///   configPath: Optional override path.
     func apply(theme: Theme, configPath: String? = nil) throws {
-        let path = configPath ?? resolvedPath
+        let path = configPath ?? defaultConfigPath
         let batLine = "export BAT_THEME=\"\(theme.nameForTool(toolName))\""
 
         // Read existing marker block content to preserve other adapters' lines.

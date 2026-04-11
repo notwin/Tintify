@@ -2,6 +2,7 @@
 import Foundation
 
 /// Observable user preferences persisted via UserDefaults.
+@MainActor
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
@@ -21,10 +22,6 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(followSystemAppearance, forKey: "followSystemAppearance") }
     }
 
-    @Published var launchAtLogin: Bool {
-        didSet { UserDefaults.standard.set(launchAtLogin, forKey: "launchAtLogin") }
-    }
-
     @Published var toolPaths: [String: String] {
         didSet { UserDefaults.standard.set(toolPaths, forKey: "toolPaths") }
     }
@@ -38,7 +35,6 @@ final class AppSettings: ObservableObject {
         self.darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
         self.lightThemeId = UserDefaults.standard.string(forKey: "lightThemeId") ?? "catppuccin-latte"
         self.followSystemAppearance = UserDefaults.standard.object(forKey: "followSystemAppearance") as? Bool ?? true
-        self.launchAtLogin = UserDefaults.standard.object(forKey: "launchAtLogin") as? Bool ?? true
         self.toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
         self.previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
     }

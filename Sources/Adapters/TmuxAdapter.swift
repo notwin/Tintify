@@ -11,7 +11,7 @@ struct TmuxAdapter: ToolAdapter {
 
     /// Write tmux status bar and pane border colors into the Tintify marker block.
     func apply(theme: Theme, configPath: String? = nil) throws {
-        let path = configPath ?? resolvedPath
+        let path = configPath ?? defaultConfigPath
         let p = theme.palette
 
         let tmuxLines = """

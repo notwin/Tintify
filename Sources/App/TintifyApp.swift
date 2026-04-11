@@ -15,6 +15,7 @@ struct TintifyApp: App {
 }
 
 /// Application delegate that owns the menu bar and appearance monitor.
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let menuBarManager = MenuBarManager()
     private var appearanceMonitor: SystemAppearanceMonitor?

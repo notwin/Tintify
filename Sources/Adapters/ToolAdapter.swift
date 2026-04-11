@@ -21,13 +21,8 @@ protocol ToolAdapter {
 }
 
 extension ToolAdapter {
-    /// Path resolved from user overrides or the adapter default.
-    var resolvedPath: String {
-        AppSettings.shared.resolvedPath(for: toolName) ?? defaultConfigPath
-    }
-
-    /// Default installation check: the resolved config file exists.
+    /// Default installation check: the default config file exists.
     func detectInstalled() -> Bool {
-        FileManager.default.fileExists(atPath: resolvedPath)
+        FileManager.default.fileExists(atPath: defaultConfigPath)
     }
 }

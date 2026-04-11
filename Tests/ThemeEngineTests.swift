@@ -4,7 +4,7 @@ import Testing
 import Foundation
 @testable import Tintify
 
-@Test func engineAppliesThemeToAllAdapters() throws {
+@Test @MainActor func engineAppliesThemeToAllAdapters() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
 
@@ -31,7 +31,7 @@ import Foundation
     #expect(zshrcResult.contains("BAT_THEME"))
 }
 
-@Test func engineReturnsApplyResult() throws {
+@Test @MainActor func engineReturnsApplyResult() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
 
@@ -53,7 +53,7 @@ import Foundation
     #expect(!result.summary.isEmpty)
 }
 
-@Test func engineCapturesAdapterFailure() {
+@Test @MainActor func engineCapturesAdapterFailure() {
     let engine = ThemeEngine(
         adapters: [GhosttyAdapter()],
         backupManager: BackupManager(backupRoot: "/tmp/tintify-test-\(UUID().uuidString)/backups"),

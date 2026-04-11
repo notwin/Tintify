@@ -4,6 +4,7 @@ import AppKit
 import SwiftUI
 
 /// Owns the NSStatusItem and builds the dropdown menu for Tintify.
+@MainActor
 final class MenuBarManager: NSObject {
     private var statusItem: NSStatusItem?
     private let engine = ThemeEngine()

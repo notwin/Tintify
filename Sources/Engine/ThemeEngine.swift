@@ -3,6 +3,7 @@
 import Foundation
 
 /// Orchestrates applying a theme across all registered tool adapters.
+@MainActor
 final class ThemeEngine {
     let adapters: [ToolAdapter]
     let backupManager: BackupManager
@@ -39,16 +40,22 @@ final class ThemeEngine {
     @discardableResult
     func apply(theme: Theme) -> ApplyResult {
         // Backup — best effort
-        let configPaths = adapters.map { pathOverrides[$0.toolName] ?? $0.defaultConfigPath }
+        let configPaths = adapters.map { adapter -> String in
+            let settingsPath = AppSettings.shared.resolvedPath(for: adapter.toolName)
+            return pathOverrides[adapter.toolName] ?? settingsPath ?? adapter.defaultConfigPath
+        }
         let uniquePaths = Array(Set(configPaths))
         _ = try? backupManager.backup(files: uniquePaths)
 
         var toolResults: [ToolResult] = []
 
         for adapter in adapters {
-            let path = pathOverrides[adapter.toolName] ?? adapter.defaultConfigPath
+            // Resolve path: explicit pathOverrides > user-set toolPaths > adapter default.
+            let settingsPath = AppSettings.shared.resolvedPath(for: adapter.toolName)
+            let resolvedConfigPath = pathOverrides[adapter.toolName] ?? settingsPath
+            let path = resolvedConfigPath ?? adapter.defaultConfigPath
             do {
-                try adapter.apply(theme: theme, configPath: pathOverrides[adapter.toolName])
+                try adapter.apply(theme: theme, configPath: resolvedConfigPath)
                 toolResults.append(ToolResult(
                     toolName: adapter.toolName,
                     status: .success,
