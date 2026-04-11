@@ -120,19 +120,11 @@ final class MenuBarManager: NSObject {
     // MARK: - Actions
 
     @objc private func themeSelected(_ sender: NSMenuItem) {
-        NSLog("[Tintify] themeSelected called")
         guard let themeId = sender.representedObject as? String,
-              let theme = registry.theme(id: themeId) else {
-            NSLog("[Tintify] themeSelected: guard failed")
-            return
-        }
-        NSLog("[Tintify] applying theme: \(themeId)")
+              let theme = registry.theme(id: themeId) else { return }
         let result = engine.apply(theme: theme)
-        NSLog("[Tintify] apply done: \(result.summary)")
         NotificationManager.shared.notify(result: result)
-        NSLog("[Tintify] notify done, rebuilding menu")
         rebuildMenu()
-        NSLog("[Tintify] themeSelected complete")
     }
 
     @objc private func rollbackTheme(_ sender: NSMenuItem) {

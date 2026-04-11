@@ -12,26 +12,27 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     /// Whether UNUserNotificationCenter is available (requires a valid bundle).
     private let notificationsAvailable: Bool
 
+    private var notificationSetupDone = false
+
     private override init() {
-        // UNUserNotificationCenter crashes without a bundle identifier (SPM debug builds)
         notificationsAvailable = Bundle.main.bundleIdentifier != nil
         super.init()
+    }
 
-        if notificationsAvailable {
-            let center = UNUserNotificationCenter.current()
-            center.delegate = self
-            center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
-        }
+    /// Lazily set up notification center on first use.
+    private func ensureSetup() {
+        guard notificationsAvailable, !notificationSetupDone else { return }
+        notificationSetupDone = true
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
     /// Send a notification and record the result in history.
     func notify(result: ApplyResult) {
         history.insert(result, at: 0)
 
-        guard notificationsAvailable else {
-            NSLog("[Tintify] \(result.summary) (notifications unavailable without bundle)")
-            return
-        }
+        guard notificationsAvailable else { return }
 
         let content = UNMutableNotificationContent()
 
@@ -48,6 +49,8 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             content.body = "\(result.summary) · 新终端窗口自动生效"
             content.sound = .default
         }
+
+        ensureSetup()
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
