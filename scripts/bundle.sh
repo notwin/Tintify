@@ -41,9 +41,14 @@ rm -rf "/Applications/${BUNDLE_NAME}"
 # Copy to Applications
 cp -r "$BUNDLE_PATH" /Applications/
 
+# Install CLI tool
+echo "=== Installing CLI ==="
+ln -sf "$SCRIPT_DIR/tintify" /usr/local/bin/tintify
+
 # Clean up project directory bundle to avoid Spotlight duplicates
 rm -rf "$BUNDLE_PATH"
 
 echo "=== Done ==="
 echo "Installed to /Applications/${BUNDLE_NAME}"
+echo "CLI installed to /usr/local/bin/tintify"
 echo "Run: open /Applications/${BUNDLE_NAME}"
