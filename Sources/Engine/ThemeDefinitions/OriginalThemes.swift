@@ -5,8 +5,8 @@ import Foundation
 enum OriginalThemes {
     static let all: [Theme] = [
         // ── Neon City ───────────────────────────────────────────
-        // 灵感：Cyberdream + SynthWave '84
-        // 纯白前景 + 高饱和霓虹强调色，粉紫青三色交织的赛博朋克美学
+        // 赛博朋克：Cyberdream 风格，纯白前景 + 高饱和霓虹强调色
+        // 粉紫青三色为主，深灰黑底色，张扬而锐利
         Theme(
             id: "neon-city",
             name: "Neon City",
@@ -26,66 +26,66 @@ enum OriginalThemes {
                 "delta": "ansi",
             ],
             category: .original,
-            description: "纯白霓虹赛博朋克，高对比的荧光色彩爆发",
+            description: "赛博朋克霓虹，纯白底上的荧光色彩爆发",
             stars: nil,
             compatibility: .ansiPartial,
-            variants: ["neon-city-matrix", "neon-city-ember"]
+            variants: nil
         ),
 
-        // ── Neon City Matrix ────────────────────────────────────
-        // 灵感：Cyberdream 的高对比 + 绿色主导的赛博矩阵
-        // 白色前景，绿/青色为主强调色，紫色为辅，深黑底色
+        // ── 墨竹 (Ink Bamboo) ───────────────────────────────────
+        // 中国水墨画意境：墨色底色，竹青/朱砂/赭石/靛蓝为强调色
+        // 素雅沉静，低饱和度，文人风骨
         Theme(
-            id: "neon-city-matrix",
-            name: "Neon City Matrix",
+            id: "ink-bamboo",
+            name: "墨竹",
             appearance: .dark,
             palette: Palette(
-                rosewater: "#80ffea", flamingo: "#6be8d4", pink: "#e135ff", mauve: "#a16aff",
-                red: "#ff5555", maroon: "#e04848", peach: "#ffb86c", yellow: "#f1fa8c",
-                green: "#50fa7b", teal: "#80ffea", sky: "#80ffea", sapphire: "#5ebbff",
-                blue: "#6272e6", lavender: "#b4a0ff",
-                text: "#f0f0f0", subtext1: "#c8c8d0", subtext0: "#a0a0ae",
-                overlay2: "#707080", overlay1: "#555566", overlay0: "#404052",
-                surface2: "#303042", surface1: "#262638", surface0: "#1e1e30",
-                base: "#0a0a14", mantle: "#06060e", crust: "#030308"
+                rosewater: "#c8827a", flamingo: "#b87070", pink: "#c46688", mauve: "#8878a8",
+                red: "#c45040", maroon: "#a84438", peach: "#cc8844", yellow: "#c8a838",
+                green: "#6a9a6a", teal: "#5a8a7a", sky: "#6888a0", sapphire: "#4a78a0",
+                blue: "#4870a0", lavender: "#8880a8",
+                text: "#d0ccc4", subtext1: "#b0aaa0", subtext0: "#908880",
+                overlay2: "#706860", overlay1: "#585048", overlay0: "#484038",
+                surface2: "#383028", surface1: "#2e2820", surface0: "#26201a",
+                base: "#1c1814", mantle: "#161210", crust: "#100e0c"
             ),
             toolNames: [
                 "bat": "ansi",
                 "delta": "ansi",
             ],
             category: .original,
-            description: "数字矩阵风，翡翠绿与电光紫的暗夜交响",
+            description: "水墨文人风，竹青朱砂间的素雅沉静",
             stars: nil,
             compatibility: .ansiPartial,
-            variants: ["neon-city", "neon-city-ember"]
+            variants: nil
         ),
 
-        // ── Neon City Ember ─────────────────────────────────────
-        // 灵感：SilkCircuit + Blade Runner 暖色调
-        // 浅灰白前景，橙/金/琥珀为主强调色，紫粉为辅，深棕底色
+        // ── 极光 (Aurora) ───────────────────────────────────────
+        // 北极光灵感：深蓝夜空底色，绿紫粉渐变的极光色彩
+        // 冷色调为主，绿色是绝对主角，紫粉作为光晕点缀
         Theme(
-            id: "neon-city-ember",
-            name: "Neon City Ember",
+            id: "aurora",
+            name: "极光",
             appearance: .dark,
             palette: Palette(
-                rosewater: "#ff9e80", flamingo: "#ff8a70", pink: "#ff6090", mauve: "#cc88dd",
-                red: "#ff5544", maroon: "#e04a3a", peach: "#ff8830", yellow: "#ffcc44",
-                green: "#88cc66", teal: "#66bbaa", sky: "#66aadd", sapphire: "#5588cc",
-                blue: "#5580cc", lavender: "#aa88dd",
-                text: "#e8e0d8", subtext1: "#c4bab0", subtext0: "#a09890",
-                overlay2: "#7a7068", overlay1: "#605850", overlay0: "#4a4038",
-                surface2: "#382e26", surface1: "#2e2420", surface0: "#261e1a",
-                base: "#1a1410", mantle: "#14100c", crust: "#0e0a08"
+                rosewater: "#e8a0b8", flamingo: "#d890a8", pink: "#e070a0", mauve: "#b080e0",
+                red: "#e05070", maroon: "#c84860", peach: "#e0a070", yellow: "#d8c870",
+                green: "#60e8a0", teal: "#50d8c0", sky: "#70c8e8", sapphire: "#5090d8",
+                blue: "#4878d0", lavender: "#a088e0",
+                text: "#e0e8f0", subtext1: "#b8c0d0", subtext0: "#9098b0",
+                overlay2: "#687098", overlay1: "#505878", overlay0: "#404860",
+                surface2: "#303850", surface1: "#283048", surface0: "#202840",
+                base: "#141828", mantle: "#101420", crust: "#0c1018"
             ),
             toolNames: [
                 "bat": "ansi",
                 "delta": "ansi",
             ],
             category: .original,
-            description: "赛博废土余烬，琥珀与暖金在深棕夜色中燃烧",
+            description: "北极光之夜，绿紫光晕在深蓝夜空中舞动",
             stars: nil,
             compatibility: .ansiPartial,
-            variants: ["neon-city", "neon-city-matrix"]
+            variants: nil
         ),
     ]
 }
