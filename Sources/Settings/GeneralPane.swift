@@ -11,17 +11,7 @@ struct GeneralPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                VStack(spacing: 4) {
-                    Image(systemName: "paintpalette")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.blue)
-                    Text("通用")
-                        .font(.title2.bold())
-                    Text("主题切换、外观跟随和启动设置")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.bottom, 8)
+                PaneHeader(icon: "paintpalette", color: .blue, title: "通用", subtitle: "主题切换、外观跟随和启动设置")
 
                 GroupBox {
                     VStack(spacing: 0) {

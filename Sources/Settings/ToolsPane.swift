@@ -12,25 +12,17 @@ struct ToolsPane: View {
         ("bat", "~/.zshrc"),
         ("fzf", "~/.zshrc"),
         ("delta", "~/.gitconfig"),
-        ("eza", "~/.config/eza/theme.yml"),
+        ("eza", "~/Library/Application Support/eza/theme.yml"),
         ("lazygit", "~/Library/Application Support/lazygit/config.yml"),
         ("zsh-syntax-highlighting", "~/.zshrc"),
+        ("tmux", "~/.tmux.conf"),
+        ("vim", "~/.vimrc"),
     ]
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                VStack(spacing: 4) {
-                    Image(systemName: "wrench.and.screwdriver")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.orange)
-                    Text("工具")
-                        .font(.title2.bold())
-                    Text("配置文件路径（留空使用默认路径）")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.bottom, 8)
+                PaneHeader(icon: "wrench.and.screwdriver", color: .orange, title: "工具", subtitle: "配置文件路径（留空使用默认路径）")
 
                 GroupBox {
                     VStack(spacing: 0) {
@@ -42,18 +34,28 @@ struct ToolsPane: View {
                                     Text(tool.defaultPath).font(.caption).foregroundStyle(.secondary)
                                 }
                                 Spacer()
-                                TextField("自定义路径", text: Binding(
-                                    get: { settings.toolPaths[tool.name] ?? "" },
-                                    set: { val in
-                                        if val.isEmpty {
-                                            settings.toolPaths.removeValue(forKey: tool.name)
-                                        } else {
-                                            settings.toolPaths[tool.name] = val
+                                VStack(alignment: .trailing, spacing: 2) {
+                                    TextField("留空使用默认路径", text: Binding(
+                                        get: { settings.toolPaths[tool.name] ?? "" },
+                                        set: { val in
+                                            if val.isEmpty {
+                                                settings.toolPaths.removeValue(forKey: tool.name)
+                                            } else {
+                                                settings.toolPaths[tool.name] = val
+                                            }
                                         }
+                                    ))
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(width: 200)
+
+                                    if let customPath = settings.toolPaths[tool.name],
+                                       !customPath.isEmpty,
+                                       !FileManager.default.fileExists(atPath: (customPath as NSString).expandingTildeInPath) {
+                                        Label("路径不存在", systemImage: "exclamationmark.triangle.fill")
+                                            .font(.caption2)
+                                            .foregroundStyle(.orange)
                                     }
-                                ))
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 200)
+                                }
                             }
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
