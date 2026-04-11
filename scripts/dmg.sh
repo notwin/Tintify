@@ -21,8 +21,8 @@ echo "=== Creating DMG ==="
 rm -rf "$STAGING_DIR" "$DMG_PATH"
 mkdir -p "$STAGING_DIR"
 
-# Copy app to staging
-cp -r "$BUNDLE_PATH" "$STAGING_DIR/"
+# Copy app from /Applications (bundle.sh cleans up project dir copy)
+cp -r "/Applications/${APP_NAME}.app" "$STAGING_DIR/"
 
 # Create symlink to Applications
 ln -s /Applications "$STAGING_DIR/Applications"
