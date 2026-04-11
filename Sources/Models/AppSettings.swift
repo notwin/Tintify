@@ -30,6 +30,10 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(previousThemeId, forKey: "previousThemeId") }
     }
 
+    @Published var disabledTools: Set<String> {
+        didSet { UserDefaults.standard.set(Array(disabledTools), forKey: "disabledTools") }
+    }
+
     private init() {
         self.currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"
         self.darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
@@ -37,6 +41,7 @@ final class AppSettings: ObservableObject {
         self.followSystemAppearance = UserDefaults.standard.object(forKey: "followSystemAppearance") as? Bool ?? true
         self.toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
         self.previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
+        self.disabledTools = Set(UserDefaults.standard.stringArray(forKey: "disabledTools") ?? [])
     }
 
     /// 获取指定工具的配置路径，自动展开 ~

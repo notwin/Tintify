@@ -50,6 +50,17 @@ final class ThemeEngine {
         var toolResults: [ToolResult] = []
 
         for adapter in adapters {
+            // Skip disabled tools
+            if AppSettings.shared.disabledTools.contains(adapter.toolName) {
+                toolResults.append(ToolResult(
+                    toolName: adapter.toolName,
+                    status: .skipped,
+                    message: "已禁用",
+                    configPath: ""
+                ))
+                continue
+            }
+
             // Resolve path: explicit pathOverrides > user-set toolPaths > adapter default.
             let settingsPath = AppSettings.shared.resolvedPath(for: adapter.toolName)
             let resolvedConfigPath = pathOverrides[adapter.toolName] ?? settingsPath

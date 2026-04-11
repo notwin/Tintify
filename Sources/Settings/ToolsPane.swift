@@ -28,12 +28,28 @@ struct ToolsPane: View {
                     VStack(spacing: 0) {
                         ForEach(Array(tools.enumerated()), id: \.offset) { idx, tool in
                             if idx > 0 { Divider() }
-                            HStack {
+                            HStack(spacing: 12) {
+                                Toggle("", isOn: Binding(
+                                    get: { !settings.disabledTools.contains(tool.name) },
+                                    set: { enabled in
+                                        if enabled {
+                                            settings.disabledTools.remove(tool.name)
+                                        } else {
+                                            settings.disabledTools.insert(tool.name)
+                                        }
+                                    }
+                                ))
+                                .toggleStyle(.switch)
+                                .labelsHidden()
+
                                 VStack(alignment: .leading) {
                                     Text(tool.name).font(.body.bold())
                                     Text(tool.defaultPath).font(.caption).foregroundStyle(.secondary)
                                 }
+                                .opacity(settings.disabledTools.contains(tool.name) ? 0.4 : 1.0)
+
                                 Spacer()
+
                                 VStack(alignment: .trailing, spacing: 2) {
                                     TextField("留空使用默认路径", text: Binding(
                                         get: { settings.toolPaths[tool.name] ?? "" },
@@ -47,6 +63,7 @@ struct ToolsPane: View {
                                     ))
                                     .textFieldStyle(.roundedBorder)
                                     .frame(width: 200)
+                                    .disabled(settings.disabledTools.contains(tool.name))
 
                                     if let customPath = settings.toolPaths[tool.name],
                                        !customPath.isEmpty,
@@ -56,6 +73,7 @@ struct ToolsPane: View {
                                             .foregroundStyle(.orange)
                                     }
                                 }
+                                .opacity(settings.disabledTools.contains(tool.name) ? 0.4 : 1.0)
                             }
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
