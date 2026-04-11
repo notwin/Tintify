@@ -2,7 +2,7 @@
 import Foundation
 
 /// Theme category for grouping in the UI.
-enum ThemeCategory: String, Codable, Hashable, CaseIterable {
+enum ThemeCategory: String, Codable, Hashable, CaseIterable, Sendable {
     case popular = "热门推荐"
     case timeless = "经典永恒"
     case trending = "新锐之选"
@@ -10,13 +10,13 @@ enum ThemeCategory: String, Codable, Hashable, CaseIterable {
 }
 
 /// Tool compatibility level.
-enum ThemeCompatibility: String, Codable, Hashable {
+enum ThemeCompatibility: String, Codable, Hashable, Sendable {
     case full          // 所有工具都有原生命名主题
     case ansiPartial   // bat/delta 使用 ansi 回退
 }
 
 /// A color theme consisting of 26 named palette colors and metadata.
-struct Theme: Identifiable, Codable, Hashable {
+struct Theme: Identifiable, Codable, Hashable, Sendable {
     let id: String
     let name: String
     let appearance: Appearance
@@ -39,7 +39,7 @@ struct Theme: Identifiable, Codable, Hashable {
 }
 
 /// The 26 semantic color slots shared by every theme.
-struct Palette: Codable, Hashable {
+struct Palette: Codable, Hashable, Sendable {
     let rosewater, flamingo, pink, mauve: String
     let red, maroon, peach, yellow: String
     let green, teal, sky, sapphire: String

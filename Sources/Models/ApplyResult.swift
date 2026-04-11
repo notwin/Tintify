@@ -2,7 +2,7 @@
 import Foundation
 
 /// Status of a single tool's theme application.
-enum ToolStatus: String, Codable {
+enum ToolStatus: String, Codable, Sendable {
     case success
     case skipped
     case failed
