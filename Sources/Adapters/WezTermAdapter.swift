@@ -1,0 +1,69 @@
+// Sources/Adapters/WezTermAdapter.swift
+import Foundation
+
+/// Adapter for WezTerm terminal emulator.
+struct WezTermAdapter: ToolAdapter {
+    let toolName = "wezterm"
+
+    var defaultConfigPath: String {
+        NSHomeDirectory() + "/.wezterm.lua"
+    }
+
+    /// Write color_scheme into the Tintify marker block in wezterm.lua.
+    ///
+    /// Uses Lua comments `-- === TINTIFY START/END ===` as markers.
+    func apply(theme: Theme, configPath: String? = nil) throws {
+        let path = configPath ?? defaultConfigPath
+        let schemeName = theme.nameForTool(toolName)
+
+        let luaLine = "config.color_scheme = \"\(schemeName)\""
+
+        // Use Lua-style marker block
+        try writeLuaMarkerBlock(to: path, content: luaLine)
+    }
+
+    /// Write a marker block using Lua comments (-- instead of #).
+    private func writeLuaMarkerBlock(to path: String, content: String) throws {
+        let startMarker = "-- === TINTIFY START ==="
+        let endMarker = "-- === TINTIFY END ==="
+
+        let fileContent: String
+        if FileManager.default.fileExists(atPath: path) {
+            fileContent = try String(contentsOfFile: path, encoding: .utf8)
+        } else {
+            // Create minimal wezterm config
+            fileContent = """
+                local wezterm = require 'wezterm'
+                local config = {}
+
+                return config
+                """
+        }
+
+        var lines = fileContent.components(separatedBy: "\n")
+        let startIdx = lines.firstIndex { $0.trimmingCharacters(in: .whitespaces) == startMarker }
+        let endIdx = lines.firstIndex { $0.trimmingCharacters(in: .whitespaces) == endMarker }
+
+        let block = [startMarker, content, endMarker]
+
+        if let start = startIdx, let end = endIdx, end > start {
+            lines.replaceSubrange(start...end, with: block)
+        } else {
+            // Insert before "return config" line
+            if let returnIdx = lines.lastIndex(where: { $0.trimmingCharacters(in: .whitespaces).hasPrefix("return config") || $0.trimmingCharacters(in: .whitespaces).hasPrefix("return ") }) {
+                lines.insert(contentsOf: block + [""], at: returnIdx)
+            } else {
+                if lines.last?.isEmpty == false { lines.append("") }
+                lines.append(contentsOf: block)
+                lines.append("")
+            }
+        }
+
+        let parentDir = (path as NSString).deletingLastPathComponent
+        if !FileManager.default.fileExists(atPath: parentDir) {
+            try FileManager.default.createDirectory(atPath: parentDir, withIntermediateDirectories: true)
+        }
+
+        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+    }
+}

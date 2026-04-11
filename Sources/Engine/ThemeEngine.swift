@@ -21,6 +21,7 @@ final class ThemeEngine {
         { ZshHighlightAdapter() },
         { TmuxAdapter() },
         { VimAdapter() },
+        { WezTermAdapter() },
     ]
 
     /// Create a new engine.
