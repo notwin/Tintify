@@ -1,2 +1,5 @@
 .build/
 .swiftpm/
+*.dmg
+*.app
+.dmg-staging/
