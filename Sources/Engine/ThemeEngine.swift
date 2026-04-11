@@ -29,6 +29,7 @@ final class ThemeEngine {
             LazygitAdapter(),
             ZshHighlightAdapter(),
             TmuxAdapter(),
+            VimAdapter(),
         ]
         self.backupManager = backupManager
         self.pathOverrides = pathOverrides
