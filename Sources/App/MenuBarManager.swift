@@ -150,7 +150,7 @@ final class MenuBarManager: NSObject {
             let hostingController = NSHostingController(rootView: SettingsView())
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Tintify Settings"
-            window.setContentSize(NSSize(width: 650, height: 450))
+            window.setContentSize(NSSize(width: 800, height: 600))
             window.styleMask = [.titled, .closable, .miniaturizable]
             window.center()
             window.isReleasedWhenClosed = false  // 关闭时不销毁，下次能复用

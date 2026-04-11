@@ -47,6 +47,6 @@ struct SettingsView: View {
             case .about: AboutPane()
             }
         }
-        .frame(width: 650, height: 450)
+        .frame(width: 800, height: 600)
     }
 }
