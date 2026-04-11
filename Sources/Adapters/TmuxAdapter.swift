@@ -36,7 +36,14 @@ struct TmuxAdapter: ToolAdapter {
         process.arguments = ["tmux", "source-file", configPath]
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
-        try? process.run()
-        process.waitUntilExit()
+        do {
+            try process.run()
+            process.waitUntilExit()
+            if process.terminationStatus != 0 {
+                NSLog("[Tintify] tmux reload failed with exit code \(process.terminationStatus)")
+            }
+        } catch {
+            // tmux not running — expected, ignore
+        }
     }
 }

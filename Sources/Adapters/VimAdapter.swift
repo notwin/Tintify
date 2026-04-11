@@ -18,6 +18,8 @@ struct VimAdapter: ToolAdapter {
     }
 
     func apply(theme: Theme, configPath: String? = nil) throws {
+        let effectiveVimrc = configPath ?? vimrcPath
+
         try FileManager.default.createDirectory(
             atPath: colorsDir, withIntermediateDirectories: true
         )
@@ -27,7 +29,7 @@ struct VimAdapter: ToolAdapter {
         try colorscheme.write(toFile: colorschemeFile, atomically: true, encoding: .utf8)
 
         let vimrcLine = "colorscheme tintify"
-        try ConfigWriter.writeMarkerBlock(to: vimrcPath, content: vimrcLine)
+        try ConfigWriter.writeMarkerBlock(to: effectiveVimrc, content: vimrcLine)
     }
 
     private func buildColorscheme(theme: Theme) -> String {
