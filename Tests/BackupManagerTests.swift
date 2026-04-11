@@ -48,6 +48,24 @@ import Foundation
     #expect(list.count == 10)
 }
 
+@Test func backupAndRestorePathWithDoubleUnderscore() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let weirdDir = tmpDir.appendingPathComponent("__pycache__")
+    try FileManager.default.createDirectory(at: weirdDir, withIntermediateDirectories: true)
+
+    let configFile = weirdDir.appendingPathComponent("config.txt")
+    try "test content".write(to: configFile, atomically: true, encoding: .utf8)
+
+    let manager = BackupManager(backupRoot: tmpDir.appendingPathComponent("backups").path)
+    let backupId = try manager.backup(files: [configFile.path])
+
+    try "modified".write(to: configFile, atomically: true, encoding: .utf8)
+    try manager.restore(backupId: backupId)
+
+    let restored = try String(contentsOf: configFile, encoding: .utf8)
+    #expect(restored == "test content")
+}
+
 @Test func listBackupsParsesDatesFromId() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let configFile = tmpDir.appendingPathComponent("config.txt")

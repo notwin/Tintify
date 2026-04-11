@@ -14,6 +14,8 @@ final class BackupManager {
     let backupRoot: String
     private let fm = FileManager.default
     private let maxBackups = 10
+    private static let dateFormat = "yyyyMMdd-HHmmss-SSS"
+    private static let dateFormatLength = 19
 
     init(backupRoot: String = NSHomeDirectory() + "/.tintify/backups") {
         self.backupRoot = backupRoot
@@ -28,16 +30,15 @@ final class BackupManager {
     ///     A unique string identifier for the created backup.
     func backup(files: [String]) throws -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd-HHmmss-SSS"
+        formatter.dateFormat = Self.dateFormat
         let backupId = formatter.string(from: Date()) + "-" + UUID().uuidString.prefix(8)
         let backupDir = (backupRoot as NSString).appendingPathComponent(backupId)
 
         try fm.createDirectory(atPath: backupDir, withIntermediateDirectories: true)
 
         for file in files where fm.fileExists(atPath: file) {
-            let dest = (backupDir as NSString).appendingPathComponent(
-                file.replacingOccurrences(of: "/", with: "__")
-            )
+            let encoded = file.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? file
+            let dest = (backupDir as NSString).appendingPathComponent(encoded)
             try fm.copyItem(atPath: file, toPath: dest)
         }
 
@@ -54,7 +55,7 @@ final class BackupManager {
         let items = try fm.contentsOfDirectory(atPath: backupDir)
 
         for item in items {
-            let originalPath = item.replacingOccurrences(of: "__", with: "/")
+            let originalPath = item.removingPercentEncoding ?? item
             let backupFile = (backupDir as NSString).appendingPathComponent(item)
 
             let parentDir = (originalPath as NSString).deletingLastPathComponent
@@ -77,7 +78,7 @@ final class BackupManager {
         guard let items = try? fm.contentsOfDirectory(atPath: backupRoot) else { return [] }
 
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd-HHmmss-SSS"
+        dateFormatter.dateFormat = Self.dateFormat
 
         return items.sorted().reversed().compactMap { name in
             let path = (backupRoot as NSString).appendingPathComponent(name)
@@ -88,7 +89,7 @@ final class BackupManager {
 
             // 从备份 ID 解析日期，格式: "yyyyMMdd-HHmmss-SSS-xxxxxxxx"
             // 取前 19 个字符作为日期部分
-            let dateString = String(name.prefix(19))
+            let dateString = String(name.prefix(Self.dateFormatLength))
             let date: Date
             if let parsed = dateFormatter.date(from: dateString) {
                 date = parsed
