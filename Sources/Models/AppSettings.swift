@@ -29,6 +29,10 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(toolPaths, forKey: "toolPaths") }
     }
 
+    @Published var previousThemeId: String? {
+        didSet { UserDefaults.standard.set(previousThemeId, forKey: "previousThemeId") }
+    }
+
     private init() {
         self.currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"
         self.darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
@@ -36,6 +40,7 @@ final class AppSettings: ObservableObject {
         self.followSystemAppearance = UserDefaults.standard.object(forKey: "followSystemAppearance") as? Bool ?? true
         self.launchAtLogin = UserDefaults.standard.object(forKey: "launchAtLogin") as? Bool ?? true
         self.toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
+        self.previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
     }
 
     /// 获取指定工具的配置路径，自动展开 ~

@@ -70,6 +70,10 @@ final class ThemeEngine {
             }
         }
 
+        // 保存上一个主题 ID（仅当切换到不同主题时）
+        if AppSettings.shared.currentThemeId != theme.id {
+            AppSettings.shared.previousThemeId = AppSettings.shared.currentThemeId
+        }
         AppSettings.shared.currentThemeId = theme.id
 
         return ApplyResult(
