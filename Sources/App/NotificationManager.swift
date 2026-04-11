@@ -31,6 +31,9 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     /// Send a notification and record the result in history.
     func notify(result: ApplyResult) {
         history.insert(result, at: 0)
+        if history.count > 50 {
+            history.removeLast(history.count - 50)
+        }
 
         guard notificationsAvailable else { return }
 

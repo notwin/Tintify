@@ -3,7 +3,9 @@ import SwiftUI
 
 /// Pane displaying theme application history with per-tool details.
 struct ResultsPane: View {
-    private let history = NotificationManager.shared.history
+    private var history: [ApplyResult] {
+        NotificationManager.shared.history
+    }
 
     var body: some View {
         ScrollView {
