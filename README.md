@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="AppIcon.icns" width="128" height="128" alt="Tintify">
+  <img src="assets/icon.png" width="128" height="128" alt="Tintify">
 </p>
 
 <h1 align="center">Tintify</h1>
