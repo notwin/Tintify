@@ -21,6 +21,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var appearanceMonitor: SystemAppearanceMonitor?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Set app icon explicitly (fixes notification icon for ad-hoc signed apps)
+        if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+           let icon = NSImage(contentsOf: iconURL) {
+            NSApplication.shared.applicationIconImage = icon
+        }
+
         // Show onboarding for first-time users
         if !AppSettings.shared.onboardingCompleted {
             showOnboarding()
