@@ -41,6 +41,9 @@ rm -rf "/Applications/${BUNDLE_NAME}"
 # Copy to Applications
 cp -r "$BUNDLE_PATH" /Applications/
 
+# Clean up project directory bundle to avoid Spotlight duplicates
+rm -rf "$BUNDLE_PATH"
+
 echo "=== Done ==="
 echo "Installed to /Applications/${BUNDLE_NAME}"
 echo "Run: open /Applications/${BUNDLE_NAME}"

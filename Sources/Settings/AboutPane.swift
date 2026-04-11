@@ -5,6 +5,8 @@ import SwiftUI
 
 /// About pane showing app info, supported tools, and links.
 struct AboutPane: View {
+    @ObservedObject private var updater = UpdateManager.shared
+
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.3.0"
     }
@@ -40,6 +42,9 @@ struct AboutPane: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+
+                // 更新按钮
+                UpdateButton(updater: updater)
 
                 Divider().padding(.horizontal, 40)
 
@@ -157,5 +162,64 @@ struct LinkRow: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
         .contentShape(Rectangle())
+    }
+}
+
+/// Update button that changes appearance based on update state.
+struct UpdateButton: View {
+    @ObservedObject var updater: UpdateManager
+
+    var body: some View {
+        Group {
+            switch updater.state {
+            case .idle:
+                Button {
+                    updater.checkForUpdate()
+                } label: {
+                    Label("检查更新", systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+
+            case .checking:
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("正在检查...")
+                        .foregroundStyle(.secondary)
+                }
+
+            case .upToDate:
+                Label("已是最新版本", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+
+            case .available(let version):
+                Button {
+                    updater.performUpdate(version: version)
+                } label: {
+                    Label("立即更新 (v\(version))", systemImage: "arrow.down.circle.fill")
+                }
+                .buttonStyle(.borderedProminent)
+
+            case .downloading(let progress):
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text(progress)
+                        .foregroundStyle(.secondary)
+                }
+
+            case .error(let message):
+                VStack(spacing: 4) {
+                    Label(message, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                    Button("重试") {
+                        updater.checkForUpdate()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+            }
+        }
     }
 }

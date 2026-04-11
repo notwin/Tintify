@@ -22,6 +22,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBarManager.setup()
+        UpdateManager.shared.checkForUpdate()
         appearanceMonitor = SystemAppearanceMonitor { [weak self] isDark in
             guard AppSettings.shared.followSystemAppearance else { return }
             let themeId = isDark
