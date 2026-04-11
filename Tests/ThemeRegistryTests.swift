@@ -12,9 +12,9 @@ import Testing
     #expect(mocha!.palette.red == "#f38ba8")
 }
 
-@Test func registryHas22Themes() {
+@Test func registryHas25Themes() {
     let all = ThemeRegistry.shared.allThemes
-    #expect(all.count == 22)
+    #expect(all.count == 25)
 }
 
 @Test func darkAndLightThemesExist() {

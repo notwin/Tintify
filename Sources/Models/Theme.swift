@@ -6,6 +6,7 @@ enum ThemeCategory: String, Codable, Hashable, CaseIterable {
     case popular = "热门推荐"
     case timeless = "经典永恒"
     case trending = "新锐之选"
+    case original = "Tintify 原创"
 }
 
 /// Tool compatibility level.

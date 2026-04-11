@@ -9,7 +9,7 @@ final class ThemeRegistry {
     let allThemes: [Theme]
 
     private init() {
-        allThemes = PopularThemes.all + TimelessThemes.all + TrendingThemes.all
+        allThemes = PopularThemes.all + TimelessThemes.all + TrendingThemes.all + OriginalThemes.all
     }
 
     /// Look up a theme by its identifier.
