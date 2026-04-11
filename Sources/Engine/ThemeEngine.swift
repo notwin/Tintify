@@ -28,6 +28,7 @@ final class ThemeEngine {
             EzaAdapter(),
             LazygitAdapter(),
             ZshHighlightAdapter(),
+            TmuxAdapter(),
         ]
         self.backupManager = backupManager
         self.pathOverrides = pathOverrides
