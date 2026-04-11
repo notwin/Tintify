@@ -31,12 +31,14 @@ final class MenuBarManager: NSObject {
     private func buildMenu() -> NSMenu {
         let menu = NSMenu()
 
+        // Header: 当前主题名
         let currentTheme = registry.theme(id: settings.currentThemeId)
         let headerItem = NSMenuItem()
         headerItem.title = currentTheme?.name ?? "No Theme"
         headerItem.isEnabled = false
         menu.addItem(headerItem)
 
+        // Info: 工具数量
         let infoItem = NSMenuItem()
         infoItem.title = "\(engine.adapters.count) tools synced"
         infoItem.isEnabled = false
@@ -44,20 +46,45 @@ final class MenuBarManager: NSObject {
 
         menu.addItem(.separator())
 
-        for theme in registry.allThemes {
-            let item = NSMenuItem(
-                title: theme.name,
-                action: #selector(themeSelected(_:)),
+        // 快速回退
+        if let prevId = settings.previousThemeId,
+           let prevTheme = registry.theme(id: prevId),
+           prevId != settings.currentThemeId {
+            let rollbackItem = NSMenuItem(
+                title: "↩ 回到上一个: \(prevTheme.name)",
+                action: #selector(rollbackTheme(_:)),
                 keyEquivalent: ""
             )
-            item.target = self
-            item.representedObject = theme.id
-            item.state = theme.id == settings.currentThemeId ? .on : .off
-            menu.addItem(item)
+            rollbackItem.target = self
+            menu.addItem(rollbackItem)
+            menu.addItem(.separator())
+        }
+
+        // 分组子菜单
+        for category in ThemeCategory.allCases {
+            let themes = registry.themes(for: category)
+            let submenuItem = NSMenuItem(title: category.rawValue, action: nil, keyEquivalent: "")
+            let submenu = NSMenu()
+
+            for theme in themes {
+                let item = NSMenuItem(
+                    title: theme.name,
+                    action: #selector(themeSelected(_:)),
+                    keyEquivalent: ""
+                )
+                item.target = self
+                item.representedObject = theme.id
+                item.state = theme.id == settings.currentThemeId ? .on : .off
+                submenu.addItem(item)
+            }
+
+            submenuItem.submenu = submenu
+            menu.addItem(submenuItem)
         }
 
         menu.addItem(.separator())
 
+        // Follow System Appearance
         let followItem = NSMenuItem(
             title: "Follow System Appearance",
             action: #selector(toggleFollowSystem(_:)),
@@ -69,6 +96,7 @@ final class MenuBarManager: NSObject {
 
         menu.addItem(.separator())
 
+        // Settings
         let settingsItem = NSMenuItem(
             title: "Settings...",
             action: #selector(openSettings),
@@ -77,6 +105,7 @@ final class MenuBarManager: NSObject {
         settingsItem.target = self
         menu.addItem(settingsItem)
 
+        // Quit
         let quitItem = NSMenuItem(
             title: "Quit Tintify",
             action: #selector(quit),
@@ -104,6 +133,14 @@ final class MenuBarManager: NSObject {
         NSLog("[Tintify] notify done, rebuilding menu")
         rebuildMenu()
         NSLog("[Tintify] themeSelected complete")
+    }
+
+    @objc private func rollbackTheme(_ sender: NSMenuItem) {
+        guard let prevId = settings.previousThemeId,
+              let theme = registry.theme(id: prevId) else { return }
+        let result = engine.apply(theme: theme)
+        NotificationManager.shared.notify(result: result)
+        rebuildMenu()
     }
 
     @objc private func toggleFollowSystem(_ sender: NSMenuItem) {
