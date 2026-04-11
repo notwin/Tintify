@@ -7,6 +7,23 @@ struct ThemesPane: View {
     private let registry = ThemeRegistry.shared
 
     @State private var expandedSections: Set<ThemeCategory> = Set(ThemeCategory.allCases)
+    @State private var searchText: String = ""
+    @State private var appearanceFilter: Theme.Appearance? = nil
+
+    private func filteredThemes(for category: ThemeCategory) -> [Theme] {
+        var themes = registry.themes(for: category)
+        if let filter = appearanceFilter {
+            themes = themes.filter { $0.appearance == filter }
+        }
+        if !searchText.isEmpty {
+            let query = searchText.lowercased()
+            themes = themes.filter {
+                $0.name.lowercased().contains(query) ||
+                $0.description.lowercased().contains(query)
+            }
+        }
+        return themes
+    }
 
     var body: some View {
         ScrollView {
@@ -23,26 +40,58 @@ struct ThemesPane: View {
                 }
                 .padding(.bottom, 8)
 
-                ForEach(ThemeCategory.allCases, id: \.self) { category in
-                    ThemeSectionView(
-                        category: category,
-                        themes: registry.themes(for: category),
-                        currentThemeId: settings.currentThemeId,
-                        isExpanded: expandedSections.contains(category),
-                        onToggle: {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                if expandedSections.contains(category) {
-                                    expandedSections.remove(category)
-                                } else {
-                                    expandedSections.insert(category)
+                // 搜索 + 过滤栏
+                HStack(spacing: 8) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.secondary)
+                        TextField("搜索主题名...", text: $searchText)
+                            .textFieldStyle(.plain)
+                    }
+                    .padding(6)
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(6)
+
+                    Picker("", selection: $appearanceFilter) {
+                        Text("全部").tag(Theme.Appearance?.none)
+                        Text("Dark").tag(Theme.Appearance?.some(.dark))
+                        Text("Light").tag(Theme.Appearance?.some(.light))
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 180)
+                }
+
+                let hasResults = ThemeCategory.allCases.contains { !filteredThemes(for: $0).isEmpty }
+
+                if hasResults {
+                    ForEach(ThemeCategory.allCases, id: \.self) { category in
+                        let themes = filteredThemes(for: category)
+                        if !themes.isEmpty {
+                            ThemeSectionView(
+                                category: category,
+                                themes: themes,
+                                currentThemeId: settings.currentThemeId,
+                                isExpanded: expandedSections.contains(category),
+                                onToggle: {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        if expandedSections.contains(category) {
+                                            expandedSections.remove(category)
+                                        } else {
+                                            expandedSections.insert(category)
+                                        }
+                                    }
+                                },
+                                onApply: { theme in
+                                    let result = ThemeEngine().apply(theme: theme)
+                                    NotificationManager.shared.notify(result: result)
                                 }
-                            }
-                        },
-                        onApply: { theme in
-                            let result = ThemeEngine().apply(theme: theme)
-                            NotificationManager.shared.notify(result: result)
+                            )
                         }
-                    )
+                    }
+                } else {
+                    Text("无匹配主题")
+                        .foregroundStyle(.secondary)
+                        .padding(40)
                 }
             }
             .padding(24)
