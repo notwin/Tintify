@@ -30,7 +30,7 @@ struct FzfAdapter: ToolAdapter {
 
         // Read existing marker block content to preserve other adapters' lines.
         let existing = BatAdapter.readExistingMarkerContent(from: path)
-        let otherLines = existing.filter { !$0.contains("FZF_DEFAULT_OPTS") && !$0.contains("--color=") }
+        let otherLines = existing.filter { !$0.contains("FZF_DEFAULT_OPTS") && !$0.trimmingCharacters(in: .whitespaces).hasPrefix("--color=") }
         let combined = (otherLines + [fzfLines]).joined(separator: "\n")
 
         try ConfigWriter.writeMarkerBlock(to: path, content: combined)

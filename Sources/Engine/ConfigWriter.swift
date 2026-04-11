@@ -30,7 +30,7 @@ enum ConfigWriter {
         if let start = startIdx, let end = endIdx, end > start {
             lines.replaceSubrange(start...end, with: block)
         } else {
-            if !lines.last!.isEmpty { lines.append("") }
+            if lines.last?.isEmpty == false { lines.append("") }
             lines.append(contentsOf: block)
             lines.append("")
         }
