@@ -1,5 +1,17 @@
 import Foundation
 
+/// ConfigWriter 遇到无法安全处理的文件结构时抛出的错误。
+enum ConfigWriterError: LocalizedError, Equatable {
+    case corruptedMarkers(path: String)
+
+    var errorDescription: String? {
+        switch self {
+        case .corruptedMarkers(let path):
+            return "配置文件中的 TINTIFY 标记不完整（START/END 不成对）：\(path)。请手动删除残留的标记行后重试。"
+        }
+    }
+}
+
 /// Utility for safely reading and writing marker-delimited blocks in config files.
 enum ConfigWriter {
     static let startMarker = "# === TINTIFY START ==="
@@ -22,13 +34,31 @@ enum ConfigWriter {
         }
 
         var lines = fileContent.components(separatedBy: "\n")
-        let startIdx = lines.firstIndex { $0.trimmingCharacters(in: .whitespaces) == startMarker }
-        let endIdx = lines.firstIndex { $0.trimmingCharacters(in: .whitespaces) == endMarker }
+
+        // 收集所有成对的标记块；孤儿/乱序标记视为文件损坏，拒绝写入
+        var blocks: [(start: Int, end: Int)] = []
+        var pendingStart: Int?
+        for (i, line) in lines.enumerated() {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed == startMarker {
+                guard pendingStart == nil else { throw ConfigWriterError.corruptedMarkers(path: path) }
+                pendingStart = i
+            } else if trimmed == endMarker {
+                guard let start = pendingStart else { throw ConfigWriterError.corruptedMarkers(path: path) }
+                blocks.append((start, i))
+                pendingStart = nil
+            }
+        }
+        guard pendingStart == nil else { throw ConfigWriterError.corruptedMarkers(path: path) }
 
         let block = [startMarker, content, endMarker]
 
-        if let start = startIdx, let end = endIdx, end > start {
-            lines.replaceSubrange(start...end, with: block)
+        if let first = blocks.first {
+            // 从后往前删除多余块，再原位替换第一个块
+            for extra in blocks.dropFirst().reversed() {
+                lines.removeSubrange(extra.start...extra.end)
+            }
+            lines.replaceSubrange(first.start...first.end, with: block)
         } else {
             if lines.last?.isEmpty == false { lines.append("") }
             lines.append(contentsOf: block)

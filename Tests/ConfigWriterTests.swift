@@ -75,3 +75,54 @@ import Foundation
     #expect(content.contains("[theme]"))
     #expect(content.contains("name = \"test\""))
 }
+
+@Test func orphanStartMarkerThrowsInsteadOfEatingUserContent() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let existing = """
+    # my config
+    # === TINTIFY START ===
+    export BAT_THEME="Old"
+    alias important='do-not-delete-me'
+    """
+    try existing.write(to: tmp, atomically: true, encoding: .utf8)
+
+    #expect(throws: ConfigWriterError.self) {
+        try ConfigWriter.writeMarkerBlock(to: tmp.path, content: "new content")
+    }
+    // 文件必须原封不动
+    let after = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(after == existing)
+}
+
+@Test func orphanEndMarkerThrows() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try "line1\n# === TINTIFY END ===\nline2".write(to: tmp, atomically: true, encoding: .utf8)
+    #expect(throws: ConfigWriterError.self) {
+        try ConfigWriter.writeMarkerBlock(to: tmp.path, content: "x")
+    }
+}
+
+@Test func duplicateBlocksAreMergedIntoFirst() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let existing = """
+    # top
+    # === TINTIFY START ===
+    old-a
+    # === TINTIFY END ===
+    # user line between blocks
+    # === TINTIFY START ===
+    old-b
+    # === TINTIFY END ===
+    # bottom
+    """
+    try existing.write(to: tmp, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.writeMarkerBlock(to: tmp.path, content: "new")
+
+    let after = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(after.components(separatedBy: "TINTIFY START").count == 2)  // 只剩一个块
+    #expect(after.contains("new"))
+    #expect(!after.contains("old-a") && !after.contains("old-b"))
+    #expect(after.contains("# user line between blocks"))               // 块间用户行保留
+    #expect(after.contains("# top") && after.contains("# bottom"))
+}
