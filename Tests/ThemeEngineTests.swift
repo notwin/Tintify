@@ -65,3 +65,25 @@ import Foundation
     // Should not crash regardless of outcome
     _ = result.summary
 }
+
+@Test @MainActor func applyAbortsWhenBackupFails() throws {
+    // backupRoot 指向一个"路径被文件占住"的位置，createDirectory 必然失败
+    let blocker = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    try "file".write(toFile: blocker, atomically: true, encoding: .utf8)
+    let badBackup = BackupManager(backupRoot: blocker + "/sub")
+
+    let tmpConf = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    try "user config".write(toFile: tmpConf, atomically: true, encoding: .utf8)
+
+    let engine = ThemeEngine(
+        adapters: [BatAdapter()],
+        backupManager: badBackup,
+        pathOverrides: ["bat": tmpConf]
+    )
+    let result = engine.apply(theme: ThemeRegistry.shared.theme(id: "nord")!)
+
+    #expect(result.failedCount == result.toolResults.count)   // 全部标记失败
+    #expect(result.backupId == nil)
+    let after = try String(contentsOfFile: tmpConf, encoding: .utf8)
+    #expect(after == "user config")                            // 配置文件未被改写
+}

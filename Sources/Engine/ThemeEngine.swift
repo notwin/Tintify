@@ -45,13 +45,27 @@ final class ThemeEngine {
     /// Apply a theme to every adapter, backing up affected config files first.
     @discardableResult
     func apply(theme: Theme) -> ApplyResult {
-        // Backup — best effort
         let configPaths = adapters.map { adapter -> String in
             let settingsPath = AppSettings.shared.resolvedPath(for: adapter.toolName)
             return pathOverrides[adapter.toolName] ?? settingsPath ?? adapter.defaultConfigPath
         }
         let uniquePaths = Array(Set(configPaths))
-        _ = try? backupManager.backup(files: uniquePaths)
+
+        let backupId: String?
+        do {
+            backupId = try backupManager.backup(files: uniquePaths)
+        } catch {
+            // 备份失败时绝不动用户配置——安全网失效必须显式失败
+            let failedResults = adapters.map {
+                ToolResult(
+                    toolName: $0.toolName,
+                    status: .failed,
+                    message: "备份失败，已中止应用：\(error.localizedDescription)",
+                    configPath: ""
+                )
+            }
+            return ApplyResult(theme: theme, timestamp: Date(), toolResults: failedResults, backupId: nil)
+        }
 
         var toolResults: [ToolResult] = []
 
@@ -98,7 +112,8 @@ final class ThemeEngine {
         return ApplyResult(
             theme: theme,
             timestamp: Date(),
-            toolResults: toolResults
+            toolResults: toolResults,
+            backupId: backupId
         )
     }
 }

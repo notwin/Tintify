@@ -23,6 +23,14 @@ struct ApplyResult: Identifiable {
     let theme: Theme
     let timestamp: Date
     let toolResults: [ToolResult]
+    let backupId: String?
+
+    init(theme: Theme, timestamp: Date, toolResults: [ToolResult], backupId: String? = nil) {
+        self.theme = theme
+        self.timestamp = timestamp
+        self.toolResults = toolResults
+        self.backupId = backupId
+    }
 
     var successCount: Int {
         toolResults.filter { $0.status == .success }.count

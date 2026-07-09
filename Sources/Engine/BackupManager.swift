@@ -36,14 +36,27 @@ final class BackupManager {
 
         try fm.createDirectory(atPath: backupDir, withIntermediateDirectories: true)
 
-        for file in files where fm.fileExists(atPath: file) {
-            let encoded = file.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? file
-            let dest = (backupDir as NSString).appendingPathComponent(encoded)
-            try fm.copyItem(atPath: file, toPath: dest)
+        // 首次备份时额外保存一份到 initial，永不淘汰——
+        // 这是用户安装 Tintify 前的原始配置，滚动淘汰不能吃掉它
+        let initialDir = (backupRoot as NSString).appendingPathComponent("initial")
+        if !fm.fileExists(atPath: initialDir) {
+            try fm.createDirectory(atPath: initialDir, withIntermediateDirectories: true)
+            try copyFiles(files, into: initialDir)
         }
+
+        try copyFiles(files, into: backupDir)
 
         prune()
         return backupId
+    }
+
+    /// Copy each existing file into `dir`, percent-encoding its path as the destination name.
+    private func copyFiles(_ files: [String], into dir: String) throws {
+        for file in files where fm.fileExists(atPath: file) {
+            let encoded = file.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? file
+            let dest = (dir as NSString).appendingPathComponent(encoded)
+            try fm.copyItem(atPath: file, toPath: dest)
+        }
     }
 
     /// Restore files from a previously created backup.
@@ -108,7 +121,7 @@ final class BackupManager {
     private func prune() {
         let backups = listBackups()
         guard backups.count > maxBackups else { return }
-        for old in backups[maxBackups...] {
+        for old in backups[maxBackups...] where old.id != "initial" {
             try? fm.removeItem(atPath: old.path)
         }
     }
