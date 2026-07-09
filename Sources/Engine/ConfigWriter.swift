@@ -35,7 +35,9 @@ enum ConfigWriter {
     ///   path: Absolute path to the config file.
     ///   content: The text to place between the markers.
     ///   commentPrefix: The line-comment token for the target file's syntax (e.g. `"#"`, `"\""` for Vim script).
-    static func writeMarkerBlock(to path: String, content: String, commentPrefix: String = "#") throws {
+    ///   insertBeforeLine: Only consulted when no existing block is found. If it matches a line,
+    ///     the block is inserted before the last matching line instead of being appended at the end.
+    static func writeMarkerBlock(to path: String, content: String, commentPrefix: String = "#", insertBeforeLine: ((String) -> Bool)? = nil) throws {
         let startMarker = "\(commentPrefix) === TINTIFY START ==="
         let endMarker = "\(commentPrefix) === TINTIFY END ==="
 
@@ -73,9 +75,14 @@ enum ConfigWriter {
             }
             lines.replaceSubrange(first.start...first.end, with: block)
         } else {
-            if lines.last?.isEmpty == false { lines.append("") }
-            lines.append(contentsOf: block)
-            lines.append("")
+            if let predicate = insertBeforeLine,
+               let anchor = lines.lastIndex(where: { predicate($0) }) {
+                lines.insert(contentsOf: block + [""], at: anchor)
+            } else {
+                if lines.last?.isEmpty == false { lines.append("") }
+                lines.append(contentsOf: block)
+                lines.append("")
+            }
         }
 
         try atomicWrite(lines.joined(separator: "\n"), to: path)

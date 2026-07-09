@@ -1,6 +1,17 @@
 // Sources/Adapters/WezTermAdapter.swift
 import Foundation
 
+enum WezTermAdapterError: LocalizedError {
+    case unrecognizedStructure(path: String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unrecognizedStructure(let path):
+            return "无法识别 wezterm.lua 的结构（未找到 return <变量名>）：\(path)。请手动在配置中设置 color_scheme。"
+        }
+    }
+}
+
 /// Adapter for WezTerm terminal emulator.
 struct WezTermAdapter: ToolAdapter {
     let toolName = "wezterm"
@@ -11,30 +22,58 @@ struct WezTermAdapter: ToolAdapter {
 
     /// Write color_scheme into the Tintify marker block in wezterm.lua.
     ///
-    /// For themes with a WezTerm built-in name, sets `config.color_scheme`.
+    /// For themes with a WezTerm built-in name, sets `<var>.color_scheme`.
     /// For custom/original themes, defines an inline color_schemes table.
+    ///
+    /// The config's local variable name (commonly `config`, but also `c` when users write
+    /// `local c = wezterm.config_builder() ... return c`) is detected from the file's
+    /// `return <identifier>` line so the injected block never references an undefined global.
     func apply(theme: Theme, configPath: String? = nil) throws {
         let path = configPath ?? defaultConfigPath
-        let schemeName = theme.nameForTool(toolName)
 
+        if !FileManager.default.fileExists(atPath: path) {
+            let parentDir = (path as NSString).deletingLastPathComponent
+            if !FileManager.default.fileExists(atPath: parentDir) {
+                try FileManager.default.createDirectory(atPath: parentDir, withIntermediateDirectories: true)
+            }
+            let template = """
+                local wezterm = require 'wezterm'
+                local config = {}
+
+                return config
+                """
+            try ConfigWriter.atomicWrite(template, to: path)
+        }
+
+        let fileContent = try String(contentsOfFile: path, encoding: .utf8)
+        guard let varName = detectConfigVariable(in: fileContent) else {
+            throw WezTermAdapterError.unrecognizedStructure(path: path)
+        }
+
+        let schemeName = theme.nameForTool(toolName)
         let luaContent: String
         if theme.toolNames["wezterm"] != nil || theme.compatibility == .full {
             // Built-in theme — just set the name
-            luaContent = "config.color_scheme = \"\(schemeName)\""
+            luaContent = "\(varName).color_scheme = \"\(schemeName)\""
         } else {
             // Custom theme — define colors inline
-            luaContent = buildCustomScheme(theme: theme, name: schemeName)
+            luaContent = buildCustomScheme(theme: theme, name: schemeName, varName: varName)
         }
 
-        try writeLuaMarkerBlock(to: path, content: luaContent)
+        try ConfigWriter.writeMarkerBlock(
+            to: path,
+            content: luaContent,
+            commentPrefix: "--",
+            insertBeforeLine: { $0.trimmingCharacters(in: .whitespaces).hasPrefix("return ") }
+        )
     }
 
     /// Build inline WezTerm color_schemes definition from palette.
-    private func buildCustomScheme(theme: Theme, name: String) -> String {
+    private func buildCustomScheme(theme: Theme, name: String, varName: String) -> String {
         let p = theme.palette
         return """
-            config.color_schemes = config.color_schemes or {}
-            config.color_schemes["\(name)"] = {
+            \(varName).color_schemes = \(varName).color_schemes or {}
+            \(varName).color_schemes["\(name)"] = {
               foreground = "\(p.text)",
               background = "\(p.base)",
               cursor_bg = "\(p.rosewater)",
@@ -44,50 +83,21 @@ struct WezTermAdapter: ToolAdapter {
               ansi = {"\(p.crust)", "\(p.red)", "\(p.green)", "\(p.yellow)", "\(p.blue)", "\(p.pink)", "\(p.teal)", "\(p.subtext1)"},
               brights = {"\(p.surface1)", "\(p.maroon)", "\(p.green)", "\(p.yellow)", "\(p.sapphire)", "\(p.mauve)", "\(p.sky)", "\(p.text)"},
             }
-            config.color_scheme = "\(name)"
+            \(varName).color_scheme = "\(name)"
             """
     }
 
-    /// Write a marker block using Lua comments (-- instead of #).
-    private func writeLuaMarkerBlock(to path: String, content: String) throws {
-        let startMarker = "-- === TINTIFY START ==="
-        let endMarker = "-- === TINTIFY END ==="
-
-        let fileContent: String
-        if FileManager.default.fileExists(atPath: path) {
-            fileContent = try String(contentsOfFile: path, encoding: .utf8)
-        } else {
-            fileContent = """
-                local wezterm = require 'wezterm'
-                local config = {}
-
-                return config
-                """
-        }
-
-        var lines = fileContent.components(separatedBy: "\n")
-        let startIdx = lines.firstIndex { $0.trimmingCharacters(in: .whitespaces) == startMarker }
-        let endIdx = lines.firstIndex { $0.trimmingCharacters(in: .whitespaces) == endMarker }
-
-        let block = [startMarker, content, endMarker]
-
-        if let start = startIdx, let end = endIdx, end > start {
-            lines.replaceSubrange(start...end, with: block)
-        } else {
-            if let returnIdx = lines.lastIndex(where: { $0.trimmingCharacters(in: .whitespaces).hasPrefix("return config") || $0.trimmingCharacters(in: .whitespaces).hasPrefix("return ") }) {
-                lines.insert(contentsOf: block + [""], at: returnIdx)
-            } else {
-                if lines.last?.isEmpty == false { lines.append("") }
-                lines.append(contentsOf: block)
-                lines.append("")
+    /// 从 "return <identifier>" 行提取配置变量名。
+    private func detectConfigVariable(in content: String) -> String? {
+        let pattern = #"^\s*return\s+([A-Za-z_][A-Za-z0-9_]*)\s*$"#
+        let regex = try! NSRegularExpression(pattern: pattern)
+        for line in content.components(separatedBy: "\n").reversed() {
+            let range = NSRange(line.startIndex..., in: line)
+            if let match = regex.firstMatch(in: line, range: range),
+               let r = Range(match.range(at: 1), in: line) {
+                return String(line[r])
             }
         }
-
-        let parentDir = (path as NSString).deletingLastPathComponent
-        if !FileManager.default.fileExists(atPath: parentDir) {
-            try FileManager.default.createDirectory(atPath: parentDir, withIntermediateDirectories: true)
-        }
-
-        try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
+        return nil
     }
 }
