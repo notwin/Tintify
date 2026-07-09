@@ -26,25 +26,37 @@ struct StarshipAdapter: ToolAdapter {
     ///   configPath: Optional override path.
     func apply(theme: Theme, configPath: String? = nil) throws {
         let path = configPath ?? defaultConfigPath
-        let paletteName = theme.id.replacingOccurrences(of: "-", with: "_")
 
         // Set the palette reference line (must sit in the TOML top-level area,
         // before the first [section] — replaceLine would append to EOF and
-        // silently land inside the last section).
+        // silently land inside the last section). The section name is fixed
+        // to "tintify" so user format strings referencing grad/ink slots
+        // never need to change when the theme changes.
         try ConfigWriter.replaceTopLevelKey(
             in: path,
             key: "palette",
-            line: "palette = \"\(paletteName)\""
+            line: "palette = \"tintify\""
         )
 
         // Remove only Tintify-known [palettes.*] sections to avoid accumulation,
         // preserving any user-authored palettes.
-        try removeKnownPaletteSections(in: path, currentPaletteName: paletteName)
+        try removeKnownPaletteSections(in: path, currentPaletteName: "tintify")
 
-        // Build the palette section with all 26 colors.
+        // Build the palette section: gradient/ink slots first, then all 26 colors.
         let p = theme.palette
+        let segs = theme.promptSegments
         let section = """
-            [palettes.\(paletteName)]
+            [palettes.tintify]
+            grad1 = "\(segs[0].color)"
+            grad2 = "\(segs[1].color)"
+            grad3 = "\(segs[2].color)"
+            grad4 = "\(segs[3].color)"
+            grad5 = "\(segs[4].color)"
+            ink1 = "\(segs[0].ink)"
+            ink2 = "\(segs[1].ink)"
+            ink3 = "\(segs[2].ink)"
+            ink4 = "\(segs[3].ink)"
+            ink5 = "\(segs[4].ink)"
             rosewater = "\(p.rosewater)"
             flamingo = "\(p.flamingo)"
             pink = "\(p.pink)"
@@ -75,7 +87,7 @@ struct StarshipAdapter: ToolAdapter {
 
         try ConfigWriter.replaceTOMLSection(
             in: path,
-            sectionPrefix: "[palettes.\(paletteName)]",
+            sectionPrefix: "[palettes.tintify]",
             newContent: section
         )
     }
