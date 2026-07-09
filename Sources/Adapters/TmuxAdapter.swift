@@ -4,6 +4,12 @@ import Foundation
 /// Adapter for tmux terminal multiplexer.
 struct TmuxAdapter: ToolAdapter {
     let toolName = "tmux"
+    /// 是否在 apply 后触发 `tmux source-file` 刷新真实会话；测试中应设为 false。
+    let reloadEnabled: Bool
+
+    init(reloadEnabled: Bool = true) {
+        self.reloadEnabled = reloadEnabled
+    }
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.tmux.conf"
@@ -27,7 +33,9 @@ struct TmuxAdapter: ToolAdapter {
             """
 
         try ConfigWriter.writeMarkerBlock(to: path, content: tmuxLines)
-        reloadTmux(configPath: path)
+        if reloadEnabled {
+            reloadTmux(configPath: path)
+        }
     }
 
     private func reloadTmux(configPath: String) {
