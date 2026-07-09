@@ -174,6 +174,40 @@ import Foundation
     #expect(try String(contentsOfFile: real, encoding: .utf8) == "updated")
 }
 
+@Test func replaceTopLevelKeyInsertsBeforeFirstSection() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let existing = """
+    add_newline = false
+
+    [character]
+    success_symbol = "[➜](bold green)"
+    """
+    try existing.write(to: tmp, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.replaceTopLevelKey(in: tmp.path, key: "palette", line: "palette = \"nord\"")
+
+    let lines = try String(contentsOf: tmp, encoding: .utf8).components(separatedBy: "\n")
+    let paletteIdx = lines.firstIndex { $0.hasPrefix("palette = ") }!
+    let sectionIdx = lines.firstIndex { $0.hasPrefix("[character]") }!
+    #expect(paletteIdx < sectionIdx)  // 必须在第一个 section 之前
+}
+
+@Test func replaceTopLevelKeyIgnoresKeyInsideSection() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let existing = """
+    [somesection]
+    palette = "inner"
+    """
+    try existing.write(to: tmp, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.replaceTopLevelKey(in: tmp.path, key: "palette", line: "palette = \"nord\"")
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(content.contains("palette = \"inner\""))  // section 内的同名键不动
+    let lines = content.components(separatedBy: "\n")
+    #expect(lines.firstIndex { $0 == "palette = \"nord\"" }! < lines.firstIndex { $0.hasPrefix("[somesection]") }!)
+}
+
 @Test func markerBlockWriteThroughSymlink() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)

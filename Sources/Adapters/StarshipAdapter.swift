@@ -5,6 +5,16 @@ import Foundation
 struct StarshipAdapter: ToolAdapter {
     let toolName = "starship"
 
+    /// Palette names Tintify itself generates (built-in theme ids). Only
+    /// `[palettes.*]` sections whose name is in this set — or matches the
+    /// palette being applied — are removed; anything else is user-authored
+    /// and must be preserved.
+    let knownPaletteNames: Set<String>
+
+    init(knownPaletteNames: Set<String> = []) {
+        self.knownPaletteNames = knownPaletteNames
+    }
+
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.config/starship.toml"
     }
@@ -18,15 +28,18 @@ struct StarshipAdapter: ToolAdapter {
         let path = configPath ?? defaultConfigPath
         let paletteName = theme.id.replacingOccurrences(of: "-", with: "_")
 
-        // Set the palette reference line.
-        try ConfigWriter.replaceLine(
+        // Set the palette reference line (must sit in the TOML top-level area,
+        // before the first [section] — replaceLine would append to EOF and
+        // silently land inside the last section).
+        try ConfigWriter.replaceTopLevelKey(
             in: path,
-            prefix: "palette = ",
-            newLine: "palette = \"\(paletteName)\""
+            key: "palette",
+            line: "palette = \"\(paletteName)\""
         )
 
-        // Remove all existing [palettes.*] sections to avoid accumulation.
-        try Self.removeAllPaletteSections(in: path)
+        // Remove only Tintify-known [palettes.*] sections to avoid accumulation,
+        // preserving any user-authored palettes.
+        try removeKnownPaletteSections(in: path, currentPaletteName: paletteName)
 
         // Build the palette section with all 26 colors.
         let p = theme.palette
@@ -67,8 +80,10 @@ struct StarshipAdapter: ToolAdapter {
         )
     }
 
-    /// Remove all [palettes.*] sections from the TOML file.
-    private static func removeAllPaletteSections(in path: String) throws {
+    /// Remove [palettes.*] sections whose name is known to Tintify (or is the
+    /// palette currently being applied). Sections with unrecognized names are
+    /// left untouched — they were authored by the user.
+    private func removeKnownPaletteSections(in path: String, currentPaletteName: String) throws {
         guard FileManager.default.fileExists(atPath: path) else { return }
         let content = try String(contentsOfFile: path, encoding: .utf8)
         var lines = content.components(separatedBy: "\n")
@@ -76,13 +91,21 @@ struct StarshipAdapter: ToolAdapter {
         var i = 0
         while i < lines.count {
             if lines[i].hasPrefix("[palettes.") {
+                var name = lines[i].dropFirst("[palettes.".count)
+                if name.hasSuffix("]") {
+                    name = name.dropLast()
+                }
                 // Remove from this header to the next top-level section or EOF
                 var end = i + 1
                 while end < lines.count && !lines[end].hasPrefix("[") {
                     end += 1
                 }
-                lines.removeSubrange(i..<end)
-                // Don't increment i — check the same index again
+                if knownPaletteNames.contains(String(name)) || String(name) == currentPaletteName {
+                    lines.removeSubrange(i..<end)
+                    // Don't increment i — check the same index again
+                    continue
+                }
+                i = end
             } else {
                 i += 1
             }

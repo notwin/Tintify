@@ -12,7 +12,9 @@ final class ThemeEngine {
     /// All available adapter constructors — adapters are created on demand.
     static let adapterFactories: [() -> ToolAdapter] = [
         { GhosttyAdapter() },
-        { StarshipAdapter() },
+        { StarshipAdapter(knownPaletteNames: Set(ThemeRegistry.shared.allThemes.map {
+            $0.id.replacingOccurrences(of: "-", with: "_")
+        })) },
         { BatAdapter() },
         { FzfAdapter() },
         { DeltaAdapter() },

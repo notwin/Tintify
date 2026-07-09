@@ -159,6 +159,34 @@ enum ConfigWriter {
         try atomicWrite(lines.joined(separator: "\n"), to: path)
     }
 
+    /// 在 TOML 文件的顶层区域（第一个 [section] 之前）替换或插入一个键。
+    ///
+    /// `replaceLine` 找不到时会追加到文件末尾——在 TOML 中那属于最后一个
+    /// section，顶层键必须插在第一个 section 头之前。
+    static func replaceTopLevelKey(in path: String, key: String, line newLine: String) throws {
+        let fileContent: String
+        if FileManager.default.fileExists(atPath: path) {
+            fileContent = try String(contentsOfFile: path, encoding: .utf8)
+        } else {
+            fileContent = ""
+        }
+        var lines = fileContent.components(separatedBy: "\n")
+
+        let firstSection = lines.firstIndex {
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("[")
+        } ?? lines.count
+
+        if let idx = lines[..<firstSection].firstIndex(where: {
+            $0.hasPrefix("\(key) =") || $0.hasPrefix("\(key)=")
+        }) {
+            lines[idx] = newLine
+        } else {
+            lines.insert(contentsOf: [newLine, ""], at: firstSection)
+        }
+
+        try atomicWrite(lines.joined(separator: "\n"), to: path)
+    }
+
     /// Replace an entire TOML section (from `[sectionPrefix` to the next `[` header) with new content.
     ///
     /// If the section does not exist it is appended.
