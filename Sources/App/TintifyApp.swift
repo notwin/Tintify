@@ -3,6 +3,16 @@
 import SwiftUI
 
 @main
+enum TintifyMain {
+    static func main() {
+        let args = CommandLine.arguments
+        if args.count > 1, args[1] == "cli" {
+            CLIRunner.run(Array(args.dropFirst(2)))  // 不返回
+        }
+        TintifyApp.main()
+    }
+}
+
 struct TintifyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
@@ -42,6 +52,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let result = ThemeEngine().apply(theme: theme)
             NotificationManager.shared.notify(result: result)
             self?.menuBarManager.rebuildMenu()
+        }
+
+        // CLI 进程应用主题后通知 GUI 刷新（defaults 已被外部进程修改）
+        DistributedNotificationCenter.default().addObserver(
+            forName: .init(CLIRunner.externalChangeNotification),
+            object: nil, queue: .main
+        ) { _ in
+            MainActor.assumeIsolated {
+                AppSettings.shared.reload()
+            }
         }
     }
 

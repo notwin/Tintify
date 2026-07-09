@@ -58,4 +58,15 @@ final class AppSettings: ObservableObject {
         guard let path = toolPaths[toolName] else { return nil }
         return (path as NSString).expandingTildeInPath
     }
+
+    /// 从 UserDefaults 重读全部设置（CLI 等外部进程修改 defaults 后调用）。
+    func reload() {
+        currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"
+        darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
+        lightThemeId = UserDefaults.standard.string(forKey: "lightThemeId") ?? "catppuccin-latte"
+        followSystemAppearance = UserDefaults.standard.object(forKey: "followSystemAppearance") as? Bool ?? true
+        toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
+        previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
+        disabledTools = Set(UserDefaults.standard.stringArray(forKey: "disabledTools") ?? [])
+    }
 }
