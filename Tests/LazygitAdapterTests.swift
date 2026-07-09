@@ -48,3 +48,45 @@ import Foundation
     let adapter = LazygitAdapter()
     #expect(adapter.toolName == "lazygit")
 }
+
+@Test func lazygitPreservesUserGuiSettings() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".yml")
+    let existing = """
+    gui:
+      nerdFontsVersion: "3"
+      mouseEvents: false
+      theme:
+        activeBorderColor:
+          - "#old"
+          - bold
+      showFileTree: true
+    git:
+      paging:
+        colorArg: always
+    """
+    try existing.write(to: tmp, atomically: true, encoding: .utf8)
+
+    let adapter = LazygitAdapter()
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(content.contains("nerdFontsVersion: \"3\""))   // 用户 gui 子键保留
+    #expect(content.contains("mouseEvents: false"))
+    #expect(content.contains("showFileTree: true"))
+    #expect(content.contains("git:"))                       // 其他顶层段保留
+    #expect(!content.contains("#old"))                      // 旧 theme 子块被替换
+    #expect(content.contains("activeBorderColor:"))
+}
+
+@Test func lazygitInsertsThemeWhenGuiHasNoTheme() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".yml")
+    try "gui:\n  mouseEvents: false\n".write(toFile: tmp.path, atomically: true, encoding: .utf8)
+
+    let adapter = LazygitAdapter()
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+
+    let content = try String(contentsOfFile: tmp.path, encoding: .utf8)
+    #expect(content.contains("mouseEvents: false"))
+    #expect(content.contains("theme:"))
+    #expect(content.contains("activeBorderColor:"))
+}
