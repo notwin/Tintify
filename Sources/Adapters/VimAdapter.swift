@@ -29,7 +29,9 @@ struct VimAdapter: ToolAdapter {
         try colorscheme.write(toFile: colorschemeFile, atomically: true, encoding: .utf8)
 
         let vimrcLine = "colorscheme tintify"
-        try ConfigWriter.writeMarkerBlock(to: effectiveVimrc, content: vimrcLine)
+        // 迁移：清理 v1.7 以前误写入的 shell 风格标记（vim 会报 E488）
+        try ConfigWriter.removeMarkerBlocks(from: effectiveVimrc, commentPrefix: "#")
+        try ConfigWriter.writeMarkerBlock(to: effectiveVimrc, content: vimrcLine, commentPrefix: "\"")
     }
 
     private func buildColorscheme(theme: Theme) -> String {

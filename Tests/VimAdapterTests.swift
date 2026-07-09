@@ -47,3 +47,20 @@ import Foundation
     let adapter = VimAdapter()
     #expect(adapter.toolName == "vim")
 }
+
+@Test func vimAdapterWritesVimScriptComments() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+    let vimrc = tmpDir.appendingPathComponent(".vimrc").path
+    // 模拟旧版本写坏的 .vimrc：含 # 标记块
+    try "set number\n# === TINTIFY START ===\ncolorscheme tintify\n# === TINTIFY END ===\n"
+        .write(toFile: vimrc, atomically: true, encoding: .utf8)
+
+    let adapter = VimAdapter(colorsDir: tmpDir.appendingPathComponent("colors").path, vimrcPath: vimrc)
+    try adapter.apply(theme: ThemeRegistry.shared.allThemes[0], configPath: nil)
+
+    let result = try String(contentsOfFile: vimrc, encoding: .utf8)
+    #expect(!result.contains("# === TINTIFY"))          // 旧的 # 块已迁移清除
+    #expect(result.contains("\" === TINTIFY START ===")) // 新块用 vim 注释
+    #expect(result.contains("colorscheme tintify"))
+}

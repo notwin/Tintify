@@ -102,6 +102,36 @@ import Foundation
     }
 }
 
+@Test func markerBlockWithVimCommentPrefix() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try "set number\n".write(to: tmp, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.writeMarkerBlock(to: tmp.path, content: "colorscheme tintify", commentPrefix: "\"")
+
+    let result = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(result.contains("\" === TINTIFY START ==="))
+    #expect(result.contains("\" === TINTIFY END ==="))
+    #expect(!result.contains("# === TINTIFY"))
+}
+
+@Test func removeMarkerBlocksCleansOldStyleMarkers() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let existing = """
+    set number
+    # === TINTIFY START ===
+    colorscheme tintify
+    # === TINTIFY END ===
+    set ruler
+    """
+    try existing.write(to: tmp, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.removeMarkerBlocks(from: tmp.path, commentPrefix: "#")
+
+    let result = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(!result.contains("TINTIFY"))
+    #expect(result.contains("set number") && result.contains("set ruler"))
+}
+
 @Test func duplicateBlocksAreMergedIntoFirst() throws {
     let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let existing = """

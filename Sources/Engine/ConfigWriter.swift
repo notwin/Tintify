@@ -25,7 +25,11 @@ enum ConfigWriter {
     /// Args:
     ///   path: Absolute path to the config file.
     ///   content: The text to place between the markers.
-    static func writeMarkerBlock(to path: String, content: String) throws {
+    ///   commentPrefix: The line-comment token for the target file's syntax (e.g. `"#"`, `"\""` for Vim script).
+    static func writeMarkerBlock(to path: String, content: String, commentPrefix: String = "#") throws {
+        let startMarker = "\(commentPrefix) === TINTIFY START ==="
+        let endMarker = "\(commentPrefix) === TINTIFY END ==="
+
         let fileContent: String
         if FileManager.default.fileExists(atPath: path) {
             fileContent = try String(contentsOfFile: path, encoding: .utf8)
@@ -63,6 +67,59 @@ enum ConfigWriter {
             if lines.last?.isEmpty == false { lines.append("") }
             lines.append(contentsOf: block)
             lines.append("")
+        }
+
+        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+    }
+
+    /// Remove all TINTIFY marker blocks using the given `commentPrefix` from the file at `path`.
+    ///
+    /// Used to migrate files that were previously written with the wrong comment syntax
+    /// (e.g. `#` markers in a `.vimrc`, which Vim script cannot parse). Unlike `writeMarkerBlock`,
+    /// this is deliberately lenient: paired blocks are removed in full, and orphan marker lines
+    /// (no matching partner) are removed individually rather than causing a throw.
+    ///
+    /// Args:
+    ///   path: Absolute path to the config file.
+    ///   commentPrefix: The line-comment token the old markers were written with (e.g. `"#"`).
+    static func removeMarkerBlocks(from path: String, commentPrefix: String) throws {
+        guard FileManager.default.fileExists(atPath: path) else { return }
+
+        let startMarker = "\(commentPrefix) === TINTIFY START ==="
+        let endMarker = "\(commentPrefix) === TINTIFY END ==="
+
+        let fileContent = try String(contentsOfFile: path, encoding: .utf8)
+        var lines = fileContent.components(separatedBy: "\n")
+
+        var removeRanges: [ClosedRange<Int>] = []
+        var pendingStart: Int?
+        for (i, line) in lines.enumerated() {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed == startMarker {
+                if let orphan = pendingStart {
+                    // 前一个 start 没等到 end，单独删除它
+                    removeRanges.append(orphan...orphan)
+                }
+                pendingStart = i
+            } else if trimmed == endMarker {
+                if let start = pendingStart {
+                    removeRanges.append(start...i)
+                    pendingStart = nil
+                } else {
+                    // 孤儿 end 标记，单独删除
+                    removeRanges.append(i...i)
+                }
+            }
+        }
+        if let orphan = pendingStart {
+            removeRanges.append(orphan...orphan)
+        }
+
+        guard !removeRanges.isEmpty else { return }
+
+        // 从后往前删除，避免索引错位
+        for range in removeRanges.sorted(by: { $0.lowerBound > $1.lowerBound }) {
+            lines.removeSubrange(range)
         }
 
         try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
