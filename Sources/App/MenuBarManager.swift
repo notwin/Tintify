@@ -19,18 +19,20 @@ final class MenuBarManager: NSObject {
             accessibilityDescription: "Tintify"
         )
         statusItem?.button?.image?.size = NSSize(width: 18, height: 18)
-        statusItem?.menu = buildMenu()
+        let menu = NSMenu()
+        menu.delegate = self
+        statusItem?.menu = menu
     }
 
     /// Tear down and recreate the menu to reflect current state.
     func rebuildMenu() {
-        statusItem?.menu = buildMenu()
+        if let menu = statusItem?.menu { populate(menu) }
     }
 
     // MARK: - Menu Construction
 
-    private func buildMenu() -> NSMenu {
-        let menu = NSMenu()
+    private func populate(_ menu: NSMenu) {
+        menu.removeAllItems()
 
         // Header: 当前主题名
         let currentTheme = registry.theme(id: settings.currentThemeId)
@@ -114,8 +116,6 @@ final class MenuBarManager: NSObject {
         )
         quitItem.target = self
         menu.addItem(quitItem)
-
-        return menu
     }
 
     // MARK: - Actions
@@ -166,5 +166,12 @@ final class MenuBarManager: NSObject {
 
     @objc private func quit() {
         NSApplication.shared.terminate(nil)
+    }
+}
+
+extension MenuBarManager: NSMenuDelegate {
+    /// 每次打开菜单时重建 — 无论主题从哪个入口被应用，菜单永远反映当前状态。
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        populate(menu)
     }
 }
