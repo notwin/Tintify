@@ -17,6 +17,15 @@ enum ConfigWriter {
     static let startMarker = "# === TINTIFY START ==="
     static let endMarker = "# === TINTIFY END ==="
 
+    /// symlink 安全的原子写入：先解析链接，把内容写到真实目标文件。
+    ///
+    /// `String.write(atomically:)` 会用临时文件 rename 覆盖路径本身，
+    /// 若路径是 symlink 会将其替换为普通文件，破坏用户的 dotfiles 链接。
+    static func atomicWrite(_ content: String, to path: String) throws {
+        let resolved = URL(fileURLWithPath: path).resolvingSymlinksInPath().path
+        try content.write(toFile: resolved, atomically: true, encoding: .utf8)
+    }
+
     /// Insert or replace a TINTIFY START/END marker block in the file at `path`.
     ///
     /// If a marker block already exists it is replaced in-place.
@@ -69,7 +78,7 @@ enum ConfigWriter {
             lines.append("")
         }
 
-        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+        try atomicWrite(lines.joined(separator: "\n"), to: path)
     }
 
     /// Remove all TINTIFY marker blocks using the given `commentPrefix` from the file at `path`.
@@ -122,7 +131,7 @@ enum ConfigWriter {
             lines.removeSubrange(range)
         }
 
-        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+        try atomicWrite(lines.joined(separator: "\n"), to: path)
     }
 
     /// Replace the first line matching `prefix` with `newLine`, or append if no match.
@@ -147,7 +156,7 @@ enum ConfigWriter {
             lines.append(newLine)
         }
 
-        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+        try atomicWrite(lines.joined(separator: "\n"), to: path)
     }
 
     /// Replace an entire TOML section (from `[sectionPrefix` to the next `[` header) with new content.
@@ -184,6 +193,6 @@ enum ConfigWriter {
             lines.append(contentsOf: newContent.components(separatedBy: "\n"))
         }
 
-        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+        try atomicWrite(lines.joined(separator: "\n"), to: path)
     }
 }

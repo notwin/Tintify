@@ -26,15 +26,8 @@ struct EzaAdapter: ToolAdapter {
             atPath: dir, withIntermediateDirectories: true
         )
 
-        // Remove symlink if present so we write a real file, not overwrite the link target.
-        let fm = FileManager.default
-        if let target = try? fm.destinationOfSymbolicLink(atPath: path) {
-            NSLog("[Tintify] eza: replacing symlink at \(path) (was -> \(target))")
-            try fm.removeItem(atPath: path)
-        }
-
         let yaml = buildYAML(palette: p)
-        try yaml.write(toFile: path, atomically: true, encoding: .utf8)
+        try ConfigWriter.atomicWrite(yaml, to: path)
     }
 
     /// Build the eza theme YAML from a palette.

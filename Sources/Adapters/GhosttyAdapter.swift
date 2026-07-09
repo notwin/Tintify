@@ -69,6 +69,6 @@ struct GhosttyAdapter: ToolAdapter {
             """
 
         let themePath = (customThemesDir as NSString).appendingPathComponent(name)
-        try content.write(toFile: themePath, atomically: true, encoding: .utf8)
+        try ConfigWriter.atomicWrite(content, to: themePath)
     }
 }

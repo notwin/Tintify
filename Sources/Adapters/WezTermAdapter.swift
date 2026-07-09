@@ -88,6 +88,6 @@ struct WezTermAdapter: ToolAdapter {
             try FileManager.default.createDirectory(atPath: parentDir, withIntermediateDirectories: true)
         }
 
-        try lines.joined(separator: "\n").write(toFile: path, atomically: true, encoding: .utf8)
+        try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
     }
 }

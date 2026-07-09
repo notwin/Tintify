@@ -26,7 +26,7 @@ struct VimAdapter: ToolAdapter {
 
         let colorscheme = buildColorscheme(theme: theme)
         let colorschemeFile = (colorsDir as NSString).appendingPathComponent("tintify.vim")
-        try colorscheme.write(toFile: colorschemeFile, atomically: true, encoding: .utf8)
+        try ConfigWriter.atomicWrite(colorscheme, to: colorschemeFile)
 
         let vimrcLine = "colorscheme tintify"
         // 迁移：清理 v1.7 以前误写入的 shell 风格标记（vim 会报 E488）

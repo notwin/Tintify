@@ -85,10 +85,9 @@ struct LazygitAdapter: ToolAdapter {
                 lines.removeFirst()
             }
 
-            try lines.joined(separator: "\n")
-                .write(toFile: path, atomically: true, encoding: .utf8)
+            try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
         } else {
-            try guiSection.write(toFile: path, atomically: true, encoding: .utf8)
+            try ConfigWriter.atomicWrite(guiSection, to: path)
         }
     }
 }

@@ -156,3 +156,35 @@ import Foundation
     #expect(after.contains("# user line between blocks"))               // 块间用户行保留
     #expect(after.contains("# top") && after.contains("# bottom"))
 }
+
+@Test func atomicWritePreservesSymlink() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+    let real = tmpDir.appendingPathComponent("real.conf").path
+    let link = tmpDir.appendingPathComponent("link.conf").path
+    try "original".write(toFile: real, atomically: true, encoding: .utf8)
+    try FileManager.default.createSymbolicLink(atPath: link, withDestinationPath: real)
+
+    try ConfigWriter.atomicWrite("updated", to: link)
+
+    // 链接仍是链接
+    let attrs = try FileManager.default.attributesOfItem(atPath: link)
+    #expect(attrs[.type] as? FileAttributeType == .typeSymbolicLink)
+    // 真实文件被更新
+    #expect(try String(contentsOfFile: real, encoding: .utf8) == "updated")
+}
+
+@Test func markerBlockWriteThroughSymlink() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+    let real = tmpDir.appendingPathComponent("zshrc").path
+    let link = tmpDir.appendingPathComponent(".zshrc").path
+    try "# user config".write(toFile: real, atomically: true, encoding: .utf8)
+    try FileManager.default.createSymbolicLink(atPath: link, withDestinationPath: real)
+
+    try ConfigWriter.writeMarkerBlock(to: link, content: "export X=1")
+
+    let attrs = try FileManager.default.attributesOfItem(atPath: link)
+    #expect(attrs[.type] as? FileAttributeType == .typeSymbolicLink)
+    #expect(try String(contentsOfFile: real, encoding: .utf8).contains("export X=1"))
+}
