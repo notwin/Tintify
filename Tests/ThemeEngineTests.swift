@@ -87,3 +87,28 @@ import Foundation
     let after = try String(contentsOfFile: tmpConf, encoding: .utf8)
     #expect(after == "user config")                            // 配置文件未被改写
 }
+
+@MainActor
+@Test func totalFailureDoesNotUpdateCurrentTheme() throws {
+    struct AlwaysFailingAdapter: ToolAdapter {
+        let toolName = "failing"
+        var defaultConfigPath: String { "/nonexistent" }
+        func apply(theme: Theme, configPath: String?) throws {
+            throw NSError(domain: "test", code: 1)
+        }
+    }
+    let before = AppSettings.shared.currentThemeId
+    let beforePrev = AppSettings.shared.previousThemeId
+    defer {  // 恢复真实 defaults，避免污染
+        AppSettings.shared.currentThemeId = before
+        AppSettings.shared.previousThemeId = beforePrev
+    }
+
+    let tmpRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    let engine = ThemeEngine(adapters: [AlwaysFailingAdapter()], backupManager: BackupManager(backupRoot: tmpRoot))
+    let target = ThemeRegistry.shared.allThemes.first { $0.id != before }!
+    let result = engine.apply(theme: target)
+
+    #expect(result.failedCount > 0 && result.successCount == 0)
+    #expect(AppSettings.shared.currentThemeId == before)  // 全失败不更新
+}

@@ -103,11 +103,15 @@ final class ThemeEngine {
             }
         }
 
-        // 保存上一个主题 ID（仅当切换到不同主题时）
-        if AppSettings.shared.currentThemeId != theme.id {
-            AppSettings.shared.previousThemeId = AppSettings.shared.currentThemeId
+        // 至少一个工具成功才算切换成功；全失败时保持原状态，
+        // 否则菜单勾选和"回到上一个"都会指向幻影主题
+        let successCount = toolResults.filter { $0.status == .success }.count
+        if successCount > 0 {
+            if AppSettings.shared.currentThemeId != theme.id {
+                AppSettings.shared.previousThemeId = AppSettings.shared.currentThemeId
+            }
+            AppSettings.shared.currentThemeId = theme.id
         }
-        AppSettings.shared.currentThemeId = theme.id
 
         return ApplyResult(
             theme: theme,
