@@ -41,3 +41,14 @@ import Testing
     let ansiThemes = trending.filter { $0.compatibility == .ansiPartial }
     #expect(ansiThemes.count >= 7)
 }
+
+@Test func verifiedToolNamesAreNotRegressed() throws {
+    let registry = ThemeRegistry.shared
+    #expect(registry.theme(id: "solarized-dark")?.toolNames["ghostty"] == "Solarized Dark Patched")
+    #expect(registry.theme(id: "solarized-light")?.toolNames["ghostty"] == "iTerm2 Solarized Light")
+    #expect(registry.theme(id: "rose-pine")?.toolNames["ghostty"] == "Rose Pine")
+    #expect(registry.theme(id: "rose-pine-moon")?.toolNames["ghostty"] == "Rose Pine Moon")
+    #expect(registry.theme(id: "rose-pine-dawn")?.toolNames["ghostty"] == "Rose Pine Dawn")
+    #expect(registry.theme(id: "gruvbox-dark")?.toolNames["wezterm"] == "GruvboxDark")
+    #expect(registry.theme(id: "gruvbox-light")?.toolNames["wezterm"] == "GruvboxLight")
+}
