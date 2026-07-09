@@ -142,17 +142,30 @@ struct OnboardingView: View {
         }
     }
 
+    /// Homebrew(arm64/x86) 与系统路径；GUI app 的 PATH 不含 Homebrew，
+    /// 不能用 `which`，直接探测这些固定位置。
+    private static let binSearchPaths = [
+        "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"
+    ]
+
+    private func findExecutable(_ name: String) -> Bool {
+        Self.binSearchPaths.contains {
+            FileManager.default.isExecutableFile(atPath: "\($0)/\(name)")
+        }
+    }
+
     private func detectTools() {
         let toolChecks: [(String, () -> Bool)] = [
             ("ghostty", { FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Library/Application Support/com.mitchellh.ghostty/config") }),
-            ("starship", { shell("which starship") }),
-            ("bat", { shell("which bat") }),
-            ("fzf", { shell("which fzf") }),
-            ("delta", { shell("which delta") }),
-            ("eza", { shell("which eza") }),
-            ("lazygit", { shell("which lazygit") }),
-            ("tmux", { shell("which tmux") }),
-            ("vim", { shell("which vim") }),
+            ("starship", { findExecutable("starship") }),
+            ("bat", { findExecutable("bat") }),
+            ("fzf", { findExecutable("fzf") }),
+            ("delta", { findExecutable("delta") }),
+            ("eza", { findExecutable("eza") }),
+            ("lazygit", { findExecutable("lazygit") }),
+            ("tmux", { findExecutable("tmux") }),
+            ("vim", { findExecutable("vim") }),
+            ("wezterm", { findExecutable("wezterm") || FileManager.default.fileExists(atPath: "/Applications/WezTerm.app") }),
             ("zsh-syntax-highlighting", { FileManager.default.fileExists(atPath: "/opt/homebrew/share/zsh-syntax-highlighting") || FileManager.default.fileExists(atPath: "/usr/local/share/zsh-syntax-highlighting") }),
         ]
 
@@ -162,21 +175,6 @@ struct OnboardingView: View {
             if !installed {
                 settings.disabledTools.insert(name)
             }
-        }
-    }
-
-    private func shell(_ command: String) -> Bool {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-        process.arguments = ["-c", command]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        do {
-            try process.run()
-            process.waitUntilExit()
-            return process.terminationStatus == 0
-        } catch {
-            return false
         }
     }
 }
