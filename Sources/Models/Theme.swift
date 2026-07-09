@@ -27,6 +27,7 @@ struct Theme: Identifiable, Codable, Hashable, Sendable {
     let stars: String?
     let compatibility: ThemeCompatibility
     let variants: [String]?
+    let promptSegments: [PromptSegment]
 
     enum Appearance: String, Codable, Hashable {
         case dark, light
@@ -36,6 +37,12 @@ struct Theme: Identifiable, Codable, Hashable, Sendable {
     func nameForTool(_ tool: String) -> String {
         toolNames[tool] ?? name
     }
+}
+
+/// starship 胶囊渐变的一段：段底色 + 段内文字色（ink 写入 palette 块备用）。
+struct PromptSegment: Codable, Hashable, Sendable {
+    let color: String
+    let ink: String
 }
 
 /// The 26 semantic color slots shared by every theme.

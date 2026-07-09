@@ -29,7 +29,14 @@ enum OriginalThemes {
             description: "赛博朋克霓虹，纯白底上的荧光色彩爆发",
             stars: nil,
             compatibility: .ansiPartial,
-            variants: nil
+            variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#ff2daf", ink: "#0c0c0f"),
+                PromptSegment(color: "#bd5eff", ink: "#0c0c0f"),
+                PromptSegment(color: "#5ea1ff", ink: "#0c0c0f"),
+                PromptSegment(color: "#5ef1ff", ink: "#0c0c0f"),
+                PromptSegment(color: "#5eff6c", ink: "#0c0c0f"),
+            ]
         ),
 
         // ── 墨竹 (Ink Bamboo) ───────────────────────────────────
@@ -57,7 +64,14 @@ enum OriginalThemes {
             description: "水墨文人风，竹青朱砂间的素雅沉静",
             stars: nil,
             compatibility: .ansiPartial,
-            variants: nil
+            variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#8878a8", ink: "#1c1814"),
+                PromptSegment(color: "#c45040", ink: "#d0ccc4"),
+                PromptSegment(color: "#cc8844", ink: "#1c1814"),
+                PromptSegment(color: "#6a9a6a", ink: "#1c1814"),
+                PromptSegment(color: "#4870a0", ink: "#d0ccc4"),
+            ]
         ),
 
         // ── 极光 (Aurora) ───────────────────────────────────────
@@ -85,7 +99,14 @@ enum OriginalThemes {
             description: "北极光之夜，绿紫光晕在深蓝夜空中舞动",
             stars: nil,
             compatibility: .ansiPartial,
-            variants: nil
+            variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#60e8a0", ink: "#0c1018"),
+                PromptSegment(color: "#50d8c0", ink: "#0c1018"),
+                PromptSegment(color: "#70c8e8", ink: "#0c1018"),
+                PromptSegment(color: "#a088e0", ink: "#0c1018"),
+                PromptSegment(color: "#e070a0", ink: "#0c1018"),
+            ]
         ),
     ]
 }

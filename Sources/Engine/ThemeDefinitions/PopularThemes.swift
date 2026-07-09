@@ -17,7 +17,14 @@ enum PopularThemes {
                 base: "#1e1e2e", mantle: "#181825", crust: "#11111b"),
             toolNames: [:], category: .popular,
             description: "最受欢迎的柔和暖色方案，低对比护眼", stars: "18.8k",
-            compatibility: .full, variants: ["catppuccin-macchiato", "catppuccin-frappe", "catppuccin-latte"]),
+            compatibility: .full, variants: ["catppuccin-macchiato", "catppuccin-frappe", "catppuccin-latte"],
+            promptSegments: [
+                PromptSegment(color: "#cba6f7", ink: "#11111b"),
+                PromptSegment(color: "#f5c2e7", ink: "#11111b"),
+                PromptSegment(color: "#89b4fa", ink: "#11111b"),
+                PromptSegment(color: "#94e2d5", ink: "#11111b"),
+                PromptSegment(color: "#b4befe", ink: "#11111b"),
+            ]),
         Theme(
             id: "catppuccin-macchiato", name: "Catppuccin Macchiato", appearance: .dark,
             palette: Palette(
@@ -31,7 +38,14 @@ enum PopularThemes {
                 base: "#24273a", mantle: "#1e2030", crust: "#181926"),
             toolNames: [:], category: .popular,
             description: "Catppuccin 的中高对比变体", stars: nil,
-            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-frappe", "catppuccin-latte"]),
+            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-frappe", "catppuccin-latte"],
+            promptSegments: [
+                PromptSegment(color: "#c6a0f6", ink: "#181926"),
+                PromptSegment(color: "#f5bde6", ink: "#181926"),
+                PromptSegment(color: "#8aadf4", ink: "#181926"),
+                PromptSegment(color: "#8bd5ca", ink: "#181926"),
+                PromptSegment(color: "#b7bdf8", ink: "#181926"),
+            ]),
         Theme(
             id: "catppuccin-frappe", name: "Catppuccin Frappe", appearance: .dark,
             palette: Palette(
@@ -45,7 +59,14 @@ enum PopularThemes {
                 base: "#303446", mantle: "#292c3c", crust: "#232634"),
             toolNames: [:], category: .popular,
             description: "Catppuccin 的中等对比变体", stars: nil,
-            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-macchiato", "catppuccin-latte"]),
+            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-macchiato", "catppuccin-latte"],
+            promptSegments: [
+                PromptSegment(color: "#ca9ee6", ink: "#232634"),
+                PromptSegment(color: "#f4b8e4", ink: "#232634"),
+                PromptSegment(color: "#8caaee", ink: "#232634"),
+                PromptSegment(color: "#81c8be", ink: "#232634"),
+                PromptSegment(color: "#babbf1", ink: "#232634"),
+            ]),
         Theme(
             id: "catppuccin-latte", name: "Catppuccin Latte", appearance: .light,
             palette: Palette(
@@ -59,7 +80,14 @@ enum PopularThemes {
                 base: "#eff1f5", mantle: "#e6e9ef", crust: "#dce0e8"),
             toolNames: [:], category: .popular,
             description: "Catppuccin 唯一的浅色方案，柔和优雅", stars: nil,
-            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-macchiato", "catppuccin-frappe"]),
+            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-macchiato", "catppuccin-frappe"],
+            promptSegments: [
+                PromptSegment(color: "#8839ef", ink: "#eff1f5"),
+                PromptSegment(color: "#ea76cb", ink: "#eff1f5"),
+                PromptSegment(color: "#1e66f5", ink: "#eff1f5"),
+                PromptSegment(color: "#179299", ink: "#eff1f5"),
+                PromptSegment(color: "#7287fd", ink: "#eff1f5"),
+            ]),
         Theme(
             id: "dracula", name: "Dracula", appearance: .dark,
             palette: Palette(
@@ -73,7 +101,14 @@ enum PopularThemes {
                 base: "#282a36", mantle: "#22232e", crust: "#1c1d27"),
             toolNames: ["wezterm": "Dracula (Official)"], category: .popular,
             description: "高对比鲜艳配色，紫粉绿的经典组合", stars: "23.2k",
-            compatibility: .full, variants: nil),
+            compatibility: .full, variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#bd93f9", ink: "#282a36"),
+                PromptSegment(color: "#ff79c6", ink: "#282a36"),
+                PromptSegment(color: "#ffb86c", ink: "#282a36"),
+                PromptSegment(color: "#50fa7b", ink: "#282a36"),
+                PromptSegment(color: "#8be9fd", ink: "#282a36"),
+            ]),
         Theme(
             id: "solarized-dark", name: "Solarized Dark", appearance: .dark,
             palette: Palette(
@@ -88,7 +123,14 @@ enum PopularThemes {
             toolNames: ["ghostty": "Solarized Dark Patched", "bat": "Solarized (dark)", "delta": "Solarized (dark)", "wezterm": "Builtin Solarized Dark"],
             category: .popular,
             description: "终端配色始祖，科学设计的精准色彩关系", stars: "15.8k",
-            compatibility: .full, variants: ["solarized-light"]),
+            compatibility: .full, variants: ["solarized-light"],
+            promptSegments: [
+                PromptSegment(color: "#6c71c4", ink: "#002b36"),
+                PromptSegment(color: "#d33682", ink: "#002b36"),
+                PromptSegment(color: "#268bd2", ink: "#002b36"),
+                PromptSegment(color: "#2aa198", ink: "#002b36"),
+                PromptSegment(color: "#859900", ink: "#002b36"),
+            ]),
         Theme(
             id: "solarized-light", name: "Solarized Light", appearance: .light,
             palette: Palette(
@@ -103,6 +145,13 @@ enum PopularThemes {
             toolNames: ["ghostty": "iTerm2 Solarized Light", "bat": "Solarized (light)", "delta": "Solarized (light)", "wezterm": "Builtin Solarized Light"],
             category: .popular,
             description: "最经典的浅色方案，温暖底色舒适阅读", stars: nil,
-            compatibility: .full, variants: ["solarized-dark"]),
+            compatibility: .full, variants: ["solarized-dark"],
+            promptSegments: [
+                PromptSegment(color: "#6c71c4", ink: "#fdf6e3"),
+                PromptSegment(color: "#d33682", ink: "#fdf6e3"),
+                PromptSegment(color: "#268bd2", ink: "#fdf6e3"),
+                PromptSegment(color: "#2aa198", ink: "#fdf6e3"),
+                PromptSegment(color: "#859900", ink: "#fdf6e3"),
+            ]),
     ]
 }

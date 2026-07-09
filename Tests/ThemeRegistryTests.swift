@@ -52,3 +52,13 @@ import Testing
     #expect(registry.theme(id: "gruvbox-dark")?.toolNames["wezterm"] == "GruvboxDark")
     #expect(registry.theme(id: "gruvbox-light")?.toolNames["wezterm"] == "GruvboxLight")
 }
+
+@Test func everyThemeHasFivePromptSegmentsWithValidHex() throws {
+    for theme in ThemeRegistry.shared.allThemes {
+        #expect(theme.promptSegments.count == 5, "主题 \(theme.id) 的渐变段数不是 5")
+        for seg in theme.promptSegments {
+            #expect(seg.color.wholeMatch(of: #/#[0-9a-fA-F]{6}/#) != nil, "主题 \(theme.id) 渐变色 \(seg.color) 非法")
+            #expect(seg.ink.wholeMatch(of: #/#[0-9a-fA-F]{6}/#) != nil, "主题 \(theme.id) 字色 \(seg.ink) 非法")
+        }
+    }
+}

@@ -18,7 +18,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "TokyoNight", "bat": "ansi", "delta": "ansi", "wezterm": "tokyonight"],
             category: .trending,
             description: "霓虹东京夜景风，深蓝底色配荧光色彩", stars: nil,
-            compatibility: .ansiPartial, variants: ["tokyo-night-light"]),
+            compatibility: .ansiPartial, variants: ["tokyo-night-light"],
+            promptSegments: [
+                PromptSegment(color: "#bb9af7", ink: "#16161e"),
+                PromptSegment(color: "#7aa2f7", ink: "#16161e"),
+                PromptSegment(color: "#7dcfff", ink: "#16161e"),
+                PromptSegment(color: "#73daca", ink: "#16161e"),
+                PromptSegment(color: "#3d59a1", ink: "#e8ecfb"),
+            ]),
         Theme(
             id: "tokyo-night-light", name: "Tokyo Night Light", appearance: .light,
             palette: Palette(
@@ -33,7 +40,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "TokyoNight Day", "bat": "ansi", "delta": "ansi", "wezterm": "tokyonight-day"],
             category: .trending,
             description: "Tokyo Night 的日间模式，柔和浅色", stars: nil,
-            compatibility: .ansiPartial, variants: ["tokyo-night"]),
+            compatibility: .ansiPartial, variants: ["tokyo-night"],
+            promptSegments: [
+                PromptSegment(color: "#7847bd", ink: "#d5d6db"),
+                PromptSegment(color: "#34548a", ink: "#d5d6db"),
+                PromptSegment(color: "#166775", ink: "#d5d6db"),
+                PromptSegment(color: "#33635c", ink: "#d5d6db"),
+                PromptSegment(color: "#8f5e15", ink: "#d5d6db"),
+            ]),
         Theme(
             id: "rose-pine", name: "Rosé Pine", appearance: .dark,
             palette: Palette(
@@ -48,7 +62,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Rose Pine", "bat": "ansi", "delta": "ansi", "wezterm": "rose-pine"],
             category: .trending,
             description: "柔和 soho 美学，松绿与玫瑰金的诗意组合", stars: "1.5k",
-            compatibility: .ansiPartial, variants: ["rose-pine-moon", "rose-pine-dawn"]),
+            compatibility: .ansiPartial, variants: ["rose-pine-moon", "rose-pine-dawn"],
+            promptSegments: [
+                PromptSegment(color: "#c4a7e7", ink: "#191724"),
+                PromptSegment(color: "#eb6f92", ink: "#191724"),
+                PromptSegment(color: "#f6c177", ink: "#191724"),
+                PromptSegment(color: "#9ccfd8", ink: "#191724"),
+                PromptSegment(color: "#31748f", ink: "#f2eff9"),
+            ]),
         Theme(
             id: "rose-pine-moon", name: "Rosé Pine Moon", appearance: .dark,
             palette: Palette(
@@ -63,7 +84,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Rose Pine Moon", "bat": "ansi", "delta": "ansi", "wezterm": "rose-pine-moon"],
             category: .trending,
             description: "Rosé Pine 的月光变体，稍高对比度", stars: nil,
-            compatibility: .ansiPartial, variants: ["rose-pine", "rose-pine-dawn"]),
+            compatibility: .ansiPartial, variants: ["rose-pine", "rose-pine-dawn"],
+            promptSegments: [
+                PromptSegment(color: "#c4a7e7", ink: "#232136"),
+                PromptSegment(color: "#eb6f92", ink: "#232136"),
+                PromptSegment(color: "#f6c177", ink: "#232136"),
+                PromptSegment(color: "#9ccfd8", ink: "#232136"),
+                PromptSegment(color: "#3e8fb0", ink: "#e0def4"),
+            ]),
         Theme(
             id: "rose-pine-dawn", name: "Rosé Pine Dawn", appearance: .light,
             palette: Palette(
@@ -78,7 +106,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Rose Pine Dawn", "bat": "ansi", "delta": "ansi", "wezterm": "rose-pine-dawn"],
             category: .trending,
             description: "Rosé Pine 的黎明浅色，温暖优雅", stars: nil,
-            compatibility: .ansiPartial, variants: ["rose-pine", "rose-pine-moon"]),
+            compatibility: .ansiPartial, variants: ["rose-pine", "rose-pine-moon"],
+            promptSegments: [
+                PromptSegment(color: "#907aa9", ink: "#fdfaf6"),
+                PromptSegment(color: "#b4637a", ink: "#fdfaf6"),
+                PromptSegment(color: "#d7827e", ink: "#fdfaf6"),
+                PromptSegment(color: "#ea9d34", ink: "#fdfaf6"),
+                PromptSegment(color: "#286983", ink: "#fdfaf6"),
+            ]),
         Theme(
             id: "kanagawa-wave", name: "Kanagawa Wave", appearance: .dark,
             palette: Palette(
@@ -93,7 +128,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Kanagawa Wave", "bat": "ansi", "delta": "ansi", "wezterm": "Kanagawa (Gogh)"],
             category: .trending,
             description: "日式水墨画风，深靛与柔金的东方美学", stars: "5.1k",
-            compatibility: .ansiPartial, variants: ["kanagawa-dragon", "kanagawa-lotus"]),
+            compatibility: .ansiPartial, variants: ["kanagawa-dragon", "kanagawa-lotus"],
+            promptSegments: [
+                PromptSegment(color: "#d27e99", ink: "#16161d"),
+                PromptSegment(color: "#957fb8", ink: "#16161d"),
+                PromptSegment(color: "#7e9cd8", ink: "#16161d"),
+                PromptSegment(color: "#7aa89f", ink: "#16161d"),
+                PromptSegment(color: "#2d4f67", ink: "#e9e4d4"),
+            ]),
         Theme(
             id: "kanagawa-dragon", name: "Kanagawa Dragon", appearance: .dark,
             palette: Palette(
@@ -108,7 +150,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Kanagawa Dragon", "bat": "ansi", "delta": "ansi", "wezterm": "Kanagawa (Gogh)"],
             category: .trending,
             description: "Kanagawa 的高对比暗色变体，龙之墨色", stars: nil,
-            compatibility: .ansiPartial, variants: ["kanagawa-wave", "kanagawa-lotus"]),
+            compatibility: .ansiPartial, variants: ["kanagawa-wave", "kanagawa-lotus"],
+            promptSegments: [
+                PromptSegment(color: "#c4746e", ink: "#181616"),
+                PromptSegment(color: "#a292a3", ink: "#181616"),
+                PromptSegment(color: "#8ba4b0", ink: "#181616"),
+                PromptSegment(color: "#8a9a7b", ink: "#181616"),
+                PromptSegment(color: "#393836", ink: "#c5c9c5"),
+            ]),
         Theme(
             id: "kanagawa-lotus", name: "Kanagawa Lotus", appearance: .light,
             palette: Palette(
@@ -123,7 +172,14 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Kanagawa Lotus", "bat": "ansi", "delta": "ansi", "wezterm": "Kanagawa (Gogh)"],
             category: .trending,
             description: "Kanagawa 的莲花浅色，和纸质感的独特配色", stars: nil,
-            compatibility: .ansiPartial, variants: ["kanagawa-wave", "kanagawa-dragon"]),
+            compatibility: .ansiPartial, variants: ["kanagawa-wave", "kanagawa-dragon"],
+            promptSegments: [
+                PromptSegment(color: "#624c83", ink: "#f2ecbc"),
+                PromptSegment(color: "#b35b79", ink: "#f2ecbc"),
+                PromptSegment(color: "#5d7599", ink: "#f2ecbc"),
+                PromptSegment(color: "#597b75", ink: "#f2ecbc"),
+                PromptSegment(color: "#77713f", ink: "#f2ecbc"),
+            ]),
         Theme(
             id: "everforest-dark", name: "Everforest Dark", appearance: .dark,
             palette: Palette(
@@ -138,6 +194,13 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Everforest Dark Hard", "bat": "ansi", "delta": "ansi", "wezterm": "Everforest Dark (Gogh)"],
             category: .trending,
             description: "绿色系护眼设计，长时间编码首选", stars: "3.8k",
-            compatibility: .ansiPartial, variants: nil),
+            compatibility: .ansiPartial, variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#d699b6", ink: "#2d353b"),
+                PromptSegment(color: "#e69875", ink: "#2d353b"),
+                PromptSegment(color: "#dbbc7f", ink: "#2d353b"),
+                PromptSegment(color: "#a7c080", ink: "#2d353b"),
+                PromptSegment(color: "#7fbbb3", ink: "#2d353b"),
+            ]),
     ]
 }

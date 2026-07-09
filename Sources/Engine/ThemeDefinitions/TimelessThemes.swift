@@ -18,7 +18,14 @@ enum TimelessThemes {
             toolNames: ["ghostty": "Monokai Pro", "bat": "Monokai Extended", "delta": "Monokai Extended", "wezterm": "MonokaiPro (Gogh)"],
             category: .timeless,
             description: "Sublime Text 经典配色，鲜艳温暖的代名词", stars: nil,
-            compatibility: .full, variants: nil),
+            compatibility: .full, variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#ae81ff", ink: "#272822"),
+                PromptSegment(color: "#f92672", ink: "#272822"),
+                PromptSegment(color: "#fd971f", ink: "#272822"),
+                PromptSegment(color: "#e6db74", ink: "#272822"),
+                PromptSegment(color: "#a6e22e", ink: "#272822"),
+            ]),
         Theme(
             id: "one-dark", name: "One Dark", appearance: .dark,
             palette: Palette(
@@ -33,7 +40,14 @@ enum TimelessThemes {
             toolNames: ["ghostty": "Atom One Dark", "bat": "OneHalfDark", "delta": "OneHalfDark", "wezterm": "OneHalfDark"],
             category: .timeless,
             description: "Atom 编辑器经典暗色，干净专业的首选", stars: "4k",
-            compatibility: .full, variants: ["one-light"]),
+            compatibility: .full, variants: ["one-light"],
+            promptSegments: [
+                PromptSegment(color: "#c678dd", ink: "#282c34"),
+                PromptSegment(color: "#e06c75", ink: "#282c34"),
+                PromptSegment(color: "#d19a66", ink: "#282c34"),
+                PromptSegment(color: "#98c379", ink: "#282c34"),
+                PromptSegment(color: "#61afef", ink: "#282c34"),
+            ]),
         Theme(
             id: "one-light", name: "One Light", appearance: .light,
             palette: Palette(
@@ -48,7 +62,14 @@ enum TimelessThemes {
             toolNames: ["ghostty": "Atom One Light", "bat": "OneHalfLight", "delta": "OneHalfLight", "wezterm": "OneHalfLight"],
             category: .timeless,
             description: "程序员最熟悉的浅色配色，清爽明亮", stars: nil,
-            compatibility: .full, variants: ["one-dark"]),
+            compatibility: .full, variants: ["one-dark"],
+            promptSegments: [
+                PromptSegment(color: "#a626a4", ink: "#fafafa"),
+                PromptSegment(color: "#e45649", ink: "#fafafa"),
+                PromptSegment(color: "#986801", ink: "#fafafa"),
+                PromptSegment(color: "#50a14f", ink: "#fafafa"),
+                PromptSegment(color: "#4078f2", ink: "#fafafa"),
+            ]),
         Theme(
             id: "gruvbox-dark", name: "Gruvbox Dark", appearance: .dark,
             palette: Palette(
@@ -63,7 +84,14 @@ enum TimelessThemes {
             toolNames: ["bat": "gruvbox-dark", "delta": "gruvbox-dark", "wezterm": "GruvboxDark"],
             category: .timeless,
             description: "复古暖色调，泥土质感的舒适配色", stars: "13k",
-            compatibility: .full, variants: ["gruvbox-light"]),
+            compatibility: .full, variants: ["gruvbox-light"],
+            promptSegments: [
+                PromptSegment(color: "#d3869b", ink: "#1d2021"),
+                PromptSegment(color: "#fe8019", ink: "#1d2021"),
+                PromptSegment(color: "#fabd2f", ink: "#1d2021"),
+                PromptSegment(color: "#b8bb26", ink: "#1d2021"),
+                PromptSegment(color: "#689d6a", ink: "#1d2021"),
+            ]),
         Theme(
             id: "gruvbox-light", name: "Gruvbox Light", appearance: .light,
             palette: Palette(
@@ -78,7 +106,14 @@ enum TimelessThemes {
             toolNames: ["bat": "gruvbox-light", "delta": "gruvbox-light", "wezterm": "GruvboxLight"],
             category: .timeless,
             description: "Gruvbox 的浅色变体，温暖阳光感", stars: nil,
-            compatibility: .full, variants: ["gruvbox-dark"]),
+            compatibility: .full, variants: ["gruvbox-dark"],
+            promptSegments: [
+                PromptSegment(color: "#b16286", ink: "#fbf1c7"),
+                PromptSegment(color: "#af3a03", ink: "#fbf1c7"),
+                PromptSegment(color: "#b57614", ink: "#fbf1c7"),
+                PromptSegment(color: "#79740e", ink: "#fbf1c7"),
+                PromptSegment(color: "#427b58", ink: "#fbf1c7"),
+            ]),
         Theme(
             id: "nord", name: "Nord", appearance: .dark,
             palette: Palette(
@@ -92,6 +127,13 @@ enum TimelessThemes {
                 base: "#2e3440", mantle: "#292e39", crust: "#242933"),
             toolNames: ["wezterm": "nord"], category: .timeless,
             description: "北极冰蓝色调，冷静克制的极简风格", stars: "6k",
-            compatibility: .full, variants: nil),
+            compatibility: .full, variants: nil,
+            promptSegments: [
+                PromptSegment(color: "#ebcb8b", ink: "#2e3440"),
+                PromptSegment(color: "#a3be8c", ink: "#2e3440"),
+                PromptSegment(color: "#8fbcbb", ink: "#2e3440"),
+                PromptSegment(color: "#88c0d0", ink: "#2e3440"),
+                PromptSegment(color: "#5e81ac", ink: "#eceff4"),
+            ]),
     ]
 }
