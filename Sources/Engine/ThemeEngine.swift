@@ -24,6 +24,7 @@ final class ThemeEngine {
         { TmuxAdapter() },
         { VimAdapter() },
         { WezTermAdapter() },
+        { OttyAdapter() },
     ]
 
     /// Create a new engine.
