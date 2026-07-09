@@ -27,6 +27,12 @@ struct StarshipAdapter: ToolAdapter {
     func apply(theme: Theme, configPath: String? = nil) throws {
         let path = configPath ?? defaultConfigPath
 
+        // One-time migration: rewrite hardcoded hex in the user's format string
+        // to grad/ink slot references. Must run before the palette section below
+        // is written, since that section is itself full of hex literals that a
+        // later scan would misidentify as user-authored colors.
+        try migrateHardcodedHexIfNeeded(in: path)
+
         // Set the palette reference line (must sit in the TOML top-level area,
         // before the first [section] — replaceLine would append to EOF and
         // silently land inside the last section). The section name is fixed
@@ -129,5 +135,33 @@ struct StarshipAdapter: ToolAdapter {
         }
 
         try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
+    }
+
+    /// 一次性把 format 中硬编码的 hex 迁移为 grad 槽位引用。幂等：
+    /// 文件里已出现 grad1 即视为已迁移。unique hex 超过 10 个不自动迁移（NSLog 留痕）。
+    private func migrateHardcodedHexIfNeeded(in path: String) throws {
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        let content = try String(contentsOfFile: path, encoding: .utf8)
+        guard !content.contains("grad1") else { return }
+
+        let regex = try! NSRegularExpression(pattern: "#[0-9a-fA-F]{6}")
+        let range = NSRange(content.startIndex..., in: content)
+        var seen: [String] = []
+        for match in regex.matches(in: content, range: range) {
+            let hex = String(content[Range(match.range, in: content)!]).lowercased()
+            if !seen.contains(hex) { seen.append(hex) }
+        }
+        guard !seen.isEmpty else { return }
+        guard seen.count <= 10 else {
+            NSLog("[Tintify] starship: 检测到 \(seen.count) 个自定义颜色，未自动迁移 format")
+            return
+        }
+
+        var migrated = content
+        for (i, hex) in seen.enumerated() {
+            migrated = migrated.replacingOccurrences(
+                of: hex, with: "grad\(min(i + 1, 5))", options: .caseInsensitive)
+        }
+        try ConfigWriter.atomicWrite(migrated, to: path)
     }
 }

@@ -99,3 +99,55 @@ import Foundation
     #expect(!content.contains("[palettes.nord]"))              // 历史遗留段被清
     #expect(content.contains("[palettes.tintify]"))
 }
+
+@Test func starshipMigratesHardcodedHexToGradSlots() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    // 模拟用户 Pastel Powerline：5 段渐变 + 1 个模块色，箭头引用相邻段色
+    let userConfig = """
+    format = \"\"\"
+    [](#DA627D)\\
+    $directory\\
+    [](fg:#DA627D bg:#FCA17D)\\
+    $git_branch\\
+    [](fg:#FCA17D bg:#86BBD8)\\
+    $nodejs\\
+    [](fg:#86BBD8 bg:#06969A)\\
+    $docker_context\\
+    [](fg:#06969A bg:#33658A)\\
+    $time\\
+    [ ](fg:#33658A)\\
+    \"\"\"
+
+    [username]
+    style_user = "bg:#9A348E"
+    """
+    try userConfig.write(to: tmp, atomically: true, encoding: .utf8)
+
+    let adapter = StarshipAdapter(knownPaletteNames: [])
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "rose-pine")!, configPath: tmp.path)
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(!content.contains("#DA627D") && !content.contains("#9A348E"))  // 硬编码 hex 全部消失
+    #expect(content.contains("[](grad1)"))
+    #expect(content.contains("fg:grad1 bg:grad2"))                          // 箭头引用自动正确
+    #expect(content.contains("fg:grad4 bg:grad5"))
+    #expect(content.contains("bg:grad5"))                                   // 第 6 个 hex clamp 到 grad5
+    // 幂等：再 apply 一次不重复迁移、内容稳定
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+    let second = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(second.contains("[](grad1)"))
+    #expect(!second.contains("gradgrad"))
+}
+
+@Test func starshipSkipsMigrationWhenTooManyHexes() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let hexes = (0..<12).map { String(format: "[](#%06x)", $0 * 111111 + 0x100000) }.joined(separator: "\n")
+    try "format = \"\"\"\n\(hexes)\n\"\"\"".write(to: tmp, atomically: true, encoding: .utf8)
+
+    let adapter = StarshipAdapter(knownPaletteNames: [])
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(content.contains("grad1 = "))             // palette 块照写
+    #expect(content.contains("#100000"))              // format 未被迁移
+}
