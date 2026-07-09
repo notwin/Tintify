@@ -14,7 +14,7 @@ import Testing
 
 @Test func registryHas25Themes() {
     let all = ThemeRegistry.shared.allThemes
-    #expect(all.count == 25)
+    #expect(all.count == 31)
 }
 
 @Test func darkAndLightThemesExist() {
@@ -61,4 +61,19 @@ import Testing
             #expect(seg.ink.wholeMatch(of: #/#[0-9a-fA-F]{6}/#) != nil, "主题 \(theme.id) 字色 \(seg.ink) 非法")
         }
     }
+}
+
+@Test func registryHasSixNewOriginalThemes() throws {
+    let registry = ThemeRegistry.shared
+    #expect(registry.allThemes.count == 31)
+    for id in ["synthwave-sunset", "phosphor-green", "ink-vermilion", "jewel-tones", "caramel", "soda-pop"] {
+        let theme = registry.theme(id: id)
+        #expect(theme != nil, "缺少新主题 \(id)")
+        #expect(theme?.category == .original)
+        #expect(theme?.compatibility == .ansiPartial)
+        #expect(theme?.toolNames["bat"] == "ansi")
+    }
+    #expect(registry.theme(id: "caramel")?.variants == ["soda-pop"])
+    #expect(registry.theme(id: "soda-pop")?.variants == ["caramel"])
+    #expect(registry.theme(id: "soda-pop")?.appearance == .light)
 }
