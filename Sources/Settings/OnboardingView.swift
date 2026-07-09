@@ -167,6 +167,7 @@ struct OnboardingView: View {
             ("vim", { findExecutable("vim") }),
             ("wezterm", { findExecutable("wezterm") || FileManager.default.fileExists(atPath: "/Applications/WezTerm.app") }),
             ("zsh-syntax-highlighting", { FileManager.default.fileExists(atPath: "/opt/homebrew/share/zsh-syntax-highlighting") || FileManager.default.fileExists(atPath: "/usr/local/share/zsh-syntax-highlighting") }),
+            ("otty", { FileManager.default.fileExists(atPath: "/Applications/Otty.app") }),
         ]
 
         for (name, check) in toolChecks {

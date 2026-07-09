@@ -13,7 +13,8 @@ struct AboutPane: View {
 
     private let supportedTools = [
         "Ghostty", "Starship", "bat", "fzf", "delta",
-        "eza", "lazygit", "tmux", "vim", "zsh-syntax-highlighting"
+        "eza", "lazygit", "tmux", "vim", "zsh-syntax-highlighting",
+        "WezTerm", "otty"
     ]
 
     var body: some View {

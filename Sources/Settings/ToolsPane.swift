@@ -18,6 +18,7 @@ struct ToolsPane: View {
         ("tmux", "~/.tmux.conf"),
         ("vim", "~/.vimrc"),
         ("wezterm", "~/.wezterm.lua"),
+        ("otty", "~/.config/otty/config.toml"),
     ]
 
     var body: some View {
