@@ -20,6 +20,8 @@ enum CLIRunner {
                 tools()
             case "themes-json":
                 themesJSON()
+            case "doctor":
+                doctor()
             default:
                 usage()
             }
@@ -107,6 +109,27 @@ enum CLIRunner {
         print(String(data: data, encoding: .utf8)!)
     }
 
+    @MainActor
+    private static func doctor() {
+        let id = AppSettings.shared.currentThemeId
+        guard let theme = ThemeRegistry.shared.theme(id: id) else {
+            print(L("当前主题未知（\(id)），先用 tintify set 应用一个主题再体检"))
+            exit(1)
+        }
+        print(L("Tintify 体检 — 当前主题：\(theme.name)") + "\n")
+        let findings = Doctor(theme: theme).diagnose()
+        for finding in findings {
+            print("  \(finding.level.rawValue) \(finding.tool)  \(finding.message)")
+        }
+        let fails = findings.filter { $0.level == .fail }.count
+        let warns = findings.filter { $0.level == .warn }.count
+        print("\n" + L("体检完成：\(fails) 个问题，\(warns) 个提醒"))
+        if fails > 0 {
+            print(L("提示：多数问题重新应用主题即可修复（tintify set \(theme.id)）"))
+        }
+        exit(fails > 0 ? 1 : 0)
+    }
+
     private static func usage() {
         print("""
         tintify — 终端主题管理器 CLI
@@ -116,6 +139,7 @@ enum CLIRunner {
           tintify list              列出所有主题
           tintify current           显示当前主题
           tintify tools             显示工具状态
+          tintify doctor            体检各工具配置是否实际生效
         """)
     }
 }

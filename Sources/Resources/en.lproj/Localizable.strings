@@ -139,6 +139,39 @@
 "计划书.docx" = "plan.docx";
 "PPT.pptx" = "deck.pptx";
 
+/* Doctor */
+"未找到配置，跳过" = "Config not found, skipped";
+"未安装，跳过" = "Not installed, skipped";
+"缺顶层 palette = \"tintify\" 引用，重新应用主题可修复" = "Missing top-level palette = \"tintify\" reference — re-apply the theme to fix";
+"缺 [palettes.tintify] 色板块，重新应用主题可修复" = "Missing [palettes.tintify] section — re-apply the theme to fix";
+"palette 引用与色板块齐全" = "Palette reference and color block in place";
+"BAT_THEME 与主题不符（期望 %@），重新应用主题可修复" = "BAT_THEME does not match (expected %@) — re-apply the theme to fix";
+"生成主题未注册进 bat 缓存，重新应用主题（会自动 bat cache --build）" = "Generated theme not registered in bat's cache — re-apply the theme (runs bat cache --build automatically)";
+"~/.config/bat/config 里有 --theme，部分场景会覆盖 Tintify 的设置" = "~/.config/bat/config sets --theme, which can override Tintify in some contexts";
+"BAT_THEME 匹配且主题已注册" = "BAT_THEME matches and the theme is registered";
+"syntax-theme 是 %@，期望 %@，重新应用主题可修复" = "syntax-theme is %@, expected %@ — re-apply the theme to fix";
+"未设置" = "not set";
+"delta 看不到生成主题——bat 与 delta 版本可能错配，缓存被静默忽略" = "delta cannot see the generated theme — bat/delta versions may mismatch, the cache is silently ignored";
+"syntax-theme 匹配且 delta 可见" = "syntax-theme matches and delta can see it";
+"主题文件缺失或非 Tintify 管理，重新应用主题可修复" = "Theme file missing or not Tintify-managed — re-apply the theme to fix";
+"~/.config/eza/theme.yml 是残留（macOS 上 eza 读 Application Support），建议删除" = "~/.config/eza/theme.yml is stale (eza reads Application Support on macOS) — consider deleting it";
+"主题文件在位" = "Theme file in place";
+"config.toml 的 theme 不是 %@，重新应用主题可修复" = "config.toml theme is not %@ — re-apply the theme to fix";
+"主题文件 %@.ottytheme 缺失，重新应用主题可修复" = "Theme file %@.ottytheme missing — re-apply the theme to fix";
+"配置与主题文件在位（应用后自动重载）" = "Config and theme file in place (auto-reloads after apply)";
+"theme 行不是 %@，重新应用主题可修复" = "theme line is not %@ — re-apply the theme to fix";
+"生成主题文件缺失，重新应用主题可修复" = "Generated theme file missing — re-apply the theme to fix";
+"配置就绪（已开窗口需 ⌘⇧, 重载）" = "Config ready (existing windows need ⌘⇧, to reload)";
+"FZF_DEFAULT_OPTS 缺失，重新应用主题可修复" = "FZF_DEFAULT_OPTS missing — re-apply the theme to fix";
+"颜色参数在位" = "Color options in place";
+"colorscheme 文件缺失，重新应用主题可修复" = "colorscheme file missing — re-apply the theme to fix";
+"colorscheme 是旧版（缺 termguicolors），重新应用主题可修复" = "colorscheme is outdated (missing termguicolors) — re-apply the theme to fix";
+"colorscheme 就位且启用真彩" = "colorscheme in place with true color enabled";
+"当前主题未知（%@），先用 tintify set 应用一个主题再体检" = "Current theme unknown (%@) — apply a theme with tintify set first";
+"Tintify 体检 — 当前主题：%@" = "Tintify checkup — current theme: %@";
+"体检完成：%lld 个问题，%lld 个提醒" = "Checkup complete: %lld issues, %lld warnings";
+"提示：多数问题重新应用主题即可修复（tintify set %@）" = "Tip: most issues are fixed by re-applying the theme (tintify set %@)";
+
 /* Theme descriptions — Popular */
 "最受欢迎的柔和暖色方案，低对比护眼" = "The most popular soft, warm palette — low contrast and easy on the eyes";
 "Catppuccin 的中高对比变体" = "Catppuccin's medium-high contrast variant";

@@ -139,6 +139,39 @@
 "计划书.docx" = "计划书.docx";
 "PPT.pptx" = "PPT.pptx";
 
+/* Doctor */
+"未找到配置，跳过" = "未找到配置，跳过";
+"未安装，跳过" = "未安装，跳过";
+"缺顶层 palette = \"tintify\" 引用，重新应用主题可修复" = "缺顶层 palette = \"tintify\" 引用，重新应用主题可修复";
+"缺 [palettes.tintify] 色板块，重新应用主题可修复" = "缺 [palettes.tintify] 色板块，重新应用主题可修复";
+"palette 引用与色板块齐全" = "palette 引用与色板块齐全";
+"BAT_THEME 与主题不符（期望 %@），重新应用主题可修复" = "BAT_THEME 与主题不符（期望 %@），重新应用主题可修复";
+"生成主题未注册进 bat 缓存，重新应用主题（会自动 bat cache --build）" = "生成主题未注册进 bat 缓存，重新应用主题（会自动 bat cache --build）";
+"~/.config/bat/config 里有 --theme，部分场景会覆盖 Tintify 的设置" = "~/.config/bat/config 里有 --theme，部分场景会覆盖 Tintify 的设置";
+"BAT_THEME 匹配且主题已注册" = "BAT_THEME 匹配且主题已注册";
+"syntax-theme 是 %@，期望 %@，重新应用主题可修复" = "syntax-theme 是 %@，期望 %@，重新应用主题可修复";
+"未设置" = "未设置";
+"delta 看不到生成主题——bat 与 delta 版本可能错配，缓存被静默忽略" = "delta 看不到生成主题——bat 与 delta 版本可能错配，缓存被静默忽略";
+"syntax-theme 匹配且 delta 可见" = "syntax-theme 匹配且 delta 可见";
+"主题文件缺失或非 Tintify 管理，重新应用主题可修复" = "主题文件缺失或非 Tintify 管理，重新应用主题可修复";
+"~/.config/eza/theme.yml 是残留（macOS 上 eza 读 Application Support），建议删除" = "~/.config/eza/theme.yml 是残留（macOS 上 eza 读 Application Support），建议删除";
+"主题文件在位" = "主题文件在位";
+"config.toml 的 theme 不是 %@，重新应用主题可修复" = "config.toml 的 theme 不是 %@，重新应用主题可修复";
+"主题文件 %@.ottytheme 缺失，重新应用主题可修复" = "主题文件 %@.ottytheme 缺失，重新应用主题可修复";
+"配置与主题文件在位（应用后自动重载）" = "配置与主题文件在位（应用后自动重载）";
+"theme 行不是 %@，重新应用主题可修复" = "theme 行不是 %@，重新应用主题可修复";
+"生成主题文件缺失，重新应用主题可修复" = "生成主题文件缺失，重新应用主题可修复";
+"配置就绪（已开窗口需 ⌘⇧, 重载）" = "配置就绪（已开窗口需 ⌘⇧, 重载）";
+"FZF_DEFAULT_OPTS 缺失，重新应用主题可修复" = "FZF_DEFAULT_OPTS 缺失，重新应用主题可修复";
+"颜色参数在位" = "颜色参数在位";
+"colorscheme 文件缺失，重新应用主题可修复" = "colorscheme 文件缺失，重新应用主题可修复";
+"colorscheme 是旧版（缺 termguicolors），重新应用主题可修复" = "colorscheme 是旧版（缺 termguicolors），重新应用主题可修复";
+"colorscheme 就位且启用真彩" = "colorscheme 就位且启用真彩";
+"当前主题未知（%@），先用 tintify set 应用一个主题再体检" = "当前主题未知（%@），先用 tintify set 应用一个主题再体检";
+"Tintify 体检 — 当前主题：%@" = "Tintify 体检 — 当前主题：%@";
+"体检完成：%lld 个问题，%lld 个提醒" = "体检完成：%lld 个问题，%lld 个提醒";
+"提示：多数问题重新应用主题即可修复（tintify set %@）" = "提示：多数问题重新应用主题即可修复（tintify set %@）";
+
 /* Theme descriptions — Popular */
 "最受欢迎的柔和暖色方案，低对比护眼" = "最受欢迎的柔和暖色方案，低对比护眼";
 "Catppuccin 的中高对比变体" = "Catppuccin 的中高对比变体";
