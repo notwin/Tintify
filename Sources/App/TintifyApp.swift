@@ -74,13 +74,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let onboardingView = OnboardingView {
             // Close onboarding window when done
             NSApplication.shared.windows
-                .first { $0.title == "Tintify 欢迎" }?
+                .first { $0.title == L("Tintify 欢迎") }?
                 .close()
         }
 
         let hostingController = NSHostingController(rootView: onboardingView)
         let window = NSWindow(contentViewController: hostingController)
-        window.title = "Tintify 欢迎"
+        window.title = L("Tintify 欢迎")
         window.setContentSize(NSSize(width: 480, height: 560))
         window.styleMask = [.titled, .closable]
         window.center()

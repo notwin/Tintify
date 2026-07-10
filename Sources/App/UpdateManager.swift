@@ -178,7 +178,7 @@ final class UpdateManager: ObservableObject {
             process.waitUntilExit()
             guard process.terminationStatus == 0 else {
                 throw NSError(domain: "UpdateManager", code: 1,
-                              userInfo: [NSLocalizedDescriptionKey: "挂载 DMG 失败"])
+                              userInfo: [NSLocalizedDescriptionKey: L("挂载 DMG 失败")])
             }
             return data
         }.value
@@ -187,7 +187,7 @@ final class UpdateManager: ObservableObject {
               let entities = plist["system-entities"] as? [[String: Any]],
               let mountPoint = entities.compactMap({ $0["mount-point"] as? String }).first else {
             throw NSError(domain: "UpdateManager", code: 2,
-                          userInfo: [NSLocalizedDescriptionKey: "无法解析 DMG 挂载点"])
+                          userInfo: [NSLocalizedDescriptionKey: L("无法解析 DMG 挂载点")])
         }
         return mountPoint
     }
