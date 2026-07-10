@@ -58,7 +58,7 @@ enum CLIRunner {
         for category in ThemeCategory.allCases {
             let themes = ThemeRegistry.shared.themes(for: category)
             guard !themes.isEmpty else { continue }
-            print("\(category.rawValue)")
+            print("\(category.displayName)")
             for theme in themes {
                 let marker = theme.id == current ? "✓ " : "  "
                 let badge = theme.appearance == .light ? " (浅色)" : ""
@@ -72,7 +72,7 @@ enum CLIRunner {
     private static func current() {
         let id = AppSettings.shared.currentThemeId
         if let theme = ThemeRegistry.shared.theme(id: id) {
-            print("\(theme.name) (\(theme.id)) — \(theme.category.rawValue)")
+            print("\(theme.name) (\(theme.id)) — \(theme.category.displayName)")
         } else {
             print("\(id) (未知主题)")
         }

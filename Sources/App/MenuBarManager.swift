@@ -65,7 +65,7 @@ final class MenuBarManager: NSObject {
         // 分组子菜单
         for category in ThemeCategory.allCases {
             let themes = registry.themes(for: category)
-            let submenuItem = NSMenuItem(title: category.rawValue, action: nil, keyEquivalent: "")
+            let submenuItem = NSMenuItem(title: category.displayName, action: nil, keyEquivalent: "")
             let submenu = NSMenu()
 
             for theme in themes {

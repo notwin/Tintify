@@ -38,7 +38,7 @@ struct ThemesPane: View {
                         }
                     } label: {
                         HStack(spacing: 4) {
-                            Text(category.rawValue)
+                            Text(category.displayName)
                                 .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                                 .foregroundStyle(isSelected ? .primary : .secondary)
                             Text("\(count)")

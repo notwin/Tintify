@@ -1,12 +1,38 @@
 // Sources/Models/Theme.swift
 import Foundation
 
-/// Theme category for grouping in the UI.
+/// Theme category for grouping in the UI. rawValue 是持久化标识（进 history.json），显示走 displayName。
 enum ThemeCategory: String, Codable, Hashable, CaseIterable, Sendable {
-    case popular = "热门推荐"
-    case timeless = "经典永恒"
-    case trending = "新锐之选"
-    case original = "Tintify 原创"
+    case popular, timeless, trending, original
+
+    /// UI 显示名（Task 5 接入本地化后包 L()）。
+    var displayName: String {
+        switch self {
+        case .popular: "热门推荐"
+        case .timeless: "经典永恒"
+        case .trending: "新锐之选"
+        case .original: "Tintify 原创"
+        }
+    }
+
+    /// 兼容旧版中文 rawValue（v1.8.0 及以前写入的 history.json）。
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        if let value = ThemeCategory(rawValue: raw) {
+            self = value
+            return
+        }
+        switch raw {
+        case "热门推荐": self = .popular
+        case "经典永恒": self = .timeless
+        case "新锐之选": self = .trending
+        case "Tintify 原创": self = .original
+        default:
+            throw DecodingError.dataCorrupted(.init(
+                codingPath: decoder.codingPath,
+                debugDescription: "未知的主题分类：\(raw)"))
+        }
+    }
 }
 
 /// Tool compatibility level.

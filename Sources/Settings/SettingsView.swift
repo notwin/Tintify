@@ -4,14 +4,21 @@ import SwiftUI
 
 /// Sidebar tabs for the settings window.
 enum SettingsTab: String, CaseIterable, Identifiable {
-    case general = "通用"
-    case tools = "工具"
-    case themes = "主题"
-    case results = "应用记录"
-    case backup = "备份"
-    case about = "关于"
+    case general, tools, themes, results, backup, about
 
     var id: String { rawValue }
+
+    /// UI 显示名（Task 5 接入本地化后包 L()）。
+    var displayName: String {
+        switch self {
+        case .general: "通用"
+        case .tools: "工具"
+        case .themes: "主题"
+        case .results: "应用记录"
+        case .backup: "备份"
+        case .about: "关于"
+        }
+    }
 
     var icon: String {
         switch self {
@@ -32,7 +39,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationSplitView {
             List(SettingsTab.allCases, selection: $selectedTab) { tab in
-                Label(tab.rawValue, systemImage: tab.icon)
+                Label(tab.displayName, systemImage: tab.icon)
                     .tag(tab)
             }
             .listStyle(.sidebar)

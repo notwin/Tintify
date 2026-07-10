@@ -1,5 +1,6 @@
 // Tests/ThemeRegistryTests.swift
 import Testing
+import Foundation
 @testable import Tintify
 
 @Test func themeHas26Colors() {
@@ -93,5 +94,23 @@ import Testing
         if case .builtin = theme.themeSource(for: .ghostty) {
             Issue.record("原创主题 \(theme.id) 不应对 ghostty 用内置名")
         }
+    }
+}
+
+@Test func themeCategoryDecodesLegacyChineseRawValues() throws {
+    // 旧 history.json 里存的是中文 rawValue，必须兼容解码
+    let legacy = try JSONDecoder().decode([ThemeCategory].self,
+        from: Data(#"["热门推荐","经典永恒","新锐之选","Tintify 原创"]"#.utf8))
+    #expect(legacy == [.popular, .timeless, .trending, .original])
+
+    // 新值 round-trip
+    let encoded = try JSONEncoder().encode(ThemeCategory.popular)
+    #expect(String(data: encoded, encoding: .utf8) == "\"popular\"")
+    let decoded = try JSONDecoder().decode(ThemeCategory.self, from: encoded)
+    #expect(decoded == .popular)
+
+    // 未知值 throw
+    #expect(throws: (any Error).self) {
+        try JSONDecoder().decode(ThemeCategory.self, from: Data("\"nope\"".utf8))
     }
 }
