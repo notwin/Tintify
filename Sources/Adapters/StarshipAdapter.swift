@@ -40,6 +40,10 @@ struct StarshipAdapter: ToolAdapter {
         // 段内文字颜色必须确定（设计稿用 ink 色），不能随终端默认前景漂移。
         try addInkForegrounds(in: path)
 
+        // 自愈：v1.9.2 曾把「箭头+模块」包进 (...) 条件组隐藏空段，
+        // 该行为已按用户反馈撤销，把被包过的 format 拆回原样。
+        try unwrapSegmentGroups(in: path)
+
         // Set the palette reference line (must sit in the TOML top-level area,
         // before the first [section] — replaceLine would append to EOF and
         // silently land inside the last section). The section name is fixed
@@ -169,6 +173,51 @@ struct StarshipAdapter: ToolAdapter {
         }
 
         if changed {
+            try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
+        }
+    }
+
+    /// 拆掉 v1.9.2 写入的 (...) 条件组：`([箭头](fg:gradX bg:gradY)` 行去掉
+    /// 开括号，随后模块行里以 `)` 收尾的那行去掉闭括号。只匹配当年包组的
+    /// 精确形状，用户自己的括号结构不动。幂等：拆过后无行再匹配。
+    private func unwrapSegmentGroups(in path: String) throws {
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        let content = try String(contentsOfFile: path, encoding: .utf8)
+        var lines = content.components(separatedBy: "\n")
+
+        let wrappedArrow = try! NSRegularExpression(
+            pattern: "^\\(\\[[^\\]]*\\]\\(fg:grad[1-5] bg:grad[1-5]\\)\\\\?$")
+        let innerModule = try! NSRegularExpression(pattern: "^\\$[a-z_]+\\\\?$")
+        let closingModule = try! NSRegularExpression(pattern: "^\\$[a-z_]+\\)\\\\?$")
+        func matches(_ regex: NSRegularExpression, _ s: String) -> Bool {
+            regex.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil
+        }
+
+        var changed = false
+        var i = 0
+        while i < lines.count {
+            guard matches(wrappedArrow, lines[i]) else {
+                i += 1
+                continue
+            }
+            // 组必须以 `$模块)` 行收尾，中间只允许 `$模块` 行；否则不是我们包的，不动
+            var end = i + 1
+            while end < lines.count && matches(innerModule, lines[end]) {
+                end += 1
+            }
+            if end < lines.count && matches(closingModule, lines[end]) {
+                lines[i] = String(lines[i].dropFirst())
+                let last = lines[end]
+                lines[end] = last.hasSuffix("\\")
+                    ? String(last.dropLast(2)) + "\\"
+                    : String(last.dropLast())
+                changed = true
+            }
+            i = end + 1
+        }
+
+        if changed {
+            Log.adapter.info("starship: 已拆除旧版条件组，恢复固定分隔箭头")
             try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
         }
     }

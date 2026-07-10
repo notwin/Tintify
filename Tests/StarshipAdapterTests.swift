@@ -179,6 +179,46 @@ import Foundation
     #expect(second.components(separatedBy: "fg:ink1").count == 2)   // 只出现一次
 }
 
+@Test func starshipUnwrapsConditionalGroupsFromOldVersion() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    // v1.9.2 曾把「箭头+模块」包进 (...) 条件组隐藏空段，该行为已撤销；
+    // 重新 apply 时要把被包过的 format 拆回固定箭头的原样。
+    let userConfig = """
+    format = \"\"\"
+    [](grad1)\\
+    $directory\\
+    ([](fg:grad1 bg:grad2)\\
+    $git_branch\\
+    $git_status)\\
+    ([](fg:grad2 bg:grad3)\\
+    $c\\
+    $nodejs)\\
+    ([](fg:grad4 bg:grad5)\\
+    $time)\\
+    [ ](fg:grad5)\\
+    \"\"\"
+
+    [directory]
+    style = "fg:ink1 bg:grad1"
+    """
+    try userConfig.write(to: tmp, atomically: true, encoding: .utf8)
+
+    let adapter = StarshipAdapter(knownPaletteNames: [])
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "soda-pop")!, configPath: tmp.path)
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(!content.contains("([]("))                          // 开组括号全部拆掉
+    #expect(content.contains("[](fg:grad1 bg:grad2)\\\n$git_branch\\\n$git_status\\"))
+    #expect(content.contains("$nodejs\\"))                       // 闭组括号也拆掉
+    #expect(content.contains("$time\\\n[ ](fg:grad5)\\"))
+    #expect(!content.contains("$time)") && !content.contains("$git_status)"))  // 模块行不再带闭括号
+
+    // 已是原样的配置再 apply 不变
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+    let second = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(second.contains("[](fg:grad1 bg:grad2)\\\n$git_branch\\\n$git_status\\"))
+}
+
 @Test func starshipSkipsMigrationWhenTooManyHexes() throws {
     let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let hexes = (0..<12).map { String(format: "[](#%06x)", $0 * 111111 + 0x100000) }.joined(separator: "\n")
