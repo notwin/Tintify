@@ -36,12 +36,16 @@ final class BackupManager {
 
         try fm.createDirectory(atPath: backupDir, withIntermediateDirectories: true)
 
-        // 首次备份时额外保存一份到 initial，永不淘汰——
-        // 这是用户安装 Tintify 前的原始配置，滚动淘汰不能吃掉它
+        // initial 快照增量补齐：每个文件第一次被 Tintify 触碰前的原始状态永久保留，
+        // 已存在的文件绝不覆盖，滚动淘汰也不能吃掉它
         let initialDir = (backupRoot as NSString).appendingPathComponent("initial")
-        if !fm.fileExists(atPath: initialDir) {
-            try fm.createDirectory(atPath: initialDir, withIntermediateDirectories: true)
-            try copyFiles(files, into: initialDir)
+        try fm.createDirectory(atPath: initialDir, withIntermediateDirectories: true)
+        for file in files where fm.fileExists(atPath: file) {
+            let encoded = file.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? file
+            let dest = (initialDir as NSString).appendingPathComponent(encoded)
+            if !fm.fileExists(atPath: dest) {
+                try fm.copyItem(atPath: file, toPath: dest)
+            }
         }
 
         try copyFiles(files, into: backupDir)

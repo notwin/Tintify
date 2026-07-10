@@ -104,3 +104,23 @@ import Foundation
     let saved = try String(contentsOfFile: (initialDir as NSString).appendingPathComponent(items[0]), encoding: .utf8)
     #expect(saved == "pristine")  // initial 保存的是第一次备份时的内容
 }
+
+@Test func initialSnapshotGrowsIncrementally() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    let manager = BackupManager(backupRoot: root)
+    let fileA = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    let fileB = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    try "A-pristine".write(toFile: fileA, atomically: true, encoding: .utf8)
+
+    _ = try manager.backup(files: [fileA])           // 首次只有 A
+    try "A-changed".write(toFile: fileA, atomically: true, encoding: .utf8)
+    try "B-pristine".write(toFile: fileB, atomically: true, encoding: .utf8)
+    _ = try manager.backup(files: [fileA, fileB])    // B 后来才出现
+
+    let initialDir = (root as NSString).appendingPathComponent("initial")
+    let items = try FileManager.default.contentsOfDirectory(atPath: initialDir)
+    #expect(items.count == 2)                        // A、B 都进了 initial
+    let encodedA = fileA.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!
+    let savedA = try String(contentsOfFile: (initialDir as NSString).appendingPathComponent(encodedA), encoding: .utf8)
+    #expect(savedA == "A-pristine")                  // A 保持首版，未被第二次备份覆盖
+}
