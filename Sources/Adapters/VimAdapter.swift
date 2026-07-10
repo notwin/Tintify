@@ -3,7 +3,7 @@ import Foundation
 
 /// Adapter for Vim. Generates a colorscheme file and sets it in .vimrc.
 struct VimAdapter: ToolAdapter {
-    let toolName = "vim"
+    let id: ToolID = .vim
     let colorsDir: String
     let vimrcPath: String
 
@@ -15,6 +15,10 @@ struct VimAdapter: ToolAdapter {
     ) {
         self.colorsDir = colorsDir
         self.vimrcPath = vimrcPath
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("vim")
     }
 
     func apply(theme: Theme, configPath: String? = nil) throws {

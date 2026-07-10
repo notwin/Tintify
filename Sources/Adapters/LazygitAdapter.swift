@@ -3,10 +3,14 @@ import Foundation
 
 /// Adapter for lazygit.
 struct LazygitAdapter: ToolAdapter {
-    let toolName = "lazygit"
+    let id: ToolID = .lazygit
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/Library/Application Support/lazygit/config.yml"
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("lazygit")
     }
 
     /// gui 段内的 theme 子块（2 空格缩进起）。

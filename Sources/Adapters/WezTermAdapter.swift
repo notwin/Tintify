@@ -14,10 +14,15 @@ enum WezTermAdapterError: LocalizedError {
 
 /// Adapter for WezTerm terminal emulator.
 struct WezTermAdapter: ToolAdapter {
-    let toolName = "wezterm"
+    let id: ToolID = .wezterm
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.wezterm.lua"
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("wezterm")
+            || FileManager.default.fileExists(atPath: "/Applications/WezTerm.app")
     }
 
     /// Write color_scheme into the Tintify marker block in wezterm.lua.

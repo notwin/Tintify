@@ -3,7 +3,7 @@ import Foundation
 
 /// Adapter for delta (git diff viewer).
 struct DeltaAdapter: ToolAdapter {
-    let toolName = "delta"
+    let id: ToolID = .delta
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.gitconfig"
@@ -26,20 +26,8 @@ struct DeltaAdapter: ToolAdapter {
         }
     }
 
-    /// Check if git is available (delta piggybacks on git config).
     func detectInstalled() -> Bool {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-        process.arguments = ["config", "--global", "delta.syntax-theme"]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        do {
-            try process.run()
-            process.waitUntilExit()
-            return process.terminationStatus == 0
-        } catch {
-            return false
-        }
+        ToolDetection.findExecutable("delta")
     }
 }
 

@@ -3,7 +3,7 @@ import Foundation
 
 /// Adapter for tmux terminal multiplexer.
 struct TmuxAdapter: ToolAdapter {
-    let toolName = "tmux"
+    let id: ToolID = .tmux
     /// 是否在 apply 后触发 `tmux source-file` 刷新真实会话；测试中应设为 false。
     let reloadEnabled: Bool
 
@@ -13,6 +13,10 @@ struct TmuxAdapter: ToolAdapter {
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.tmux.conf"
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("tmux")
     }
 
     /// Write tmux status bar and pane border colors into the Tintify marker block.

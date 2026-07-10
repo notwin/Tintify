@@ -10,7 +10,7 @@ final class ThemeEngine {
     let pathOverrides: [String: String]
 
     /// All available adapter constructors — adapters are created on demand.
-    static let adapterFactories: [() -> ToolAdapter] = [
+    nonisolated static let adapterFactories: [() -> ToolAdapter] = [
         { GhosttyAdapter() },
         { StarshipAdapter(knownPaletteNames: Set(ThemeRegistry.shared.allThemes.map {
             $0.id.replacingOccurrences(of: "-", with: "_")
@@ -26,6 +26,9 @@ final class ThemeEngine {
         { WezTermAdapter() },
         { OttyAdapter() },
     ]
+
+    /// UI/CLI 派生工具清单的唯一真相源。
+    nonisolated static var allAdapters: [ToolAdapter] { adapterFactories.map { $0() } }
 
     /// Create a new engine.
     ///

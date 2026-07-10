@@ -7,7 +7,7 @@ import Foundation
 /// otty 按 meta.name 匹配），config.toml 的 theme 和 theme-dark 写同一个值——
 /// 深浅切换统一由 Tintify 的跟随系统外观负责。
 struct OttyAdapter: ToolAdapter {
-    let toolName = "otty"
+    let id: ToolID = .otty
     let themesDir: String
 
     init(themesDir: String = NSHomeDirectory() + "/.config/otty/themes") {

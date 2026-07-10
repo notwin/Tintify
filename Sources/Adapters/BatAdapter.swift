@@ -3,10 +3,14 @@ import Foundation
 
 /// Adapter for the bat syntax highlighter.
 struct BatAdapter: ToolAdapter {
-    let toolName = "bat"
+    let id: ToolID = .bat
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.zshrc"
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("bat")
     }
 
     /// Write `export BAT_THEME` into the Tintify marker block.

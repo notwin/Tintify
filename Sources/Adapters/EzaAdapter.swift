@@ -3,7 +3,7 @@ import Foundation
 
 /// Adapter for eza (modern ls replacement).
 struct EzaAdapter: ToolAdapter {
-    let toolName = "eza"
+    let id: ToolID = .eza
 
     /// Path to the legacy config location an older Tintify version wrote to.
     /// On macOS eza actually reads the Application Support path, so a leftover
@@ -16,6 +16,10 @@ struct EzaAdapter: ToolAdapter {
 
     init(legacyConfigPath: String = NSHomeDirectory() + "/.config/eza/theme.yml") {
         self.legacyConfigPath = legacyConfigPath
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("eza")
     }
 
     /// Write full YAML theme file with colors mapped from the palette.

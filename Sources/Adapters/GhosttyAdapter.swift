@@ -3,10 +3,14 @@ import Foundation
 
 /// Adapter for the Ghostty terminal emulator.
 struct GhosttyAdapter: ToolAdapter {
-    let toolName = "ghostty"
+    let id: ToolID = .ghostty
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/Library/Application Support/com.mitchellh.ghostty/config"
+    }
+
+    func detectInstalled() -> Bool {
+        FileManager.default.fileExists(atPath: defaultConfigPath)
     }
 
     /// Custom themes directory for themes not built into Ghostty.

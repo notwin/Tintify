@@ -3,10 +3,14 @@ import Foundation
 
 /// Adapter for fzf (fuzzy finder).
 struct FzfAdapter: ToolAdapter {
-    let toolName = "fzf"
+    let id: ToolID = .fzf
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.zshrc"
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("fzf")
     }
 
     /// Write FZF_DEFAULT_OPTS color scheme into the Tintify marker block.

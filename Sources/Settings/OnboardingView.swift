@@ -142,30 +142,18 @@ struct OnboardingView: View {
         }
     }
 
-    /// Homebrew(arm64/x86) 与系统路径；GUI app 的 PATH 不含 Homebrew，
-    /// 不能用 `which`，直接探测这些固定位置。
-    private static let binSearchPaths = [
-        "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"
-    ]
-
-    private func findExecutable(_ name: String) -> Bool {
-        Self.binSearchPaths.contains {
-            FileManager.default.isExecutableFile(atPath: "\($0)/\(name)")
-        }
-    }
-
     private func detectTools() {
         let toolChecks: [(String, () -> Bool)] = [
             ("ghostty", { FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Library/Application Support/com.mitchellh.ghostty/config") }),
-            ("starship", { findExecutable("starship") }),
-            ("bat", { findExecutable("bat") }),
-            ("fzf", { findExecutable("fzf") }),
-            ("delta", { findExecutable("delta") }),
-            ("eza", { findExecutable("eza") }),
-            ("lazygit", { findExecutable("lazygit") }),
-            ("tmux", { findExecutable("tmux") }),
-            ("vim", { findExecutable("vim") }),
-            ("wezterm", { findExecutable("wezterm") || FileManager.default.fileExists(atPath: "/Applications/WezTerm.app") }),
+            ("starship", { ToolDetection.findExecutable("starship") }),
+            ("bat", { ToolDetection.findExecutable("bat") }),
+            ("fzf", { ToolDetection.findExecutable("fzf") }),
+            ("delta", { ToolDetection.findExecutable("delta") }),
+            ("eza", { ToolDetection.findExecutable("eza") }),
+            ("lazygit", { ToolDetection.findExecutable("lazygit") }),
+            ("tmux", { ToolDetection.findExecutable("tmux") }),
+            ("vim", { ToolDetection.findExecutable("vim") }),
+            ("wezterm", { ToolDetection.findExecutable("wezterm") || FileManager.default.fileExists(atPath: "/Applications/WezTerm.app") }),
             ("zsh-syntax-highlighting", { FileManager.default.fileExists(atPath: "/opt/homebrew/share/zsh-syntax-highlighting") || FileManager.default.fileExists(atPath: "/usr/local/share/zsh-syntax-highlighting") }),
             ("otty", { FileManager.default.fileExists(atPath: "/Applications/Otty.app") }),
         ]

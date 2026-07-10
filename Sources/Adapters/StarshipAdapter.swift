@@ -3,7 +3,7 @@ import Foundation
 
 /// Adapter for the Starship prompt.
 struct StarshipAdapter: ToolAdapter {
-    let toolName = "starship"
+    let id: ToolID = .starship
 
     /// Palette names Tintify itself generates (built-in theme ids). Only
     /// `[palettes.*]` sections whose name is in this set — or matches the
@@ -17,6 +17,10 @@ struct StarshipAdapter: ToolAdapter {
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.config/starship.toml"
+    }
+
+    func detectInstalled() -> Bool {
+        ToolDetection.findExecutable("starship")
     }
 
     /// Write palette reference and color definitions into starship.toml.

@@ -91,11 +91,12 @@ import Foundation
 @MainActor
 @Test func totalFailureDoesNotUpdateCurrentTheme() throws {
     struct AlwaysFailingAdapter: ToolAdapter {
-        let toolName = "failing"
+        let id: ToolID = .bat
         var defaultConfigPath: String { "/nonexistent" }
         func apply(theme: Theme, configPath: String?) throws {
             throw NSError(domain: "test", code: 1)
         }
+        func detectInstalled() -> Bool { true }
     }
     let before = AppSettings.shared.currentThemeId
     let beforePrev = AppSettings.shared.previousThemeId

@@ -3,17 +3,13 @@ import Foundation
 
 /// Protocol that every CLI-tool adapter must conform to.
 protocol ToolAdapter {
-    /// Machine-readable tool identifier (e.g. "ghostty", "bat").
-    var toolName: String { get }
+    /// 工具的稳定标识（rawValue 即持久化键）。
+    var id: ToolID { get }
 
     /// Default config file path when the user has not overridden it.
     var defaultConfigPath: String { get }
 
-    /// Apply the given theme, writing to `configPath` (or `resolvedPath` if nil).
-    ///
-    /// Args:
-    ///   theme: The theme to apply.
-    ///   configPath: Optional override path; defaults to `resolvedPath`.
+    /// Apply the given theme, writing to `configPath` (or the default if nil).
     func apply(theme: Theme, configPath: String?) throws
 
     /// Return `true` if the tool appears to be installed.
@@ -21,8 +17,22 @@ protocol ToolAdapter {
 }
 
 extension ToolAdapter {
-    /// Default installation check: the default config file exists.
-    func detectInstalled() -> Bool {
-        FileManager.default.fileExists(atPath: defaultConfigPath)
+    /// 持久化/日志用字符串标识——disabledTools、toolPaths、toolNames 的键。
+    var toolName: String { id.rawValue }
+
+    /// ToolsPane 显示用：home 前缀缩写为 ~。
+    var defaultPathDescription: String {
+        defaultConfigPath.replacingOccurrences(of: NSHomeDirectory(), with: "~")
+    }
+}
+
+/// 工具安装检测的共享逻辑。GUI app 的 PATH 不含 Homebrew，用固定路径探测。
+enum ToolDetection {
+    static let binSearchPaths = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"]
+
+    static func findExecutable(_ name: String) -> Bool {
+        binSearchPaths.contains {
+            FileManager.default.isExecutableFile(atPath: "\($0)/\(name)")
+        }
     }
 }
