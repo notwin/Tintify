@@ -86,6 +86,28 @@ import Foundation
     #expect(result.contains("  attribute:\n    foreground: \"\(mocha.palette.overlay2)\""))
 }
 
+@Test func ezaWritesDesignLsExtensions() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let tmpPath = tmpDir.appendingPathComponent("theme.yml").path
+    let adapter = EzaAdapter(legacyConfigPath: tmpDir.appendingPathComponent("legacy").path)
+
+    // 设计稿「ls 三色」要落到真实 eza：html/docx/pptx 按扩展名着色，
+    // 与主题卡预览（同一数据源 LsThemeColors）完全一致
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "soda-pop")!, configPath: tmpPath)
+    let result = try String(contentsOfFile: tmpPath, encoding: .utf8)
+    #expect(result.contains("extensions:"))
+    // eza 规范：extensions 的颜色要包在 filename 键下
+    #expect(result.contains("  html:\n    filename:\n      foreground: \"#d81159\""))
+    #expect(result.contains("  docx:\n    filename:\n      foreground: \"#0f8a6d\""))
+    #expect(result.contains("  pptx:\n    filename:\n      foreground: \"#7048b6\""))
+
+    // 速查表没覆盖的主题回退 blue/green/pink
+    let latte = ThemeRegistry.shared.theme(id: "catppuccin-latte")!
+    try adapter.apply(theme: latte, configPath: tmpPath)
+    let latteResult = try String(contentsOfFile: tmpPath, encoding: .utf8)
+    #expect(latteResult.contains("  html:\n    filename:\n      foreground: \"\(latte.palette.blue)\""))
+}
+
 @Test func ezaAdapterToolName() {
     let adapter = EzaAdapter()
     #expect(adapter.toolName == "eza")

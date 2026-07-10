@@ -3,7 +3,7 @@ import Foundation
 @testable import Tintify
 
 @Test func lsColorOverridesReferenceValidThemes() {
-    for (id, colors) in TerminalPreview.lsColorOverrides {
+    for (id, colors) in LsThemeColors.overrides {
         #expect(ThemeRegistry.shared.theme(id: id) != nil, "未知主题 id: \(id)")
         #expect(colors.count == 3, "\(id) 的 ls 三色数量不对")
         for hex in colors {
@@ -17,8 +17,6 @@ import Foundation
 @Test func lsColorFallbackCoversAllThemes() {
     // 没有专属 ls 三色的主题回退 blue/green/pink，全部主题都要能取到 3 个合法色
     for theme in ThemeRegistry.shared.allThemes {
-        let colors = TerminalPreview.lsColorOverrides[theme.id]
-            ?? [theme.palette.blue, theme.palette.green, theme.palette.pink]
-        #expect(colors.count == 3)
+        #expect(LsThemeColors.colors(for: theme).count == 3)
     }
 }

@@ -43,7 +43,7 @@ struct EzaAdapter: ToolAdapter {
             atPath: dir, withIntermediateDirectories: true
         )
 
-        let yaml = buildYAML(palette: p, accent: theme.accent)
+        let yaml = buildYAML(palette: p, accent: theme.accent, lsColors: LsThemeColors.colors(for: theme))
         try ConfigWriter.atomicWrite(yaml, to: path)
     }
 
@@ -72,10 +72,11 @@ struct EzaAdapter: ToolAdapter {
     /// Args:
     ///   palette: The color palette to use.
     ///   accent: 主题点睛色；定义了就让 executable 用它出场。
+    ///   lsColors: 设计稿「ls 三色」，按扩展名落到 html/docx/pptx 族。
     ///
     /// Returns:
     ///   The full YAML string.
-    private func buildYAML(palette p: Palette, accent: String?) -> String {
+    private func buildYAML(palette p: Palette, accent: String?, lsColors: [String]) -> String {
         return """
             # Tintify-managed eza theme
             filekinds:
@@ -131,6 +132,26 @@ struct EzaAdapter: ToolAdapter {
                 is_underline: false
               source:
                 foreground: "\(p.yellow)"
+
+            extensions:
+              html:
+                filename:
+                  foreground: "\(lsColors[0])"
+              htm:
+                filename:
+                  foreground: "\(lsColors[0])"
+              docx:
+                filename:
+                  foreground: "\(lsColors[1])"
+              doc:
+                filename:
+                  foreground: "\(lsColors[1])"
+              pptx:
+                filename:
+                  foreground: "\(lsColors[2])"
+              ppt:
+                filename:
+                  foreground: "\(lsColors[2])"
 
             perms:
               user_read:
