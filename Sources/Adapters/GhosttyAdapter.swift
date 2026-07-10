@@ -20,22 +20,18 @@ struct GhosttyAdapter: ToolAdapter {
 
     /// Write `theme = <name>` into the Ghostty config.
     ///
-    /// For themes without a Ghostty built-in (compatibility == .ansiPartial and no ghostty toolName),
-    /// generates a custom theme file in ~/.config/ghostty/themes/.
+    /// When `theme.themeSource(for: .ghostty)` resolves to `.generate`, a custom theme file
+    /// is written to ~/.config/ghostty/themes/ first.
     func apply(theme: Theme, configPath: String? = nil) throws {
         let path = configPath ?? defaultConfigPath
-        let themeName = theme.nameForTool(toolName)
 
-        // If this is an original/custom theme (no built-in Ghostty theme), generate a theme file
-        if theme.toolNames["ghostty"] == nil && theme.compatibility == .ansiPartial {
-            try generateCustomTheme(theme: theme, name: themeName)
+        switch theme.themeSource(for: .ghostty) {
+        case .generate(let name):
+            try generateCustomTheme(theme: theme, name: name)
+            try ConfigWriter.replaceLine(in: path, prefix: "theme = ", newLine: "theme = \(name)")
+        case .builtin(let name):
+            try ConfigWriter.replaceLine(in: path, prefix: "theme = ", newLine: "theme = \(name)")
         }
-
-        try ConfigWriter.replaceLine(
-            in: path,
-            prefix: "theme = ",
-            newLine: "theme = \(themeName)"
-        )
     }
 
     /// Generate a Ghostty custom theme file from the palette.

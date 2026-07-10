@@ -39,6 +39,20 @@ struct Theme: Identifiable, Codable, Hashable, Sendable {
     }
 }
 
+/// 某工具应如何获得这个主题：用内置主题名，还是由 Tintify 生成配色文件。
+enum ToolThemeSource: Equatable {
+    case builtin(name: String)
+    case generate(name: String)
+}
+
+extension Theme {
+    func themeSource(for tool: ToolID) -> ToolThemeSource {
+        if let name = toolNames[tool.rawValue] { return .builtin(name: name) }
+        if compatibility == .full { return .builtin(name: nameForTool(tool.rawValue)) }
+        return .generate(name: nameForTool(tool.rawValue))
+    }
+}
+
 /// starship 胶囊渐变的一段：段底色 + 段内文字色（ink 写入 palette 块备用）。
 struct PromptSegment: Codable, Hashable, Sendable {
     let color: String

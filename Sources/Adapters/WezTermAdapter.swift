@@ -55,14 +55,12 @@ struct WezTermAdapter: ToolAdapter {
             throw WezTermAdapterError.unrecognizedStructure(path: path)
         }
 
-        let schemeName = theme.nameForTool(toolName)
         let luaContent: String
-        if theme.toolNames["wezterm"] != nil || theme.compatibility == .full {
-            // Built-in theme — just set the name
-            luaContent = "\(varName).color_scheme = \"\(schemeName)\""
-        } else {
-            // Custom theme — define colors inline
-            luaContent = buildCustomScheme(theme: theme, name: schemeName, varName: varName)
+        switch theme.themeSource(for: .wezterm) {
+        case .builtin(let name):
+            luaContent = "\(varName).color_scheme = \"\(name)\""
+        case .generate(let name):
+            luaContent = buildCustomScheme(theme: theme, name: name, varName: varName)
         }
 
         try ConfigWriter.writeMarkerBlock(

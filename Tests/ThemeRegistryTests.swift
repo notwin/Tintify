@@ -77,3 +77,21 @@ import Testing
     #expect(registry.theme(id: "soda-pop")?.variants == ["caramel"])
     #expect(registry.theme(id: "soda-pop")?.appearance == .light)
 }
+
+@Test func themeSourceDistinguishesBuiltinFromGenerated() {
+    let mocha = ThemeRegistry.shared.theme(id: "catppuccin-mocha")!   // .full、无 ghostty 键
+    let neon = ThemeRegistry.shared.theme(id: "neon-city")!            // 原创
+    let monokai = ThemeRegistry.shared.theme(id: "monokai")!           // 有显式 ghostty 名
+
+    #expect(monokai.themeSource(for: .ghostty) == .builtin(name: "Monokai Pro"))
+    #expect(mocha.themeSource(for: .ghostty) == .builtin(name: mocha.nameForTool("ghostty")))
+    #expect(neon.themeSource(for: .ghostty) == .generate(name: neon.nameForTool("ghostty")))
+    #expect(neon.themeSource(for: .wezterm) == .generate(name: neon.nameForTool("wezterm")))
+
+    // 全量不变量：原创主题对依赖主题名的工具必须走 generate
+    for theme in ThemeRegistry.shared.allThemes where theme.category == .original {
+        if case .builtin = theme.themeSource(for: .ghostty) {
+            Issue.record("原创主题 \(theme.id) 不应对 ghostty 用内置名")
+        }
+    }
+}
