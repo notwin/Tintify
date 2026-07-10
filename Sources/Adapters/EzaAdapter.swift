@@ -43,7 +43,7 @@ struct EzaAdapter: ToolAdapter {
             atPath: dir, withIntermediateDirectories: true
         )
 
-        let yaml = buildYAML(palette: p)
+        let yaml = buildYAML(palette: p, accent: theme.accent)
         try ConfigWriter.atomicWrite(yaml, to: path)
     }
 
@@ -64,12 +64,18 @@ struct EzaAdapter: ToolAdapter {
 
     /// Build the eza theme YAML from a palette.
     ///
+    /// theme.yml 是「叠加」语义：解析后与 eza 内置默认主题逐字段合并，
+    /// 没写的段会透出默认 ANSI 色，只写 foreground 也清不掉默认的
+    /// bold/underline——所以 file_type 必须整段写、带下划线默认值的键
+    /// 要显式 is_underline: false。
+    ///
     /// Args:
     ///   palette: The color palette to use.
+    ///   accent: 主题点睛色；定义了就让 executable 用它出场。
     ///
     /// Returns:
     ///   The full YAML string.
-    private func buildYAML(palette p: Palette) -> String {
+    private func buildYAML(palette p: Palette, accent: String?) -> String {
         return """
             # Tintify-managed eza theme
             filekinds:
@@ -82,20 +88,49 @@ struct EzaAdapter: ToolAdapter {
                 foreground: "\(p.teal)"
               pipe:
                 foreground: "\(p.mauve)"
-              blockdevice:
+              block_device:
                 foreground: "\(p.peach)"
-              chardevice:
+              char_device:
                 foreground: "\(p.peach)"
               socket:
                 foreground: "\(p.mauve)"
               special:
                 foreground: "\(p.yellow)"
               executable:
-                foreground: "\(p.green)"
+                foreground: "\(accent ?? p.green)"
                 is_bold: true
               mount_point:
                 foreground: "\(p.blue)"
                 is_bold: true
+                is_underline: false
+
+            file_type:
+              image:
+                foreground: "\(p.mauve)"
+              video:
+                foreground: "\(p.mauve)"
+                is_bold: true
+              music:
+                foreground: "\(p.sky)"
+              lossless:
+                foreground: "\(p.sky)"
+                is_bold: true
+              crypto:
+                foreground: "\(p.maroon)"
+              document:
+                foreground: "\(p.lavender)"
+              compressed:
+                foreground: "\(p.red)"
+              temp:
+                foreground: "\(p.overlay1)"
+              compiled:
+                foreground: "\(p.peach)"
+              build:
+                foreground: "\(p.yellow)"
+                is_bold: true
+                is_underline: false
+              source:
+                foreground: "\(p.yellow)"
 
             perms:
               user_read:
@@ -104,6 +139,7 @@ struct EzaAdapter: ToolAdapter {
                 foreground: "\(p.red)"
               user_execute_file:
                 foreground: "\(p.green)"
+                is_underline: false
               user_execute_other:
                 foreground: "\(p.green)"
               group_read:
@@ -123,7 +159,7 @@ struct EzaAdapter: ToolAdapter {
               special_other:
                 foreground: "\(p.mauve)"
               attribute:
-                foreground: "\(p.overlay1)"
+                foreground: "\(p.overlay2)"
 
             size:
               number_byte:
@@ -158,18 +194,13 @@ struct EzaAdapter: ToolAdapter {
               renamed:
                 foreground: "\(p.teal)"
               ignored:
-                foreground: "\(p.overlay0)"
+                foreground: "\(p.overlay1)"
               conflicted:
                 foreground: "\(p.red)"
                 is_bold: true
 
             date:
-              hour_old:
-                foreground: "\(p.green)"
-              day_old:
-                foreground: "\(p.text)"
-              older:
-                foreground: "\(p.subtext0)"
+              foreground: "\(p.subtext0)"
             """
     }
 }

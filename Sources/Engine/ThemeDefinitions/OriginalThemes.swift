@@ -211,7 +211,8 @@ enum OriginalThemes {
                 PromptSegment(color: "#b0a99b", ink: "#191713"),
                 PromptSegment(color: "#7a746a", ink: "#f2efe8"),
                 PromptSegment(color: "#403c35", ink: "#e8e3d7"),
-            ]
+            ],
+            accent: "#e34234"  // 朱印：green/blue 全是灰调，朱红必须在 ls 里出场
         ),
 
         // ── 琉璃 (Jewel Tones) ───────────────────────────────────

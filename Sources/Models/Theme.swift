@@ -54,6 +54,10 @@ struct Theme: Identifiable, Codable, Hashable, Sendable {
     let compatibility: ThemeCompatibility
     let variants: [String]?
     let promptSegments: [PromptSegment]
+    /// 主题的点睛强调色（hex）。多数主题的标志色住在 26 色的语义槽里，
+    /// 工具映射（如 eza 的 executable）取不到；定义了 accent 的主题
+    /// 用它标记「这个颜色必须在列表类输出里出场」。nil = 沿用语义槽惯例。
+    var accent: String? = nil
 
     enum Appearance: String, Codable, Hashable {
         case dark, light
