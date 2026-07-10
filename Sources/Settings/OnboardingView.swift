@@ -121,8 +121,7 @@ struct OnboardingView: View {
             // Start button
             Button {
                 if let theme = ThemeRegistry.shared.theme(id: selectedThemeId) {
-                    let result = ThemeEngine().apply(theme: theme)
-                    NotificationManager.shared.notify(result: result)
+                    ThemeApplicationService.apply(theme: theme)
                 }
                 AppSettings.shared.onboardingCompleted = true
                 onComplete()

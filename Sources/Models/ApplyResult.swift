@@ -9,21 +9,25 @@ enum ToolStatus: String, Codable, Sendable {
 }
 
 /// Result of applying a theme to a single tool adapter.
-struct ToolResult: Identifiable {
-    let id = UUID()
+struct ToolResult: Identifiable, Codable {
+    var id = UUID()
     let toolName: String
     let status: ToolStatus
     let message: String?
     let configPath: String
+
+    enum CodingKeys: String, CodingKey { case toolName, status, message, configPath }
 }
 
 /// Aggregate result of applying a theme across all tool adapters.
-struct ApplyResult: Identifiable {
-    let id = UUID()
+struct ApplyResult: Identifiable, Codable {
+    var id = UUID()
     let theme: Theme
     let timestamp: Date
     let toolResults: [ToolResult]
     let backupId: String?
+
+    enum CodingKeys: String, CodingKey { case theme, timestamp, toolResults, backupId }
 
     init(theme: Theme, timestamp: Date, toolResults: [ToolResult], backupId: String? = nil) {
         self.theme = theme

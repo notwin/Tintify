@@ -6,9 +6,6 @@ import UserNotifications
 final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationManager()
 
-    /// History of apply results for the ResultsPane.
-    private(set) var history: [ApplyResult] = []
-
     /// Whether UNUserNotificationCenter is available (requires a valid bundle).
     private let notificationsAvailable: Bool
 
@@ -28,13 +25,8 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
-    /// Send a notification and record the result in history.
+    /// Send a notification for the result.
     func notify(result: ApplyResult) {
-        history.insert(result, at: 0)
-        if history.count > 50 {
-            history.removeLast(history.count - 50)
-        }
-
         guard notificationsAvailable else { return }
 
         let content = UNMutableNotificationContent()

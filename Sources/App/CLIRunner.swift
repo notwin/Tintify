@@ -31,7 +31,7 @@ enum CLIRunner {
             print("错误: 未找到主题 '\(themeId ?? "")'。运行 'tintify list' 查看可用主题。")
             exit(1)
         }
-        let result = ThemeEngine().apply(theme: theme)
+        let result = ThemeApplicationService.apply(theme: theme)
         for tool in result.toolResults {
             let mark: String
             switch tool.status {

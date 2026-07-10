@@ -3,8 +3,9 @@ import SwiftUI
 
 /// Pane displaying theme application history with per-tool details.
 struct ResultsPane: View {
+    @ObservedObject private var store = ApplyHistoryStore.shared
     private var history: [ApplyResult] {
-        NotificationManager.shared.history
+        store.history
     }
 
     var body: some View {

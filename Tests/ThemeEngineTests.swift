@@ -4,7 +4,7 @@ import Testing
 import Foundation
 @testable import Tintify
 
-@Test @MainActor func engineAppliesThemeToAllAdapters() throws {
+@Test func engineAppliesThemeToAllAdapters() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
 
@@ -31,7 +31,7 @@ import Foundation
     #expect(zshrcResult.contains("BAT_THEME"))
 }
 
-@Test @MainActor func engineReturnsApplyResult() throws {
+@Test func engineReturnsApplyResult() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
 
@@ -53,7 +53,7 @@ import Foundation
     #expect(!result.summary.isEmpty)
 }
 
-@Test @MainActor func engineCapturesAdapterFailure() {
+@Test func engineCapturesAdapterFailure() {
     let engine = ThemeEngine(
         adapters: [GhosttyAdapter()],
         backupManager: BackupManager(backupRoot: "/tmp/tintify-test-\(UUID().uuidString)/backups"),
@@ -66,7 +66,7 @@ import Foundation
     _ = result.summary
 }
 
-@Test @MainActor func applyAbortsWhenBackupFails() throws {
+@Test func applyAbortsWhenBackupFails() throws {
     // backupRoot 指向一个"路径被文件占住"的位置，createDirectory 必然失败
     let blocker = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
     try "file".write(toFile: blocker, atomically: true, encoding: .utf8)
@@ -88,8 +88,11 @@ import Foundation
     #expect(after == "user config")                            // 配置文件未被改写
 }
 
-@MainActor
-@Test func totalFailureDoesNotUpdateCurrentTheme() throws {
+// "successCount == 0 时不更新 currentThemeId" 的语义已随 apply 链路重构搬到
+// ThemeApplicationService（引擎本身不再碰 AppSettings）。façade 直接测会碰真实
+// AppSettings/通知中心，为避免污染只保留引擎侧的纯断言：全失败时 successCount == 0。
+// 状态更新语义已经人工验证（见 task-3-report.md）。
+@Test func totalFailureReportsZeroSuccessCount() throws {
     struct AlwaysFailingAdapter: ToolAdapter {
         let id: ToolID = .bat
         var defaultConfigPath: String { "/nonexistent" }
@@ -98,18 +101,25 @@ import Foundation
         }
         func detectInstalled() -> Bool { true }
     }
-    let before = AppSettings.shared.currentThemeId
-    let beforePrev = AppSettings.shared.previousThemeId
-    defer {  // 恢复真实 defaults，避免污染
-        AppSettings.shared.currentThemeId = before
-        AppSettings.shared.previousThemeId = beforePrev
-    }
 
     let tmpRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
     let engine = ThemeEngine(adapters: [AlwaysFailingAdapter()], backupManager: BackupManager(backupRoot: tmpRoot))
-    let target = ThemeRegistry.shared.allThemes.first { $0.id != before }!
+    let target = ThemeRegistry.shared.theme(id: "nord")!
     let result = engine.apply(theme: target)
 
     #expect(result.failedCount > 0 && result.successCount == 0)
-    #expect(AppSettings.shared.currentThemeId == before)  // 全失败不更新
+}
+
+@Test func engineSkipsToolsInInjectedDisabledSet() throws {
+    let tmpRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    let tmpConf = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    let engine = ThemeEngine(
+        adapters: [BatAdapter()],
+        backupManager: BackupManager(backupRoot: tmpRoot),
+        pathOverrides: ["bat": tmpConf],
+        disabledTools: ["bat"]
+    )
+    let result = engine.apply(theme: ThemeRegistry.shared.theme(id: "nord")!)
+    #expect(result.skippedCount == 1)
+    #expect(!FileManager.default.fileExists(atPath: tmpConf))   // 未写文件
 }

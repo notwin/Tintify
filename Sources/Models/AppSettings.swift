@@ -53,12 +53,6 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    /// 获取指定工具的配置路径，自动展开 ~
-    func resolvedPath(for toolName: String) -> String? {
-        guard let path = toolPaths[toolName] else { return nil }
-        return (path as NSString).expandingTildeInPath
-    }
-
     /// 从 UserDefaults 重读全部设置（CLI 等外部进程修改 defaults 后调用）。
     func reload() {
         currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"

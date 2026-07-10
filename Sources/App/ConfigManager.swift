@@ -56,7 +56,6 @@ struct ConfigManager {
               let config = try? JSONDecoder().decode(TintifyConfig.self, from: data) else { return }
 
         let settings = AppSettings.shared
-        settings.currentThemeId = config.currentThemeId
         settings.darkThemeId = config.darkThemeId
         settings.lightThemeId = config.lightThemeId
         settings.followSystemAppearance = config.followSystemAppearance
@@ -64,9 +63,6 @@ struct ConfigManager {
         settings.toolPaths = config.toolPaths
 
         // Apply the imported theme
-        if let theme = ThemeRegistry.shared.theme(id: config.currentThemeId) {
-            let result = ThemeEngine().apply(theme: theme)
-            NotificationManager.shared.notify(result: result)
-        }
+        ThemeApplicationService.apply(themeId: config.currentThemeId)
     }
 }

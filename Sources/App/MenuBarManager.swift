@@ -7,7 +7,6 @@ import SwiftUI
 @MainActor
 final class MenuBarManager: NSObject {
     private var statusItem: NSStatusItem?
-    private let engine = ThemeEngine()
     private let registry = ThemeRegistry.shared
     private let settings = AppSettings.shared
 
@@ -43,7 +42,7 @@ final class MenuBarManager: NSObject {
 
         // Info: 工具数量
         let infoItem = NSMenuItem()
-        infoItem.title = "已配置 \(engine.adapters.count) 个工具"
+        infoItem.title = "已配置 \(ThemeEngine.allAdapters.count) 个工具"
         infoItem.isEnabled = false
         menu.addItem(infoItem)
 
@@ -123,16 +122,14 @@ final class MenuBarManager: NSObject {
     @objc private func themeSelected(_ sender: NSMenuItem) {
         guard let themeId = sender.representedObject as? String,
               let theme = registry.theme(id: themeId) else { return }
-        let result = engine.apply(theme: theme)
-        NotificationManager.shared.notify(result: result)
+        ThemeApplicationService.apply(theme: theme)
         rebuildMenu()
     }
 
     @objc private func rollbackTheme(_ sender: NSMenuItem) {
         guard let prevId = settings.previousThemeId,
               let theme = registry.theme(id: prevId) else { return }
-        let result = engine.apply(theme: theme)
-        NotificationManager.shared.notify(result: result)
+        ThemeApplicationService.apply(theme: theme)
         rebuildMenu()
     }
 

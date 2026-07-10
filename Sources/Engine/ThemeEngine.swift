@@ -3,14 +3,14 @@
 import Foundation
 
 /// Orchestrates applying a theme across all registered tool adapters.
-@MainActor
 final class ThemeEngine {
     let adapters: [ToolAdapter]
     let backupManager: BackupManager
     let pathOverrides: [String: String]
+    let disabledTools: Set<String>
 
     /// All available adapter constructors — adapters are created on demand.
-    nonisolated static let adapterFactories: [() -> ToolAdapter] = [
+    static let adapterFactories: [() -> ToolAdapter] = [
         { GhosttyAdapter() },
         { StarshipAdapter(knownPaletteNames: Set(ThemeRegistry.shared.allThemes.map {
             $0.id.replacingOccurrences(of: "-", with: "_")
@@ -28,7 +28,7 @@ final class ThemeEngine {
     ]
 
     /// UI/CLI 派生工具清单的唯一真相源。
-    nonisolated static var allAdapters: [ToolAdapter] { adapterFactories.map { $0() } }
+    static var allAdapters: [ToolAdapter] { adapterFactories.map { $0() } }
 
     /// Create a new engine.
     ///
@@ -36,22 +36,24 @@ final class ThemeEngine {
     ///     adapters: Tool adapters to apply themes to. Defaults to all built-in adapters (lazy-created).
     ///     backupManager: Manager used to snapshot configs before writing.
     ///     pathOverrides: Per-tool config path overrides keyed by ``ToolAdapter/toolName``.
+    ///     disabledTools: Tool names to skip during apply.
     init(
         adapters: [ToolAdapter]? = nil,
         backupManager: BackupManager = BackupManager(),
-        pathOverrides: [String: String] = [:]
+        pathOverrides: [String: String] = [:],
+        disabledTools: Set<String> = []
     ) {
         self.adapters = adapters ?? Self.adapterFactories.map { $0() }
         self.backupManager = backupManager
         self.pathOverrides = pathOverrides
+        self.disabledTools = disabledTools
     }
 
     /// Apply a theme to every adapter, backing up affected config files first.
     @discardableResult
     func apply(theme: Theme) -> ApplyResult {
         let configPaths = adapters.map { adapter -> String in
-            let settingsPath = AppSettings.shared.resolvedPath(for: adapter.toolName)
-            return pathOverrides[adapter.toolName] ?? settingsPath ?? adapter.defaultConfigPath
+            pathOverrides[adapter.toolName] ?? adapter.defaultConfigPath
         }
         let uniquePaths = Array(Set(configPaths))
 
@@ -75,7 +77,7 @@ final class ThemeEngine {
 
         for adapter in adapters {
             // Skip disabled tools
-            if AppSettings.shared.disabledTools.contains(adapter.toolName) {
+            if disabledTools.contains(adapter.toolName) {
                 toolResults.append(ToolResult(
                     toolName: adapter.toolName,
                     status: .skipped,
@@ -85,9 +87,8 @@ final class ThemeEngine {
                 continue
             }
 
-            // Resolve path: explicit pathOverrides > user-set toolPaths > adapter default.
-            let settingsPath = AppSettings.shared.resolvedPath(for: adapter.toolName)
-            let resolvedConfigPath = pathOverrides[adapter.toolName] ?? settingsPath
+            // Resolve path: explicit pathOverrides > adapter default.
+            let resolvedConfigPath = pathOverrides[adapter.toolName]
             let path = resolvedConfigPath ?? adapter.defaultConfigPath
             do {
                 try adapter.apply(theme: theme, configPath: resolvedConfigPath)
@@ -105,16 +106,6 @@ final class ThemeEngine {
                     configPath: path
                 ))
             }
-        }
-
-        // 至少一个工具成功才算切换成功；全失败时保持原状态，
-        // 否则菜单勾选和"回到上一个"都会指向幻影主题
-        let successCount = toolResults.filter { $0.status == .success }.count
-        if successCount > 0 {
-            if AppSettings.shared.currentThemeId != theme.id {
-                AppSettings.shared.previousThemeId = AppSettings.shared.currentThemeId
-            }
-            AppSettings.shared.currentThemeId = theme.id
         }
 
         return ApplyResult(
