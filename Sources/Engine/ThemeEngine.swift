@@ -67,7 +67,7 @@ final class ThemeEngine {
                 ToolResult(
                     toolName: $0.toolName,
                     status: .failed,
-                    message: "备份失败，已中止应用：\(error.localizedDescription)",
+                    message: L("备份失败，已中止应用：\(error.localizedDescription)"),
                     configPath: ""
                 )
             }
@@ -82,7 +82,7 @@ final class ThemeEngine {
                 toolResults.append(ToolResult(
                     toolName: adapter.toolName,
                     status: .skipped,
-                    message: "已禁用",
+                    message: L("已禁用"),
                     configPath: ""
                 ))
                 continue

@@ -36,7 +36,7 @@ final class UpdateManager: ObservableObject {
         let urlString = "https://api.github.com/repos/\(owner)/\(repo)/releases/latest"
         guard let url = URL(string: urlString) else {
             Log.update.error("无效的 URL")
-            state = .error(message: "无效的 URL")
+            state = .error(message: L("无效的 URL"))
             return
         }
 
@@ -50,14 +50,14 @@ final class UpdateManager: ObservableObject {
                 guard let httpResponse = response as? HTTPURLResponse,
                       httpResponse.statusCode == 200 else {
                     Log.update.error("网络请求失败")
-                    state = .error(message: "网络请求失败")
+                    state = .error(message: L("网络请求失败"))
                     return
                 }
 
                 guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                       let tagName = json["tag_name"] as? String else {
                     Log.update.error("解析失败")
-                    state = .error(message: "解析失败")
+                    state = .error(message: L("解析失败"))
                     return
                 }
 
@@ -70,31 +70,31 @@ final class UpdateManager: ObservableObject {
                 }
             } catch {
                 Log.update.error("检查失败：\(error.localizedDescription)")
-                state = .error(message: "检查失败：\(error.localizedDescription)")
+                state = .error(message: L("检查失败：\(error.localizedDescription)"))
             }
         }
     }
 
     /// Download the latest DMG, mount it, replace the app, and relaunch.
     func performUpdate(version: String) {
-        state = .downloading(progress: "下载中...")
+        state = .downloading(progress: L("下载中..."))
 
         let dmgURL = "https://github.com/\(owner)/\(repo)/releases/download/v\(version)/Tintify-\(version).dmg"
         guard let url = URL(string: dmgURL) else {
             Log.update.error("下载地址无效")
-            state = .error(message: "下载地址无效")
+            state = .error(message: L("下载地址无效"))
             return
         }
 
         Task {
             do {
                 // 1. Download DMG
-                state = .downloading(progress: "下载中...")
+                state = .downloading(progress: L("下载中..."))
                 let (tempURL, response) = try await URLSession.shared.download(from: url)
                 guard let httpResponse = response as? HTTPURLResponse,
                       httpResponse.statusCode == 200 else {
                     Log.update.error("下载失败")
-                    state = .error(message: "下载失败")
+                    state = .error(message: L("下载失败"))
                     return
                 }
 
@@ -109,12 +109,12 @@ final class UpdateManager: ObservableObject {
                 if let ok = try await verifyChecksum(dmgPath: dmgPath, dmgURL: url), !ok {
                     try? fm.removeItem(atPath: dmgPath)
                     Log.update.error("校验失败，已中止更新")
-                    state = .error(message: "校验失败，已中止更新")
+                    state = .error(message: L("校验失败，已中止更新"))
                     return
                 }
 
                 // 2. Mount DMG
-                state = .downloading(progress: "安装中...")
+                state = .downloading(progress: L("安装中..."))
                 let mountPoint = try await mountDMG(at: dmgPath)
 
                 // 3. Replace app
@@ -124,7 +124,7 @@ final class UpdateManager: ObservableObject {
                 guard fm.fileExists(atPath: sourceApp) else {
                     try await unmountDMG(at: mountPoint)
                     Log.update.error("DMG 中未找到 Tintify.app")
-                    state = .error(message: "DMG 中未找到 Tintify.app")
+                    state = .error(message: L("DMG 中未找到 Tintify.app"))
                     return
                 }
 
@@ -147,7 +147,7 @@ final class UpdateManager: ObservableObject {
 
             } catch {
                 Log.update.error("更新失败：\(error.localizedDescription)")
-                state = .error(message: "更新失败：\(error.localizedDescription)")
+                state = .error(message: L("更新失败：\(error.localizedDescription)"))
             }
         }
     }

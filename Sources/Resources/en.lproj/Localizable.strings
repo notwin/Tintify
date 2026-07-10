@@ -2,3 +2,61 @@
 "经典永恒" = "Timeless";
 "新锐之选" = "Trending";
 "Tintify 原创" = "Tintify Originals";
+
+/* MenuBarManager */
+"未设置主题" = "No Theme";
+"已配置 %lld 个工具" = "%lld tools configured";
+"↩ 回到上一个: %@" = "↩ Back to Previous: %@";
+"跟随系统外观" = "Follow System Appearance";
+"设置..." = "Settings...";
+"退出 Tintify" = "Quit Tintify";
+
+/* NotificationManager */
+"已切换到 %@" = "Switched to %@";
+"%lld/%lld 工具已更新 · 新终端窗口自动生效" = "%lld/%lld tools updated · New terminal windows pick this up automatically";
+"主题切换失败" = "Theme switch failed";
+"%lld 个工具均未更新" = "%lld tools failed to update";
+"%@ · 新终端窗口自动生效" = "%@ · New terminal windows pick this up automatically";
+
+/* CLIRunner */
+"错误: 未找到主题 '%@'。运行 'tintify list' 查看可用主题。" = "Error: theme '%@' not found. Run 'tintify list' to see available themes.";
+"(浅色)" = "(Light)";
+"%@ (未知主题)" = "%@ (unknown theme)";
+"工具状态" = "Tool Status";
+"已禁用" = "Disabled";
+"已启用" = "Enabled";
+
+/* UpdateManager */
+"无效的 URL" = "Invalid URL";
+"网络请求失败" = "Network request failed";
+"解析失败" = "Parsing failed";
+"检查失败：%@" = "Check failed: %@";
+"下载中..." = "Downloading...";
+"下载地址无效" = "Invalid download URL";
+"下载失败" = "Download failed";
+"校验失败，已中止更新" = "Checksum mismatch, update aborted";
+"安装中..." = "Installing...";
+"DMG 中未找到 Tintify.app" = "Tintify.app not found in DMG";
+"更新失败：%@" = "Update failed: %@";
+
+/* ConfigManager */
+"导出失败：配置编码错误" = "Export failed: config encoding error";
+"导出 Tintify 配置" = "Export Tintify Configuration";
+"导出失败：%@" = "Export failed: %@";
+"导入 Tintify 配置" = "Import Tintify Configuration";
+"导入失败：文件格式无效" = "Import failed: invalid file format";
+"导入失败：配置引用了不存在的主题 %@" = "Import failed: config references a nonexistent theme %@";
+
+/* ThemeEngine */
+"备份失败，已中止应用：%@" = "Backup failed, apply aborted: %@";
+
+/* ConfigWriter */
+"配置文件中的 TINTIFY 标记不完整（START/END 不成对）：%@。请手动删除残留的标记行后重试。" = "The TINTIFY markers in the config file are incomplete (START/END not paired): %@. Please manually remove the leftover marker lines and try again.";
+
+/* WezTermAdapter */
+"无法识别 wezterm.lua 的结构（未找到 return <变量名>）：%@。请手动在配置中设置 color_scheme。" = "Could not recognize the structure of wezterm.lua (no 'return <variable>' found): %@. Please set color_scheme manually in the config.";
+
+/* ApplyResult */
+"%lld 成功" = "%lld succeeded";
+"%lld 跳过" = "%lld skipped";
+"%lld 失败" = "%lld failed";

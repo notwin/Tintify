@@ -7,7 +7,7 @@ enum WezTermAdapterError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unrecognizedStructure(let path):
-            return "无法识别 wezterm.lua 的结构（未找到 return <变量名>）：\(path)。请手动在配置中设置 color_scheme。"
+            return L("无法识别 wezterm.lua 的结构（未找到 return <变量名>）：\(path)。请手动在配置中设置 color_scheme。")
         }
     }
 }

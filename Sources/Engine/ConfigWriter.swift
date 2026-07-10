@@ -7,7 +7,7 @@ enum ConfigWriterError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .corruptedMarkers(let path):
-            return "配置文件中的 TINTIFY 标记不完整（START/END 不成对）：\(path)。请手动删除残留的标记行后重试。"
+            return L("配置文件中的 TINTIFY 标记不完整（START/END 不成对）：\(path)。请手动删除残留的标记行后重试。")
         }
     }
 }

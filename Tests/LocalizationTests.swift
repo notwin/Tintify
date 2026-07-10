@@ -10,3 +10,12 @@ import Foundation
     let translated = enBundle.localizedString(forKey: "热门推荐", value: nil, table: nil)
     #expect(translated == "Popular")
 }
+
+@Test func appLayerStringsHaveEnglishTranslations() throws {
+    let enPath = try #require(Bundle.module.path(forResource: "en", ofType: "lproj"))
+    let enBundle = try #require(Bundle(path: enPath))
+
+    #expect(enBundle.localizedString(forKey: "已禁用", value: nil, table: nil) == "Disabled")
+    #expect(enBundle.localizedString(forKey: "主题切换失败", value: nil, table: nil) == "Theme switch failed")
+    #expect(enBundle.localizedString(forKey: "校验失败，已中止更新", value: nil, table: nil) == "Checksum mismatch, update aborted")
+}

@@ -40,12 +40,12 @@ struct ConfigManager {
 
         guard let data = try? JSONEncoder().encode(config),
               let json = String(data: data, encoding: .utf8) else {
-            showError("导出失败：配置编码错误")
+            showError(L("导出失败：配置编码错误"))
             return
         }
 
         let panel = NSSavePanel()
-        panel.title = "导出 Tintify 配置"
+        panel.title = L("导出 Tintify 配置")
         panel.nameFieldStringValue = "tintify-config.json"
         panel.allowedContentTypes = [.json]
 
@@ -53,7 +53,7 @@ struct ConfigManager {
             do {
                 try json.write(to: url, atomically: true, encoding: .utf8)
             } catch {
-                showError("导出失败：\(error.localizedDescription)")
+                showError(L("导出失败：\(error.localizedDescription)"))
             }
         }
     }
@@ -61,7 +61,7 @@ struct ConfigManager {
     /// Import settings from a user-chosen JSON file.
     static func importConfig() {
         let panel = NSOpenPanel()
-        panel.title = "导入 Tintify 配置"
+        panel.title = L("导入 Tintify 配置")
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
 
@@ -69,14 +69,14 @@ struct ConfigManager {
 
         guard let data = try? Data(contentsOf: url),
               let config = try? JSONDecoder().decode(TintifyConfig.self, from: data) else {
-            showError("导入失败：文件格式无效")
+            showError(L("导入失败：文件格式无效"))
             return
         }
 
         let registry = ThemeRegistry.shared
         for themeId in [config.currentThemeId, config.darkThemeId, config.lightThemeId] {
             guard registry.theme(id: themeId) != nil else {
-                showError("导入失败：配置引用了不存在的主题 \(themeId)")
+                showError(L("导入失败：配置引用了不存在的主题 \(themeId)"))
                 return
             }
         }

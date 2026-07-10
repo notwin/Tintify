@@ -50,9 +50,9 @@ struct ApplyResult: Identifiable, Codable {
 
     var summary: String {
         var parts: [String] = []
-        if successCount > 0 { parts.append("\(successCount) 成功") }
-        if skippedCount > 0 { parts.append("\(skippedCount) 跳过") }
-        if failedCount > 0 { parts.append("\(failedCount) 失败") }
+        if successCount > 0 { parts.append(L("\(successCount) 成功")) }
+        if skippedCount > 0 { parts.append(L("\(skippedCount) 跳过")) }
+        if failedCount > 0 { parts.append(L("\(failedCount) 失败")) }
         return parts.joined(separator: ", ")
     }
 }

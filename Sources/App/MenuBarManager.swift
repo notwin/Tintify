@@ -36,13 +36,13 @@ final class MenuBarManager: NSObject {
         // Header: 当前主题名
         let currentTheme = registry.theme(id: settings.currentThemeId)
         let headerItem = NSMenuItem()
-        headerItem.title = currentTheme?.name ?? "No Theme"
+        headerItem.title = currentTheme?.name ?? L("未设置主题")
         headerItem.isEnabled = false
         menu.addItem(headerItem)
 
         // Info: 工具数量
         let infoItem = NSMenuItem()
-        infoItem.title = "已配置 \(ThemeEngine.allAdapters.count) 个工具"
+        infoItem.title = L("已配置 \(ThemeEngine.allAdapters.count) 个工具")
         infoItem.isEnabled = false
         menu.addItem(infoItem)
 
@@ -53,7 +53,7 @@ final class MenuBarManager: NSObject {
            let prevTheme = registry.theme(id: prevId),
            prevId != settings.currentThemeId {
             let rollbackItem = NSMenuItem(
-                title: "↩ 回到上一个: \(prevTheme.name)",
+                title: L("↩ 回到上一个: \(prevTheme.name)"),
                 action: #selector(rollbackTheme(_:)),
                 keyEquivalent: ""
             )
@@ -88,7 +88,7 @@ final class MenuBarManager: NSObject {
 
         // Follow System Appearance
         let followItem = NSMenuItem(
-            title: "跟随系统外观",
+            title: L("跟随系统外观"),
             action: #selector(toggleFollowSystem(_:)),
             keyEquivalent: ""
         )
@@ -100,7 +100,7 @@ final class MenuBarManager: NSObject {
 
         // Settings
         let settingsItem = NSMenuItem(
-            title: "设置...",
+            title: L("设置..."),
             action: #selector(openSettings),
             keyEquivalent: ","
         )
@@ -109,7 +109,7 @@ final class MenuBarManager: NSObject {
 
         // Quit
         let quitItem = NSMenuItem(
-            title: "退出 Tintify",
+            title: L("退出 Tintify"),
             action: #selector(quit),
             keyEquivalent: "q"
         )

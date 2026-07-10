@@ -28,7 +28,7 @@ enum CLIRunner {
     @MainActor
     private static func set(themeId: String?) {
         guard let themeId, let theme = ThemeRegistry.shared.theme(id: themeId) else {
-            print("错误: 未找到主题 '\(themeId ?? "")'。运行 'tintify list' 查看可用主题。")
+            print(L("错误: 未找到主题 '\(themeId ?? "")'。运行 'tintify list' 查看可用主题。"))
             exit(1)
         }
         let result = ThemeApplicationService.apply(theme: theme)
@@ -61,7 +61,7 @@ enum CLIRunner {
             print("\(category.displayName)")
             for theme in themes {
                 let marker = theme.id == current ? "✓ " : "  "
-                let badge = theme.appearance == .light ? " (浅色)" : ""
+                let badge = theme.appearance == .light ? " " + L("(浅色)") : ""
                 print("  \(marker)\(theme.id) — \(theme.name)\(badge)")
             }
             print("")
@@ -74,20 +74,20 @@ enum CLIRunner {
         if let theme = ThemeRegistry.shared.theme(id: id) {
             print("\(theme.name) (\(theme.id)) — \(theme.category.displayName)")
         } else {
-            print("\(id) (未知主题)")
+            print(L("\(id) (未知主题)"))
         }
     }
 
     @MainActor
     private static func tools() {
         let disabled = AppSettings.shared.disabledTools
-        print("工具状态\n")
+        print(L("工具状态") + "\n")
         for factory in ThemeEngine.adapterFactories {
             let adapter = factory()
             if disabled.contains(adapter.toolName) {
-                print("  ✗ \(adapter.toolName) — 已禁用")
+                print("  ✗ \(adapter.toolName) — \(L("已禁用"))")
             } else {
-                print("  ✓ \(adapter.toolName) — 已启用")
+                print("  ✓ \(adapter.toolName) — \(L("已启用"))")
             }
         }
     }
