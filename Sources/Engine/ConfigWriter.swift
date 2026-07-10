@@ -170,6 +170,8 @@ enum ConfigWriter {
     ///
     /// `replaceLine` 找不到时会追加到文件末尾——在 TOML 中那属于最后一个
     /// section，顶层键必须插在第一个 section 头之前。
+    /// 扫描跳过多行字符串内部的行：format 多行字符串里常有 `[](color)`
+    /// 这类以 [ 开头的行，不能误判为 section 头。
     static func replaceTopLevelKey(in path: String, key: String, line newLine: String) throws {
         let fileContent: String
         if FileManager.default.fileExists(atPath: path) {
@@ -179,12 +181,21 @@ enum ConfigWriter {
         }
         var lines = fileContent.components(separatedBy: "\n")
 
-        let firstSection = lines.firstIndex {
-            $0.trimmingCharacters(in: .whitespaces).hasPrefix("[")
+        // 自愈：旧版本曾把键行（连同一个空行）误插进多行字符串内部。
+        // 字符串内与 newLine 完全相同的行只可能是那次误写的残留，删掉。
+        var mask = multilineStringMask(for: lines)
+        for i in lines.indices.reversed() where mask[i] && lines[i] == newLine {
+            let hasTrailingBlank = i + 1 < lines.count && mask[i + 1] && lines[i + 1].isEmpty
+            lines.removeSubrange(i...(hasTrailingBlank ? i + 1 : i))
+        }
+        mask = multilineStringMask(for: lines)
+
+        let firstSection = lines.indices.first {
+            !mask[$0] && lines[$0].trimmingCharacters(in: .whitespaces).hasPrefix("[")
         } ?? lines.count
 
-        if let idx = lines[..<firstSection].firstIndex(where: {
-            $0.hasPrefix("\(key) =") || $0.hasPrefix("\(key)=")
+        if let idx = lines[..<firstSection].indices.first(where: {
+            !mask[$0] && (lines[$0].hasPrefix("\(key) =") || lines[$0].hasPrefix("\(key)="))
         }) {
             lines[idx] = newLine
         } else {
@@ -192,6 +203,57 @@ enum ConfigWriter {
         }
 
         try atomicWrite(lines.joined(separator: "\n"), to: path)
+    }
+
+    /// 逐行标记 TOML 内容中处于多行字符串（"""…""" / '''…'''）内部的行，
+    /// 含结束定界符所在行，不含开始定界符所在行。行级启发式，不覆盖
+    /// 跨行数组、多行字符串内转义引号等罕见结构。
+    private static func multilineStringMask(for lines: [String]) -> [Bool] {
+        var mask = [Bool](repeating: false, count: lines.count)
+        var openDelimiter: String?
+        for (i, line) in lines.enumerated() {
+            if let delimiter = openDelimiter {
+                mask[i] = true
+                if let close = line.range(of: delimiter) {
+                    openDelimiter = unclosedMultilineDelimiter(in: String(line[close.upperBound...]))
+                }
+            } else {
+                openDelimiter = unclosedMultilineDelimiter(in: line)
+            }
+        }
+        return mask
+    }
+
+    /// 返回本行开启且未在本行闭合的多行字符串定界符（""" 或 '''），没有则 nil。
+    /// 跳过注释和单行字符串，避免字符串值里的引号造成误判。
+    private static func unclosedMultilineDelimiter(in line: String) -> String? {
+        let chars = Array(line)
+        var i = 0
+        while i < chars.count {
+            let c = chars[i]
+            if c == "#" { return nil }
+            guard c == "\"" || c == "'" else {
+                i += 1
+                continue
+            }
+            if i + 2 < chars.count, chars[i + 1] == c, chars[i + 2] == c {
+                // 三引号：在本行找闭合，找不到即跨行
+                var j = i + 3
+                while j + 3 <= chars.count, !(chars[j] == c && chars[j + 1] == c && chars[j + 2] == c) {
+                    j += 1
+                }
+                guard j + 3 <= chars.count else { return String(repeating: c, count: 3) }
+                i = j + 3
+            } else {
+                // 单行字符串：跳到闭合引号（basic 字符串跳过 \" 转义）
+                var j = i + 1
+                while j < chars.count, chars[j] != c {
+                    j += (c == "\"" && chars[j] == "\\") ? 2 : 1
+                }
+                i = j + 1
+            }
+        }
+        return nil
     }
 
     /// Replace an entire TOML section (from `[sectionPrefix` to the next `[` header) with new content.

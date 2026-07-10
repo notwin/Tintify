@@ -208,6 +208,76 @@ import Foundation
     #expect(lines.firstIndex { $0 == "palette = \"nord\"" }! < lines.firstIndex { $0.hasPrefix("[somesection]") }!)
 }
 
+@Test func replaceTopLevelKeySkipsMultilineStrings() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    // format 多行字符串内部有以 [ 开头的行，不能被当成 section 头
+    let existing = [
+        "format = \"\"\"",
+        "[](grad1)\\",
+        "$directory\\",
+        "\"\"\"",
+        "",
+        "[username]",
+        "show_always = true",
+    ].joined(separator: "\n")
+    try existing.write(toFile: tmp.path, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.replaceTopLevelKey(in: tmp.path, key: "palette", line: "palette = \"tintify\"")
+
+    let lines = try String(contentsOf: tmp, encoding: .utf8).components(separatedBy: "\n")
+    let paletteIdx = lines.firstIndex(of: "palette = \"tintify\"")!
+    #expect(paletteIdx > lines.firstIndex(of: "\"\"\"")!)        // 在 format 字符串结束之后
+    #expect(paletteIdx < lines.firstIndex(of: "[username]")!)     // 在第一个真 section 之前
+    #expect(lines[1] == "[](grad1)\\")                            // format 内容未被改动
+}
+
+@Test func replaceTopLevelKeyReplacesExistingKeyAfterMultilineString() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let existing = [
+        "format = \"\"\"",
+        "[](grad1)\\",
+        "\"\"\"",
+        "",
+        "palette = \"old\"",
+        "",
+        "[username]",
+    ].joined(separator: "\n")
+    try existing.write(toFile: tmp.path, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.replaceTopLevelKey(in: tmp.path, key: "palette", line: "palette = \"tintify\"")
+
+    let lines = try String(contentsOf: tmp, encoding: .utf8).components(separatedBy: "\n")
+    #expect(lines.filter { $0.hasPrefix("palette") }.count == 1)  // 原位替换，不重复插入
+    #expect(lines.contains("palette = \"tintify\""))
+    #expect(!lines.contains("palette = \"old\""))
+}
+
+@Test func replaceTopLevelKeyHealsLineInsertedInsideMultilineString() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    // 旧版本 bug 会把键行连同一个空行插进 format 字符串内部，重新 apply 时要清掉
+    let existing = [
+        "format = \"\"\"",
+        "palette = \"tintify\"",
+        "",
+        "[](grad1)\\",
+        "$directory\\",
+        "\"\"\"",
+        "",
+        "[username]",
+        "show_always = true",
+    ].joined(separator: "\n")
+    try existing.write(toFile: tmp.path, atomically: true, encoding: .utf8)
+
+    try ConfigWriter.replaceTopLevelKey(in: tmp.path, key: "palette", line: "palette = \"tintify\"")
+
+    let lines = try String(contentsOf: tmp, encoding: .utf8).components(separatedBy: "\n")
+    #expect(lines[1] == "[](grad1)\\")                            // 残留行和空行都被移除
+    #expect(lines.filter { $0 == "palette = \"tintify\"" }.count == 1)
+    let paletteIdx = lines.firstIndex(of: "palette = \"tintify\"")!
+    #expect(paletteIdx > lines.firstIndex(of: "\"\"\"")!)
+    #expect(paletteIdx < lines.firstIndex(of: "[username]")!)
+}
+
 @Test func markerBlockWriteThroughSymlink() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
