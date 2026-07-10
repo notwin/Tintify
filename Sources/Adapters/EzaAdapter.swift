@@ -5,8 +5,17 @@ import Foundation
 struct EzaAdapter: ToolAdapter {
     let toolName = "eza"
 
+    /// Path to the legacy config location an older Tintify version wrote to.
+    /// On macOS eza actually reads the Application Support path, so a leftover
+    /// file here is stale and causes drift confusion.
+    let legacyConfigPath: String
+
     var defaultConfigPath: String {
         NSHomeDirectory() + "/Library/Application Support/eza/theme.yml"
+    }
+
+    init(legacyConfigPath: String = NSHomeDirectory() + "/.config/eza/theme.yml") {
+        self.legacyConfigPath = legacyConfigPath
     }
 
     /// Write full YAML theme file with colors mapped from the palette.
@@ -17,6 +26,10 @@ struct EzaAdapter: ToolAdapter {
     ///   theme: The theme to apply.
     ///   configPath: Optional override path.
     func apply(theme: Theme, configPath: String? = nil) throws {
+        // 一次性清理：旧版 Tintify 曾写过 ~/.config/eza/theme.yml，macOS 上 eza
+        // 实际读取的是 Application Support 路径，残留会造成双份漂移的困惑
+        try removeLegacyThemeIfTintifyManaged()
+
         let path = configPath ?? defaultConfigPath
         let p = theme.palette
 
@@ -28,6 +41,21 @@ struct EzaAdapter: ToolAdapter {
 
         let yaml = buildYAML(palette: p)
         try ConfigWriter.atomicWrite(yaml, to: path)
+    }
+
+    /// Remove the legacy config file only if it was written by Tintify itself.
+    ///
+    /// Leaves user-authored files at the legacy path untouched, logging a
+    /// hint instead since eza no longer reads from there on macOS.
+    private func removeLegacyThemeIfTintifyManaged() throws {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: legacyConfigPath),
+              let content = try? String(contentsOfFile: legacyConfigPath, encoding: .utf8) else { return }
+        if content.hasPrefix("# Tintify-managed eza theme") {
+            try fm.removeItem(atPath: legacyConfigPath)
+        } else {
+            NSLog("[Tintify] eza: 检测到 \(legacyConfigPath)，eza 实际读取的是 Application Support 路径")
+        }
     }
 
     /// Build the eza theme YAML from a palette.
