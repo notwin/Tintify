@@ -27,9 +27,9 @@ struct OnboardingView: View {
                         .font(.system(size: 48))
                         .foregroundStyle(.blue)
                 }
-                Text("欢迎使用 Tintify")
+                Text(L("欢迎使用 Tintify"))
                     .font(.title.bold())
-                Text("一键统一终端工具的配色主题")
+                Text(L("一键统一终端工具的配色主题"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -38,7 +38,7 @@ struct OnboardingView: View {
 
             // Tool detection
             VStack(alignment: .leading, spacing: 8) {
-                Text("已检测到的工具")
+                Text(L("已检测到的工具"))
                     .font(.headline)
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 6) {
@@ -62,7 +62,7 @@ struct OnboardingView: View {
                             Text(tool)
                                 .font(.caption)
                             if !installed {
-                                Text("未安装")
+                                Text(L("未安装"))
                                     .font(.system(size: 9))
                                     .foregroundStyle(.orange)
                             }
@@ -75,7 +75,7 @@ struct OnboardingView: View {
 
             // Theme selection
             VStack(alignment: .leading, spacing: 8) {
-                Text("选择一个主题")
+                Text(L("选择一个主题"))
                     .font(.headline)
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 8) {
@@ -126,7 +126,7 @@ struct OnboardingView: View {
                 AppSettings.shared.onboardingCompleted = true
                 onComplete()
             } label: {
-                Text("开始使用")
+                Text(L("开始使用"))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)

@@ -8,18 +8,19 @@ struct BackupPane: View {
     @State private var showRestoreAlert = false
     @State private var selectedBackup: BackupInfo?
     @State private var restoreMessage: String?
+    @State private var restoreSucceeded = false
     private let manager = BackupManager()
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "externaldrive", color: .green, title: "备份", subtitle: "应用主题前自动备份，可一键还原")
+                PaneHeader(icon: "externaldrive", color: .green, title: L("备份"), subtitle: L("应用主题前自动备份，可一键还原"))
 
                 if backups.isEmpty {
                     EmptyStateView(
                         icon: "externaldrive",
-                        title: "暂无备份",
-                        subtitle: "切换主题时会自动创建备份"
+                        title: L("暂无备份"),
+                        subtitle: L("切换主题时会自动创建备份")
                     )
                 } else {
                     GroupBox {
@@ -35,7 +36,7 @@ struct BackupPane: View {
                                             .foregroundStyle(.secondary)
                                     }
                                     Spacer()
-                                    Button("还原") {
+                                    Button(L("还原")) {
                                         selectedBackup = backup
                                         showRestoreAlert = true
                                     }
@@ -51,27 +52,29 @@ struct BackupPane: View {
                 if let message = restoreMessage {
                     Text(message)
                         .font(.caption)
-                        .foregroundStyle(message.contains("成功") ? .green : .red)
+                        .foregroundStyle(restoreSucceeded ? .green : .red)
                         .padding(.top, 4)
                 }
             }
             .padding(24)
         }
         .onAppear { backups = manager.listBackups() }
-        .alert("确认还原？", isPresented: $showRestoreAlert) {
-            Button("取消", role: .cancel) {}
-            Button("还原", role: .destructive) {
+        .alert(L("确认还原？"), isPresented: $showRestoreAlert) {
+            Button(L("取消"), role: .cancel) {}
+            Button(L("还原"), role: .destructive) {
                 if let backup = selectedBackup {
                     do {
                         try manager.restore(backupId: backup.id)
-                        restoreMessage = "还原成功"
+                        restoreMessage = L("还原成功")
+                        restoreSucceeded = true
                     } catch {
-                        restoreMessage = "还原失败：\(error.localizedDescription)"
+                        restoreMessage = L("还原失败：\(error.localizedDescription)")
+                        restoreSucceeded = false
                     }
                 }
             }
         } message: {
-            Text("将用备份替换当前配置文件，此操作不可撤销。")
+            Text(L("将用备份替换当前配置文件，此操作不可撤销。"))
         }
     }
 }

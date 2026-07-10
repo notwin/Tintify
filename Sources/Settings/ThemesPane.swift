@@ -19,7 +19,7 @@ struct ThemesPane: View {
             let query = searchText.lowercased()
             themes = themes.filter {
                 $0.name.lowercased().contains(query) ||
-                $0.description.lowercased().contains(query)
+                $0.localizedDescription.lowercased().contains(query)
             }
         }
         return themes
@@ -66,7 +66,7 @@ struct ThemesPane: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
-                    TextField("搜索主题名...", text: $searchText)
+                    TextField(L("搜索主题名..."), text: $searchText)
                         .textFieldStyle(.plain)
                 }
                 .padding(6)
@@ -74,9 +74,9 @@ struct ThemesPane: View {
                 .cornerRadius(6)
 
                 Picker("", selection: $appearanceFilter) {
-                    Text("全部").tag(Theme.Appearance?.none)
-                    Text("暗色").tag(Theme.Appearance?.some(.dark))
-                    Text("浅色").tag(Theme.Appearance?.some(.light))
+                    Text(L("全部")).tag(Theme.Appearance?.none)
+                    Text(L("暗色")).tag(Theme.Appearance?.some(.dark))
+                    Text(L("浅色")).tag(Theme.Appearance?.some(.light))
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 180)
@@ -89,8 +89,8 @@ struct ThemesPane: View {
                 if filteredThemes.isEmpty {
                     EmptyStateView(
                         icon: "magnifyingglass",
-                        title: "无匹配主题",
-                        subtitle: "试试调整搜索词或过滤条件"
+                        title: L("无匹配主题"),
+                        subtitle: L("试试调整搜索词或过滤条件")
                     )
                 } else {
                     VStack(spacing: 12) {

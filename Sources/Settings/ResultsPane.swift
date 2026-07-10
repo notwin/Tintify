@@ -11,13 +11,13 @@ struct ResultsPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "list.clipboard", color: .orange, title: "应用记录", subtitle: "查看每次主题切换的详细结果")
+                PaneHeader(icon: "list.clipboard", color: .orange, title: L("应用记录"), subtitle: L("查看每次主题切换的详细结果"))
 
                 if history.isEmpty {
                     EmptyStateView(
                         icon: "list.clipboard",
-                        title: "暂无应用记录",
-                        subtitle: "切换主题后这里会显示详细结果"
+                        title: L("暂无应用记录"),
+                        subtitle: L("切换主题后这里会显示详细结果")
                     )
                 } else {
                     ForEach(Array(history.enumerated()), id: \.element.id) { idx, result in

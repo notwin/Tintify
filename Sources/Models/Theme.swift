@@ -72,6 +72,13 @@ enum ToolThemeSource: Equatable {
 }
 
 extension Theme {
+    /// 描述文案的本地化（key = 中文原文；不在 catalog 的原样返回）。
+    var localizedDescription: String {
+        String(localized: String.LocalizationValue(description), bundle: .module)
+    }
+}
+
+extension Theme {
     func themeSource(for tool: ToolID) -> ToolThemeSource {
         if let name = toolNames[tool.rawValue] { return .builtin(name: name) }
         if compatibility == .full { return .builtin(name: nameForTool(tool.rawValue)) }

@@ -9,7 +9,7 @@ struct ToolsPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "wrench.and.screwdriver", color: .orange, title: "工具", subtitle: "配置文件路径（留空使用默认路径）")
+                PaneHeader(icon: "wrench.and.screwdriver", color: .orange, title: L("工具"), subtitle: L("配置文件路径（留空使用默认路径）"))
 
                 GroupBox {
                     VStack(spacing: 0) {
@@ -38,7 +38,7 @@ struct ToolsPane: View {
                                 Spacer()
 
                                 VStack(alignment: .trailing, spacing: 2) {
-                                    TextField("留空使用默认路径", text: Binding(
+                                    TextField(L("留空使用默认路径"), text: Binding(
                                         get: { settings.toolPaths[adapter.toolName] ?? "" },
                                         set: { val in
                                             if val.isEmpty {
@@ -55,7 +55,7 @@ struct ToolsPane: View {
                                     if let customPath = settings.toolPaths[adapter.toolName],
                                        !customPath.isEmpty,
                                        !FileManager.default.fileExists(atPath: (customPath as NSString).expandingTildeInPath) {
-                                        Label("路径不存在", systemImage: "exclamationmark.triangle.fill")
+                                        Label(L("路径不存在"), systemImage: "exclamationmark.triangle.fill")
                                             .font(.caption2)
                                             .foregroundStyle(.orange)
                                     }

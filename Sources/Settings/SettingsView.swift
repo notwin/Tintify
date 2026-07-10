@@ -8,15 +8,15 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// UI 显示名（Task 5 接入本地化后包 L()）。
+    /// UI 显示名。
     var displayName: String {
         switch self {
-        case .general: "通用"
-        case .tools: "工具"
-        case .themes: "主题"
-        case .results: "应用记录"
-        case .backup: "备份"
-        case .about: "关于"
+        case .general: L("通用")
+        case .tools: L("工具")
+        case .themes: L("主题")
+        case .results: L("应用记录")
+        case .backup: L("备份")
+        case .about: L("关于")
         }
     }
 

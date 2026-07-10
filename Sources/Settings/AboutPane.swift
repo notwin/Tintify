@@ -35,7 +35,7 @@ struct AboutPane: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    Text("macOS 终端主题管理器")
+                    Text(L("macOS 终端主题管理器"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -47,7 +47,7 @@ struct AboutPane: View {
 
                 GroupBox {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("支持的工具")
+                        Text(L("支持的工具"))
                             .font(.headline)
                         FlowLayout(spacing: 6) {
                             ForEach(supportedTools, id: \.self) { tool in
@@ -68,14 +68,14 @@ struct AboutPane: View {
                         Button {
                             NSWorkspace.shared.open(URL(string: "https://github.com/notwin/Tintify")!)
                         } label: {
-                            LinkRow(icon: "globe", title: "GitHub 仓库", subtitle: "查看源代码和文档")
+                            LinkRow(icon: "globe", title: L("GitHub 仓库"), subtitle: L("查看源代码和文档"))
                         }
                         .buttonStyle(.plain)
                         Divider()
                         Button {
                             NSWorkspace.shared.open(URL(string: "https://github.com/notwin/Tintify/issues")!)
                         } label: {
-                            LinkRow(icon: "ladybug", title: "反馈问题", subtitle: "报告 Bug 或提交功能建议")
+                            LinkRow(icon: "ladybug", title: L("反馈问题"), subtitle: L("报告 Bug 或提交功能建议"))
                         }
                         .buttonStyle(.plain)
                     }
@@ -173,7 +173,7 @@ struct UpdateButton: View {
                 Button {
                     updater.checkForUpdate()
                 } label: {
-                    Label("检查更新", systemImage: "arrow.clockwise")
+                    Label(L("检查更新"), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(.bordered)
 
@@ -181,19 +181,19 @@ struct UpdateButton: View {
                 HStack(spacing: 6) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("正在检查...")
+                    Text(L("正在检查..."))
                         .foregroundStyle(.secondary)
                 }
 
             case .upToDate:
-                Label("已是最新版本", systemImage: "checkmark.circle.fill")
+                Label(L("已是最新版本"), systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
 
             case .available(let version):
                 Button {
                     updater.performUpdate(version: version)
                 } label: {
-                    Label("立即更新 (v\(version))", systemImage: "arrow.down.circle.fill")
+                    Label(L("立即更新 (v\(version))"), systemImage: "arrow.down.circle.fill")
                 }
                 .buttonStyle(.borderedProminent)
 
@@ -210,7 +210,7 @@ struct UpdateButton: View {
                     Label(message, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption)
                         .foregroundStyle(.red)
-                    Button("重试") {
+                    Button(L("重试")) {
                         updater.checkForUpdate()
                     }
                     .buttonStyle(.bordered)

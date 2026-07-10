@@ -11,18 +11,18 @@ struct GeneralPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "paintpalette", color: .blue, title: "通用", subtitle: "主题切换、外观跟随和启动设置")
+                PaneHeader(icon: "paintpalette", color: .blue, title: L("通用"), subtitle: L("主题切换、外观跟随和启动设置"))
 
                 GroupBox {
                     VStack(spacing: 0) {
-                        Toggle("跟随系统外观", isOn: $settings.followSystemAppearance)
+                        Toggle(L("跟随系统外观"), isOn: $settings.followSystemAppearance)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
 
                         Divider()
 
                         HStack {
-                            Label("深色主题", systemImage: "moon")
+                            Label(L("深色主题"), systemImage: "moon")
                             Spacer()
                             Picker("", selection: $settings.darkThemeId) {
                                 ForEach(registry.themes(for: .dark)) { theme in
@@ -37,7 +37,7 @@ struct GeneralPane: View {
                         Divider()
 
                         HStack {
-                            Label("浅色主题", systemImage: "sun.max")
+                            Label(L("浅色主题"), systemImage: "sun.max")
                             Spacer()
                             Picker("", selection: $settings.lightThemeId) {
                                 ForEach(registry.themes(for: .light)) { theme in
@@ -52,7 +52,7 @@ struct GeneralPane: View {
                 }
 
                 GroupBox {
-                    LaunchAtLogin.Toggle("开机自动启动")
+                    LaunchAtLogin.Toggle(L("开机自动启动"))
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
                 }
@@ -63,7 +63,7 @@ struct GeneralPane: View {
                             ConfigManager.exportConfig()
                         } label: {
                             HStack {
-                                Label("导出配置", systemImage: "square.and.arrow.up")
+                                Label(L("导出配置"), systemImage: "square.and.arrow.up")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
@@ -81,7 +81,7 @@ struct GeneralPane: View {
                             ConfigManager.importConfig()
                         } label: {
                             HStack {
-                                Label("导入配置", systemImage: "square.and.arrow.down")
+                                Label(L("导入配置"), systemImage: "square.and.arrow.down")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.caption)

@@ -34,7 +34,7 @@ struct ThemeCard: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                     }
-                    Button("应用") {
+                    Button(L("应用")) {
                         onApply(displayTheme)
                     }
                     .buttonStyle(.bordered)
@@ -42,7 +42,7 @@ struct ThemeCard: View {
                 }
 
                 // 推荐理由
-                Text(theme.description)
+                Text(theme.localizedDescription)
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
@@ -69,13 +69,13 @@ struct ThemeCard: View {
                             .foregroundStyle(.yellow)
                     }
                     Label(
-                        theme.compatibility == .full ? "全工具兼容" : "部分 ANSI 回退",
+                        theme.compatibility == .full ? L("全工具兼容") : L("部分 ANSI 回退"),
                         systemImage: theme.compatibility == .full ? "checkmark.seal.fill" : "exclamationmark.triangle.fill"
                     )
                     .font(.caption2)
                     .foregroundStyle(theme.compatibility == .full ? .green : .orange)
 
-                    TagView(text: theme.appearance == .dark ? "暗色" : "浅色")
+                    TagView(text: theme.appearance == .dark ? L("暗色") : L("浅色"))
                 }
 
                 // 变体切换
