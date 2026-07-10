@@ -33,3 +33,19 @@ import Foundation
     }
     #expect(store.history.count == 50)
 }
+
+@MainActor
+@Test func reloadPicksUpExternalWrites() throws {
+    let url = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString).appendingPathComponent("history.json")
+    let store = ApplyHistoryStore(storageURL: url)
+    #expect(store.history.isEmpty)
+
+    // 模拟另一个进程写入同一文件
+    let other = ApplyHistoryStore(storageURL: url)
+    other.record(ApplyResult(theme: ThemeRegistry.shared.theme(id: "nord")!,
+                             timestamp: Date(), toolResults: []))
+
+    store.reload()
+    #expect(store.history.count == 1)
+}

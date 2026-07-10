@@ -12,6 +12,11 @@ final class ApplyHistoryStore: ObservableObject {
 
     init(storageURL: URL = URL(fileURLWithPath: NSHomeDirectory() + "/.tintify/history.json")) {
         self.storageURL = storageURL
+        reload()
+    }
+
+    /// 从磁盘重读历史（CLI 等外部进程写入后调用）。
+    func reload() {
         if let data = try? Data(contentsOf: storageURL),
            let saved = try? JSONDecoder().decode([ApplyResult].self, from: data) {
             history = saved

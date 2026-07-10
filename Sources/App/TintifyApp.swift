@@ -60,6 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ) { _ in
             MainActor.assumeIsolated {
                 AppSettings.shared.reload()
+                ApplyHistoryStore.shared.reload()
             }
         }
     }
