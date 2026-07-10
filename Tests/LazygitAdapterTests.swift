@@ -42,6 +42,8 @@ import Foundation
     #expect(result.contains("#89b4fa"))
     #expect(!result.contains("#old"))
     #expect(result.contains("other_key: value"))
+    // selectedRangeBgColor 在 lazygit 0.62 schema 里已不存在（死键）
+    #expect(!result.contains("selectedRangeBgColor"))
 }
 
 @Test func lazygitAdapterToolName() {

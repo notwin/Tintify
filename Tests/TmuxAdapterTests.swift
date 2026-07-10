@@ -19,6 +19,10 @@ import Foundation
     #expect(content.contains("status-style"))
     #expect(content.contains("pane-border-style"))
     #expect(content.contains("pane-active-border-style"))
+    // copy-mode 不写的话默认是黄底黑字大色块
+    #expect(content.contains("mode-style"))
+    #expect(content.contains("copy-mode-match-style"))
+    #expect(content.contains("copy-mode-current-match-style"))
     #expect(content.contains("set -g mouse on"))
 }
 

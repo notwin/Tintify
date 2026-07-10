@@ -34,6 +34,9 @@ struct TmuxAdapter: ToolAdapter {
             set -g pane-active-border-style 'fg=\(p.blue)'
             set -g message-style 'fg=\(p.text),bg=\(p.surface0)'
             set -g message-command-style 'fg=\(p.text),bg=\(p.surface0)'
+            set -g mode-style 'fg=\(p.text),bg=\(p.surface1)'
+            set -g copy-mode-match-style 'fg=\(p.base),bg=\(p.yellow)'
+            set -g copy-mode-current-match-style 'fg=\(p.base),bg=\(p.peach)'
             """
 
         try ConfigWriter.writeMarkerBlock(to: path, content: tmuxLines)

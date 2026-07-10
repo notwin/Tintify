@@ -42,8 +42,6 @@ struct LazygitAdapter: ToolAdapter {
               - "\(p.subtext1)"
             inactiveViewSelectedLineBgColor:
               - "\(p.surface1)"
-            selectedRangeBgColor:
-              - "\(p.surface1)"
         """.components(separatedBy: "\n")
     }
 
