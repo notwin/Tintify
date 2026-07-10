@@ -143,26 +143,11 @@ struct OnboardingView: View {
     }
 
     private func detectTools() {
-        let toolChecks: [(String, () -> Bool)] = [
-            ("ghostty", { FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Library/Application Support/com.mitchellh.ghostty/config") }),
-            ("starship", { ToolDetection.findExecutable("starship") }),
-            ("bat", { ToolDetection.findExecutable("bat") }),
-            ("fzf", { ToolDetection.findExecutable("fzf") }),
-            ("delta", { ToolDetection.findExecutable("delta") }),
-            ("eza", { ToolDetection.findExecutable("eza") }),
-            ("lazygit", { ToolDetection.findExecutable("lazygit") }),
-            ("tmux", { ToolDetection.findExecutable("tmux") }),
-            ("vim", { ToolDetection.findExecutable("vim") }),
-            ("wezterm", { ToolDetection.findExecutable("wezterm") || FileManager.default.fileExists(atPath: "/Applications/WezTerm.app") }),
-            ("zsh-syntax-highlighting", { FileManager.default.fileExists(atPath: "/opt/homebrew/share/zsh-syntax-highlighting") || FileManager.default.fileExists(atPath: "/usr/local/share/zsh-syntax-highlighting") }),
-            ("otty", { FileManager.default.fileExists(atPath: "/Applications/Otty.app") }),
-        ]
-
-        for (name, check) in toolChecks {
-            let installed = check()
-            detectedTools[name] = installed
+        for adapter in ThemeEngine.allAdapters {
+            let installed = adapter.detectInstalled()
+            detectedTools[adapter.toolName] = installed
             if !installed {
-                settings.disabledTools.insert(name)
+                settings.disabledTools.insert(adapter.toolName)
             }
         }
     }

@@ -6,21 +6,6 @@ import SwiftUI
 struct ToolsPane: View {
     @ObservedObject private var settings = AppSettings.shared
 
-    private let tools: [(name: String, defaultPath: String)] = [
-        ("ghostty", "~/Library/Application Support/com.mitchellh.ghostty/config"),
-        ("starship", "~/.config/starship.toml"),
-        ("bat", "~/.zshrc"),
-        ("fzf", "~/.zshrc"),
-        ("delta", "~/.gitconfig"),
-        ("eza", "~/Library/Application Support/eza/theme.yml"),
-        ("lazygit", "~/Library/Application Support/lazygit/config.yml"),
-        ("zsh-syntax-highlighting", "~/.zshrc"),
-        ("tmux", "~/.tmux.conf"),
-        ("vim", "~/.vimrc"),
-        ("wezterm", "~/.wezterm.lua"),
-        ("otty", "~/.config/otty/config.toml"),
-    ]
-
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -28,16 +13,16 @@ struct ToolsPane: View {
 
                 GroupBox {
                     VStack(spacing: 0) {
-                        ForEach(Array(tools.enumerated()), id: \.offset) { idx, tool in
+                        ForEach(Array(ThemeEngine.allAdapters.enumerated()), id: \.offset) { idx, adapter in
                             if idx > 0 { Divider() }
                             HStack(spacing: 12) {
                                 Toggle("", isOn: Binding(
-                                    get: { !settings.disabledTools.contains(tool.name) },
+                                    get: { !settings.disabledTools.contains(adapter.toolName) },
                                     set: { enabled in
                                         if enabled {
-                                            settings.disabledTools.remove(tool.name)
+                                            settings.disabledTools.remove(adapter.toolName)
                                         } else {
-                                            settings.disabledTools.insert(tool.name)
+                                            settings.disabledTools.insert(adapter.toolName)
                                         }
                                     }
                                 ))
@@ -45,29 +30,29 @@ struct ToolsPane: View {
                                 .labelsHidden()
 
                                 VStack(alignment: .leading) {
-                                    Text(tool.name).font(.body.bold())
-                                    Text(tool.defaultPath).font(.caption).foregroundStyle(.secondary)
+                                    Text(adapter.toolName).font(.body.bold())
+                                    Text(adapter.defaultPathDescription).font(.caption).foregroundStyle(.secondary)
                                 }
-                                .opacity(settings.disabledTools.contains(tool.name) ? 0.4 : 1.0)
+                                .opacity(settings.disabledTools.contains(adapter.toolName) ? 0.4 : 1.0)
 
                                 Spacer()
 
                                 VStack(alignment: .trailing, spacing: 2) {
                                     TextField("留空使用默认路径", text: Binding(
-                                        get: { settings.toolPaths[tool.name] ?? "" },
+                                        get: { settings.toolPaths[adapter.toolName] ?? "" },
                                         set: { val in
                                             if val.isEmpty {
-                                                settings.toolPaths.removeValue(forKey: tool.name)
+                                                settings.toolPaths.removeValue(forKey: adapter.toolName)
                                             } else {
-                                                settings.toolPaths[tool.name] = val
+                                                settings.toolPaths[adapter.toolName] = val
                                             }
                                         }
                                     ))
                                     .textFieldStyle(.roundedBorder)
                                     .frame(width: 200)
-                                    .disabled(settings.disabledTools.contains(tool.name))
+                                    .disabled(settings.disabledTools.contains(adapter.toolName))
 
-                                    if let customPath = settings.toolPaths[tool.name],
+                                    if let customPath = settings.toolPaths[adapter.toolName],
                                        !customPath.isEmpty,
                                        !FileManager.default.fileExists(atPath: (customPath as NSString).expandingTildeInPath) {
                                         Label("路径不存在", systemImage: "exclamationmark.triangle.fill")
@@ -75,7 +60,7 @@ struct ToolsPane: View {
                                             .foregroundStyle(.orange)
                                     }
                                 }
-                                .opacity(settings.disabledTools.contains(tool.name) ? 0.4 : 1.0)
+                                .opacity(settings.disabledTools.contains(adapter.toolName) ? 0.4 : 1.0)
                             }
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)

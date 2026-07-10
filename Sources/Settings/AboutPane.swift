@@ -11,11 +11,7 @@ struct AboutPane: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.3.0"
     }
 
-    private let supportedTools = [
-        "Ghostty", "Starship", "bat", "fzf", "delta",
-        "eza", "lazygit", "tmux", "vim", "zsh-syntax-highlighting",
-        "WezTerm", "otty"
-    ]
+    private let supportedTools = ThemeEngine.allAdapters.map { $0.id.displayName }
 
     var body: some View {
         ScrollView {
