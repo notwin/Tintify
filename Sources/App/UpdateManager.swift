@@ -1,6 +1,7 @@
 // Sources/App/UpdateManager.swift
 import Foundation
 import AppKit
+import CryptoKit
 
 /// Checks GitHub Releases for updates and performs in-place app replacement.
 @MainActor
@@ -59,7 +60,7 @@ final class UpdateManager: ObservableObject {
 
                 let remoteVersion = tagName.hasPrefix("v") ? String(tagName.dropFirst()) : tagName
 
-                if isNewer(remote: remoteVersion, current: currentVersion) {
+                if UpdateManager.isNewer(remote: remoteVersion, current: currentVersion) {
                     state = .available(version: remoteVersion)
                 } else {
                     state = .upToDate
@@ -98,29 +99,37 @@ final class UpdateManager: ObservableObject {
                 }
                 try fm.moveItem(at: tempURL, to: URL(fileURLWithPath: dmgPath))
 
+                // 1b. Verify checksum (skip if release has no .sha256 file)
+                if let ok = try await verifyChecksum(dmgPath: dmgPath, dmgURL: url), !ok {
+                    try? fm.removeItem(atPath: dmgPath)
+                    state = .error(message: "校验失败，已中止更新")
+                    return
+                }
+
                 // 2. Mount DMG
                 state = .downloading(progress: "安装中...")
-                let mountPoint = try mountDMG(at: dmgPath)
+                let mountPoint = try await mountDMG(at: dmgPath)
 
                 // 3. Replace app
                 let sourceApp = mountPoint + "/Tintify.app"
                 let targetApp = "/Applications/Tintify.app"
 
                 guard fm.fileExists(atPath: sourceApp) else {
-                    try unmountDMG(at: mountPoint)
+                    try await unmountDMG(at: mountPoint)
                     state = .error(message: "DMG 中未找到 Tintify.app")
                     return
                 }
 
-                // Remove old app
-                if fm.fileExists(atPath: targetApp) {
-                    try fm.removeItem(atPath: targetApp)
-                }
-                // Copy new app
-                try fm.copyItem(atPath: sourceApp, toPath: targetApp)
+                // Atomic replace: stage the copy, then swap. If the copy fails,
+                // the old app is untouched; the final move is a same-volume rename.
+                let stagingApp = "/Applications/Tintify.app.new"
+                if fm.fileExists(atPath: stagingApp) { try? fm.removeItem(atPath: stagingApp) }
+                try fm.copyItem(atPath: sourceApp, toPath: stagingApp)
+                if fm.fileExists(atPath: targetApp) { try fm.removeItem(atPath: targetApp) }
+                try fm.moveItem(atPath: stagingApp, toPath: targetApp)
 
                 // 4. Unmount DMG
-                try unmountDMG(at: mountPoint)
+                try await unmountDMG(at: mountPoint)
 
                 // 5. Clean up
                 try? fm.removeItem(atPath: dmgPath)
@@ -136,7 +145,7 @@ final class UpdateManager: ObservableObject {
 
     // MARK: - Private
 
-    private func isNewer(remote: String, current: String) -> Bool {
+    nonisolated static func isNewer(remote: String, current: String) -> Bool {
         let r = remote.split(separator: ".").compactMap { Int($0) }
         let c = current.split(separator: ".").compactMap { Int($0) }
         for i in 0..<max(r.count, c.count) {
@@ -148,35 +157,62 @@ final class UpdateManager: ObservableObject {
         return false
     }
 
-    private func mountDMG(at path: String) throws -> String {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
-        process.arguments = ["attach", path, "-nobrowse", "-quiet", "-mountpoint", "/tmp/tintify-update"]
-        try process.run()
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else {
-            throw NSError(domain: "UpdateManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "挂载 DMG 失败"])
+    private func mountDMG(at path: String) async throws -> String {
+        let output: Data = try await Task.detached {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
+            process.arguments = ["attach", path, "-nobrowse", "-quiet", "-plist"]
+            let pipe = Pipe()
+            process.standardOutput = pipe
+            try process.run()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            process.waitUntilExit()
+            guard process.terminationStatus == 0 else {
+                throw NSError(domain: "UpdateManager", code: 1,
+                              userInfo: [NSLocalizedDescriptionKey: "挂载 DMG 失败"])
+            }
+            return data
+        }.value
+
+        guard let plist = try PropertyListSerialization.propertyList(from: output, format: nil) as? [String: Any],
+              let entities = plist["system-entities"] as? [[String: Any]],
+              let mountPoint = entities.compactMap({ $0["mount-point"] as? String }).first else {
+            throw NSError(domain: "UpdateManager", code: 2,
+                          userInfo: [NSLocalizedDescriptionKey: "无法解析 DMG 挂载点"])
         }
-        return "/tmp/tintify-update"
+        return mountPoint
     }
 
-    private func unmountDMG(at mountPoint: String) throws {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
-        process.arguments = ["detach", mountPoint, "-quiet"]
-        try process.run()
-        process.waitUntilExit()
+    private func unmountDMG(at mountPoint: String) async throws {
+        try await Task.detached {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
+            process.arguments = ["detach", mountPoint, "-quiet"]
+            try process.run()
+            process.waitUntilExit()
+        }.value
+    }
+
+    /// 校验下载的 DMG。返回 nil = release 未附校验文件（跳过），否则为校验结果。
+    private func verifyChecksum(dmgPath: String, dmgURL: URL) async throws -> Bool? {
+        guard let checksumURL = URL(string: dmgURL.absoluteString + ".sha256") else { return nil }
+        let (data, response) = try await URLSession.shared.data(from: checksumURL)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200,
+              let text = String(data: data, encoding: .utf8),
+              let expected = text.split(separator: " ").first.map({ String($0).lowercased() }) else {
+            NSLog("[Tintify] 更新：release 未附 sha256 校验文件，跳过校验")
+            return nil
+        }
+        let dmgData = try Data(contentsOf: URL(fileURLWithPath: dmgPath))
+        let actual = SHA256.hash(data: dmgData).map { String(format: "%02x", $0) }.joined()
+        return actual == expected
     }
 
     private func relaunch() {
-        let appPath = "/Applications/Tintify.app"
         let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-        task.arguments = ["-n", appPath]
+        task.executableURL = URL(fileURLWithPath: "/bin/sh")
+        task.arguments = ["-c", "sleep 1; open /Applications/Tintify.app"]
         try? task.run()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            NSApplication.shared.terminate(nil)
-        }
+        NSApplication.shared.terminate(nil)   // 旧实例先退，1 秒后新实例起——不再重叠
     }
 }

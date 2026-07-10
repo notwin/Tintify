@@ -39,3 +39,7 @@ rm -rf "$STAGING_DIR"
 echo "=== Done ==="
 echo "DMG created: $DMG_PATH"
 echo "Size: $(ls -lh "$DMG_PATH" | awk '{print $5}')"
+
+# Generate SHA256 checksum for auto-update verification
+shasum -a 256 "$DMG_PATH" | awk '{print $1 "  " FILENAME}' FILENAME="$(basename "$DMG_PATH")" > "$DMG_PATH.sha256"
+echo "Checksum written to $DMG_PATH.sha256"
