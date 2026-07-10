@@ -60,6 +60,8 @@ struct ThemeCard: View {
                             .frame(height: 10)
                     }
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(L("配色预览：\(theme.name)"))
 
                 // Stars + 兼容性 + 标签
                 HStack(spacing: 8) {

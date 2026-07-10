@@ -131,6 +131,7 @@
 "应用" = "Apply";
 "全工具兼容" = "Full Tool Compatibility";
 "部分 ANSI 回退" = "Partial ANSI Fallback";
+"配色预览：%@" = "Color preview: %@";
 
 /* Theme descriptions — Popular */
 "最受欢迎的柔和暖色方案，低对比护眼" = "The most popular soft, warm palette — low contrast and easy on the eyes";

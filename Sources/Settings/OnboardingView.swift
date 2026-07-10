@@ -97,6 +97,7 @@ struct OnboardingView: View {
                                                 .frame(height: 8)
                                         }
                                     }
+                                    .accessibilityHidden(true)
                                     Text(theme.name)
                                         .font(.caption.bold())
                                         .foregroundStyle(.primary)

@@ -54,6 +54,8 @@ struct ResultCard: View {
                         withAnimation { isExpanded.toggle() }
                     } label: {
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .contentShape(Rectangle())
+                            .padding(4)
                     }
                     .buttonStyle(.plain)
                 }

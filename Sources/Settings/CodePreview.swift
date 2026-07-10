@@ -47,5 +47,6 @@ struct CodePreview: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(hex: palette.base))
         .cornerRadius(4)
+        .accessibilityHidden(true)
     }
 }
