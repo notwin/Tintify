@@ -5,17 +5,19 @@ import Foundation
 struct GhosttyAdapter: ToolAdapter {
     let id: ToolID = .ghostty
 
+    /// Custom themes directory for themes not built into Ghostty.
+    let customThemesDir: String
+
+    init(customThemesDir: String = NSHomeDirectory() + "/.config/ghostty/themes") {
+        self.customThemesDir = customThemesDir
+    }
+
     var defaultConfigPath: String {
         NSHomeDirectory() + "/Library/Application Support/com.mitchellh.ghostty/config"
     }
 
     func detectInstalled() -> Bool {
         FileManager.default.fileExists(atPath: defaultConfigPath)
-    }
-
-    /// Custom themes directory for themes not built into Ghostty.
-    private var customThemesDir: String {
-        NSHomeDirectory() + "/.config/ghostty/themes"
     }
 
     /// Write `theme = <name>` into the Ghostty config.
@@ -42,24 +44,13 @@ struct GhosttyAdapter: ToolAdapter {
         }
 
         let p = theme.palette
-        // Map 26-color palette to Ghostty's 16-color ANSI palette
+        // 16 色 ANSI 槽位统一走 AnsiPalette（三个终端生成器共用）
+        let ansi = AnsiPalette.colors(for: theme)
+        let paletteLines = ansi.enumerated()
+            .map { "palette = \($0.offset)=\($0.element)" }
+            .joined(separator: "\n")
         let content = """
-            palette = 0=\(p.crust)
-            palette = 1=\(p.red)
-            palette = 2=\(p.green)
-            palette = 3=\(p.yellow)
-            palette = 4=\(p.blue)
-            palette = 5=\(p.pink)
-            palette = 6=\(p.teal)
-            palette = 7=\(p.subtext1)
-            palette = 8=\(p.surface1)
-            palette = 9=\(p.maroon)
-            palette = 10=\(p.green)
-            palette = 11=\(p.yellow)
-            palette = 12=\(p.sapphire)
-            palette = 13=\(p.mauve)
-            palette = 14=\(p.sky)
-            palette = 15=\(p.text)
+            \(paletteLines)
             background = \(p.base)
             foreground = \(p.text)
             cursor-color = \(p.rosewater)

@@ -117,8 +117,11 @@ enum PopularThemes {
                 green: "#859900", teal: "#2aa198", sky: "#2aa198", sapphire: "#268bd2",
                 blue: "#268bd2", lavender: "#6c71c4",
                 text: "#839496", subtext1: "#93a1a1", subtext0: "#839496",
-                overlay2: "#657b83", overlay1: "#586e75", overlay0: "#073642",
-                surface2: "#073642", surface1: "#002b36", surface0: "#002b36",
+                // 官方只给 8 阶灰（base03..base3），surface1/2、overlay0 由
+                // base02→base01 插值派生；此前 surface0/1 塌缩等于 base，
+                // 导致 ANSI 黑槽和 fzf 选中行隐形
+                overlay2: "#657b83", overlay1: "#586e75", overlay0: "#446068",
+                surface2: "#30525c", surface1: "#1b444f", surface0: "#073642",
                 base: "#002b36", mantle: "#001e26", crust: "#001419"),
             toolNames: ["ghostty": "Solarized Dark Patched", "bat": "Solarized (dark)", "delta": "Solarized (dark)", "wezterm": "Builtin Solarized Dark"],
             category: .popular,
@@ -139,8 +142,9 @@ enum PopularThemes {
                 green: "#859900", teal: "#2aa198", sky: "#2aa198", sapphire: "#268bd2",
                 blue: "#268bd2", lavender: "#6c71c4",
                 text: "#657b83", subtext1: "#586e75", subtext0: "#657b83",
-                overlay2: "#93a1a1", overlay1: "#839496", overlay0: "#eee8d5",
-                surface2: "#eee8d5", surface1: "#fdf6e3", surface0: "#fdf6e3",
+                // 灰阶塌缩修复：surface/overlay0 由 base2→base1 插值派生
+                overlay2: "#93a1a1", overlay1: "#839496", overlay0: "#aab3ae",
+                surface2: "#c0c4bb", surface1: "#d7d6c8", surface0: "#eee8d5",
                 base: "#fdf6e3", mantle: "#fdf6e3", crust: "#eee8d5"),
             toolNames: ["ghostty": "iTerm2 Solarized Light", "bat": "Solarized (light)", "delta": "Solarized (light)", "wezterm": "Builtin Solarized Light"],
             category: .popular,

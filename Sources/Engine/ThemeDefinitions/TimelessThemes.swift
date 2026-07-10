@@ -122,8 +122,9 @@ enum TimelessThemes {
                 green: "#a3be8c", teal: "#8fbcbb", sky: "#88c0d0", sapphire: "#81a1c1",
                 blue: "#5e81ac", lavender: "#b48ead",
                 text: "#eceff4", subtext1: "#e5e9f0", subtext0: "#d8dee9",
-                overlay2: "#4c566a", overlay1: "#434c5e", overlay0: "#3b4252",
-                surface2: "#434c5e", surface1: "#3b4252", surface0: "#2e3440",
+                // 灰阶塌缩修复：surface 上移到官方 nord1-3，overlay 向亮端派生
+                overlay2: "#6b778e", overlay1: "#5c667c", overlay0: "#4c566a",
+                surface2: "#4c566a", surface1: "#434c5e", surface0: "#3b4252",
                 base: "#2e3440", mantle: "#292e39", crust: "#242933"),
             toolNames: ["wezterm": "nord"], category: .timeless,
             description: "北极冰蓝色调，冷静克制的极简风格", stars: "6k",

@@ -72,8 +72,12 @@ struct WezTermAdapter: ToolAdapter {
     }
 
     /// Build inline WezTerm color_schemes definition from palette.
+    /// 16 色 ANSI 槽位统一走 AnsiPalette（三个终端生成器共用）。
     private func buildCustomScheme(theme: Theme, name: String, varName: String) -> String {
         let p = theme.palette
+        let ansi = AnsiPalette.colors(for: theme)
+        let normal = ansi[0..<8].map { "\"\($0)\"" }.joined(separator: ", ")
+        let brights = ansi[8..<16].map { "\"\($0)\"" }.joined(separator: ", ")
         return """
             \(varName).color_schemes = \(varName).color_schemes or {}
             \(varName).color_schemes["\(name)"] = {
@@ -83,8 +87,8 @@ struct WezTermAdapter: ToolAdapter {
               cursor_fg = "\(p.base)",
               selection_bg = "\(p.surface1)",
               selection_fg = "\(p.text)",
-              ansi = {"\(p.crust)", "\(p.red)", "\(p.green)", "\(p.yellow)", "\(p.blue)", "\(p.pink)", "\(p.teal)", "\(p.subtext1)"},
-              brights = {"\(p.surface1)", "\(p.maroon)", "\(p.green)", "\(p.yellow)", "\(p.sapphire)", "\(p.mauve)", "\(p.sky)", "\(p.text)"},
+              ansi = {\(normal)},
+              brights = {\(brights)},
             }
             \(varName).color_scheme = "\(name)"
             """

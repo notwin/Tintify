@@ -65,11 +65,15 @@ struct OttyAdapter: ToolAdapter {
         }
     }
 
-    /// 16 色 ANSI 顺序遵循 otty 现存 .ottytheme 惯例（ansi0 用 surface1 而非 crust，
-    /// 保证黑色槽在深底上可见），与用户 themes 目录里的 catppuccin-mocha.ottytheme 一致。
+    /// 16 色 ANSI 槽位统一走 AnsiPalette（三个终端生成器共用，
+    /// 深浅主题的灰阶端在那里分支）。
     private func buildOttyTheme(theme: Theme, name: String) -> String {
         let p = theme.palette
         let mode = theme.appearance == .dark ? "dark" : "light"
+        let ansi = AnsiPalette.colors(for: theme)
+        let rows = stride(from: 0, to: 16, by: 4).map { i in
+            "    " + ansi[i..<i+4].map { "\"\($0)\"" }.joined(separator: ", ") + ","
+        }.joined(separator: "\n")
         return """
             [meta]
             name = "\(name)"
@@ -79,10 +83,7 @@ struct OttyAdapter: ToolAdapter {
             foreground = "\(p.text)"
             background = "\(p.base)"
             palette = [
-                "\(p.surface1)", "\(p.red)", "\(p.green)", "\(p.yellow)",
-                "\(p.blue)", "\(p.pink)", "\(p.teal)", "\(p.subtext1)",
-                "\(p.surface2)", "\(p.maroon)", "\(p.green)", "\(p.yellow)",
-                "\(p.sapphire)", "\(p.mauve)", "\(p.sky)", "\(p.text)",
+            \(rows)
             ]
             """
     }
