@@ -36,7 +36,8 @@ enum OriginalThemes {
                 PromptSegment(color: "#5ea1ff", ink: "#0c0c0f"),
                 PromptSegment(color: "#5ef1ff", ink: "#0c0c0f"),
                 PromptSegment(color: "#5eff6c", ink: "#0c0c0f"),
-            ]
+            ],
+            accent: "#ff2daf"  // 霓虹粉是主打色，让它在 ls 里出场
         ),
 
         // ── 墨竹 (Ink Bamboo) ───────────────────────────────────
@@ -141,12 +142,14 @@ enum OriginalThemes {
                 PromptSegment(color: "#ff7edb", ink: "#241b2f"),
                 PromptSegment(color: "#b26df8", ink: "#241b2f"),
                 PromptSegment(color: "#5b4bc4", ink: "#f0edfd"),
-            ]
+            ],
+            accent: "#ff7edb"  // synthwave 的标志热粉，让它在 ls 里出场
         ),
 
         // ── 磷光 (Phosphor Green) ────────────────────────────────
         // 老 CRT 显示器意象：单色磷光绿，从亮到暗走五档
         // red/maroon 用低饱和灼痕红维持错误语义，不破坏单色观感
+        // 不设 accent：executable 的磷光绿本身就是标志色，单色是设计本体
         Theme(
             id: "phosphor-green",
             name: "磷光",
@@ -218,6 +221,7 @@ enum OriginalThemes {
         // ── 琉璃 (Jewel Tones) ───────────────────────────────────
         // 丝绒夜里的宝石切面：红宝、紫晶、蓝宝、翡翠，浓而不闹
         // 深紫底色衬托宝石般浓郁的高饱和强调色
+        // 不设 accent：翡翠(executable)和蓝宝(directory)已在 ls 出场，浓而不闹
         Theme(
             id: "jewel-tones",
             name: "琉璃",

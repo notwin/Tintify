@@ -47,9 +47,19 @@ import Foundation
     let tmpPath = tmpDir.appendingPathComponent("theme.yml").path
     let adapter = EzaAdapter(legacyConfigPath: tmpDir.appendingPathComponent("legacy").path)
 
-    // 墨与朱定义了朱红 accent（设计意图：只允许一枚朱印跳出来）
+    // 标志色住在非映射槽的原创主题定义了 accent（各自的设计意图）
     let ink = ThemeRegistry.shared.theme(id: "ink-vermilion")!
-    #expect(ink.accent == "#e34234")
+    #expect(ink.accent == "#e34234")                                             // 朱印
+    #expect(ThemeRegistry.shared.theme(id: "neon-city")!.accent == "#ff2daf")     // 霓虹粉
+    #expect(ThemeRegistry.shared.theme(id: "synthwave-sunset")!.accent == "#ff7edb")  // 热粉
+    // rose-pine 家族对齐官方 eza 主题：executable = iris
+    #expect(ThemeRegistry.shared.theme(id: "rose-pine")!.accent == "#c4a7e7")
+    #expect(ThemeRegistry.shared.theme(id: "rose-pine-moon")!.accent == "#c4a7e7")
+    #expect(ThemeRegistry.shared.theme(id: "rose-pine-dawn")!.accent == "#907aa9")
+    // 单色/多宝石主题刻意不设 accent；经典主题维持官方绿色惯例
+    #expect(ThemeRegistry.shared.theme(id: "phosphor-green")!.accent == nil)
+    #expect(ThemeRegistry.shared.theme(id: "jewel-tones")!.accent == nil)
+    #expect(ThemeRegistry.shared.theme(id: "dracula")!.accent == nil)
 
     try adapter.apply(theme: ink, configPath: tmpPath)
     let result = try String(contentsOfFile: tmpPath, encoding: .utf8)

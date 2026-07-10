@@ -69,7 +69,9 @@ enum TrendingThemes {
                 PromptSegment(color: "#f6c177", ink: "#191724"),
                 PromptSegment(color: "#9ccfd8", ink: "#191724"),
                 PromptSegment(color: "#31748f", ink: "#f2eff9"),
-            ]),
+            ],
+            // 官方 eza 主题的 executable 就是 iris（rose-pine 色板没有正经的绿）
+            accent: "#c4a7e7"),
         Theme(
             id: "rose-pine-moon", name: "Rosé Pine Moon", appearance: .dark,
             palette: Palette(
@@ -91,7 +93,8 @@ enum TrendingThemes {
                 PromptSegment(color: "#f6c177", ink: "#232136"),
                 PromptSegment(color: "#9ccfd8", ink: "#232136"),
                 PromptSegment(color: "#3e8fb0", ink: "#e0def4"),
-            ]),
+            ],
+            accent: "#c4a7e7"),
         Theme(
             id: "rose-pine-dawn", name: "Rosé Pine Dawn", appearance: .light,
             palette: Palette(
@@ -113,7 +116,8 @@ enum TrendingThemes {
                 PromptSegment(color: "#d7827e", ink: "#fdfaf6"),
                 PromptSegment(color: "#ea9d34", ink: "#fdfaf6"),
                 PromptSegment(color: "#286983", ink: "#fdfaf6"),
-            ]),
+            ],
+            accent: "#907aa9"),
         Theme(
             id: "kanagawa-wave", name: "Kanagawa Wave", appearance: .dark,
             palette: Palette(
