@@ -24,6 +24,9 @@ if [ -d ".build/release/Tintify_Tintify.bundle" ]; then
     cp -r ".build/release/Tintify_Tintify.bundle" "$BUNDLE_PATH/Contents/MacOS/"
 fi
 
+# Copy CLI wrapper into Resources (used by /usr/local/bin/tintify symlink)
+cp "$SCRIPT_DIR/tintify" "$BUNDLE_PATH/Contents/Resources/tintify" && chmod +x "$BUNDLE_PATH/Contents/Resources/tintify"
+
 # Copy Info.plist
 cp Info.plist "$BUNDLE_PATH/Contents/"
 
@@ -48,7 +51,7 @@ cp -r "$BUNDLE_PATH" /Applications/
 
 # Install CLI tool
 echo "=== Installing CLI ==="
-ln -sf "$SCRIPT_DIR/tintify" /usr/local/bin/tintify
+ln -sf "/Applications/Tintify.app/Contents/Resources/tintify" /usr/local/bin/tintify
 
 # Clean up project directory bundle to avoid Spotlight duplicates
 rm -rf "$BUNDLE_PATH"

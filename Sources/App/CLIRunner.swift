@@ -18,6 +18,8 @@ enum CLIRunner {
                 current()
             case "tools":
                 tools()
+            case "themes-json":
+                themesJSON()
             default:
                 usage()
             }
@@ -90,6 +92,19 @@ enum CLIRunner {
                 print("  ✓ \(adapter.toolName) — \(L("已启用"))")
             }
         }
+    }
+
+    @MainActor
+    private static func themesJSON() {
+        struct Entry: Codable {
+            let id: String
+            let toolNames: [String: String]
+        }
+        let entries = ThemeRegistry.shared.allThemes.map {
+            Entry(id: $0.id, toolNames: $0.toolNames)
+        }
+        let data = try! JSONEncoder().encode(entries)
+        print(String(data: data, encoding: .utf8)!)
     }
 
     private static func usage() {
