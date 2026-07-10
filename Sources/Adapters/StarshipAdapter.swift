@@ -40,9 +40,6 @@ struct StarshipAdapter: ToolAdapter {
         // 段内文字颜色必须确定（设计稿用 ink 色），不能随终端默认前景漂移。
         try addInkForegrounds(in: path)
 
-        // 空段（如语言/docker）不该留下挤扁的分隔箭头细条。
-        try wrapSegmentGroupsIfNeeded(in: path)
-
         // Set the palette reference line (must sit in the TOML top-level area,
         // before the first [section] — replaceLine would append to EOF and
         // silently land inside the last section). The section name is fixed
@@ -172,61 +169,6 @@ struct StarshipAdapter: ToolAdapter {
         }
 
         if changed {
-            try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
-        }
-    }
-
-    /// 把 format 多行字符串里的「分隔箭头 + 模块行」包进 (...) 条件组：
-    /// 组内变量全空时整组（含箭头）不渲染，空段不再挤成细色条。
-    /// 代价是中间段隐藏时相邻过渡箭头颜色有一处不衔接（starship 静态
-    /// 配置无法按可见段动态选色）。只处理「箭头独占一行 + 后随 $模块行」
-    /// 的结构，其他一律不动。幂等：包过的箭头行以 ( 开头，不再匹配。
-    private func wrapSegmentGroupsIfNeeded(in path: String) throws {
-        guard FileManager.default.fileExists(atPath: path) else { return }
-        let content = try String(contentsOfFile: path, encoding: .utf8)
-
-        var lines = content.components(separatedBy: "\n")
-
-        // 定位 format 多行字符串块，找不到或不闭合则不动
-        guard let open = lines.firstIndex(where: {
-            let t = $0.trimmingCharacters(in: .whitespaces)
-            return t == "format = \"\"\"" || t == "format = '''"
-        }) else { return }
-        let delimiter = lines[open].contains("\"\"\"") ? "\"\"\"" : "'''"
-        guard let close = ((open + 1)..<lines.count).first(where: { lines[$0].contains(delimiter) })
-        else { return }
-
-        // 括号内是 powerline 箭头字形（如 ），允许任意非 ] 内容
-        let arrow = try! NSRegularExpression(pattern: "^\\[[^\\]]*\\]\\(fg:grad[1-5] bg:grad[1-5]\\)\\\\?$")
-        let module = try! NSRegularExpression(pattern: "^\\$[a-z_]+\\\\?$")
-        func matches(_ regex: NSRegularExpression, _ s: String) -> Bool {
-            regex.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil
-        }
-
-        var changed = false
-        var i = open + 1
-        while i < close {
-            guard matches(arrow, lines[i]) else {
-                i += 1
-                continue
-            }
-            var end = i + 1
-            while end < close && matches(module, lines[end]) {
-                end += 1
-            }
-            if end > i + 1 {
-                lines[i] = "(" + lines[i]
-                let last = lines[end - 1]
-                lines[end - 1] = last.hasSuffix("\\")
-                    ? String(last.dropLast()) + ")\\"
-                    : last + ")"
-                changed = true
-            }
-            i = end
-        }
-
-        if changed {
-            Log.adapter.info("starship: 已把分隔箭头包进条件组，空段自动隐藏")
             try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
         }
     }
