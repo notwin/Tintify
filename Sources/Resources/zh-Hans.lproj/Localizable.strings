@@ -136,6 +136,11 @@
 "部分 ANSI 回退" = "部分 ANSI 回退";
 "配色预览：%@" = "配色预览：%@";
 
+/* TerminalPreview */
+"架构图.html" = "架构图.html";
+"计划书.docx" = "计划书.docx";
+"PPT.pptx" = "PPT.pptx";
+
 /* Theme descriptions — Popular */
 "最受欢迎的柔和暖色方案，低对比护眼" = "最受欢迎的柔和暖色方案，低对比护眼";
 "Catppuccin 的中高对比变体" = "Catppuccin 的中高对比变体";

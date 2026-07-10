@@ -19,8 +19,8 @@ struct ThemeCard: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // 左侧：代码预览
-            CodePreview(palette: displayTheme.palette)
+            // 左侧：终端预览（提示符胶囊 + ls，与设计稿一致）
+            TerminalPreview(theme: displayTheme)
                 .frame(width: 200)
 
             // 右侧：信息 + 操作

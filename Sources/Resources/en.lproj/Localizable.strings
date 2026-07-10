@@ -136,6 +136,11 @@
 "部分 ANSI 回退" = "Partial ANSI Fallback";
 "配色预览：%@" = "Color preview: %@";
 
+/* TerminalPreview */
+"架构图.html" = "report.html";
+"计划书.docx" = "plan.docx";
+"PPT.pptx" = "deck.pptx";
+
 /* Theme descriptions — Popular */
 "最受欢迎的柔和暖色方案，低对比护眼" = "The most popular soft, warm palette — low contrast and easy on the eyes";
 "Catppuccin 的中高对比变体" = "Catppuccin's medium-high contrast variant";
