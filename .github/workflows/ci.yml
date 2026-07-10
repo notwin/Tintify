@@ -5,7 +5,8 @@ on:
   pull_request:
 jobs:
   test:
-    runs-on: macos-14
+    # Swift Testing 需要 Xcode 16+ 工具链（macos-14 默认 Xcode 15 会报 no such module 'Testing'）
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Build
