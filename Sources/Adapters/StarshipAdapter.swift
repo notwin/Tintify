@@ -37,6 +37,9 @@ struct StarshipAdapter: ToolAdapter {
         // later scan would misidentify as user-authored colors.
         try migrateHardcodedHexIfNeeded(in: path)
 
+        // 段内文字颜色必须确定（设计稿用 ink 色），不能随终端默认前景漂移。
+        try addInkForegrounds(in: path)
+
         // Set the palette reference line (must sit in the TOML top-level area,
         // before the first [section] — replaceLine would append to EOF and
         // silently land inside the last section). The section name is fixed
@@ -139,6 +142,35 @@ struct StarshipAdapter: ToolAdapter {
         }
 
         try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
+    }
+
+    /// 给引用 grad 槽位背景但没写前景色的 style/style_* 键补上配套 fg:inkN。
+    /// 不写 fg 时文字用终端默认前景，在深底终端里浅色 grad 段上是浅字，
+    /// 不可读；主题的 promptSegments 为每段配了 ink 前景正是为此。
+    /// 已写 fg 的样式视为用户意图，不动。幂等：补过的行含 fg: 即跳过。
+    private func addInkForegrounds(in path: String) throws {
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        let content = try String(contentsOfFile: path, encoding: .utf8)
+        var lines = content.components(separatedBy: "\n")
+        let regex = try! NSRegularExpression(
+            pattern: "^(\\s*style\\w*\\s*=\\s*\")([^\"]*bg:grad([1-5])[^\"]*)(\".*)$")
+
+        var changed = false
+        for (i, line) in lines.enumerated() {
+            let range = NSRange(line.startIndex..., in: line)
+            guard let match = regex.firstMatch(in: line, range: range),
+                  let value = Range(match.range(at: 2), in: line),
+                  !line[value].contains("fg:") else { continue }
+            let prefix = line[Range(match.range(at: 1), in: line)!]
+            let slot = line[Range(match.range(at: 3), in: line)!]
+            let suffix = line[Range(match.range(at: 4), in: line)!]
+            lines[i] = "\(prefix)fg:ink\(slot) \(line[value])\(suffix)"
+            changed = true
+        }
+
+        if changed {
+            try ConfigWriter.atomicWrite(lines.joined(separator: "\n"), to: path)
+        }
     }
 
     /// 一次性把 format 中硬编码的 hex 迁移为 grad 槽位引用。幂等：

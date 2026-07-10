@@ -139,6 +139,46 @@ import Foundation
     #expect(!second.contains("gradgrad"))
 }
 
+@Test func starshipAddsInkForegroundToGradStyles() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    // 已迁移过的配置：style 只有 bg:gradN 没有 fg，文字颜色会随终端默认前景漂移。
+    // 设计稿里段内文字用配套 ink 色，apply 时应补上 fg:inkN。
+    let userConfig = """
+    format = \"\"\"
+    [](grad1)\\
+    $directory\\
+    [](fg:grad1 bg:grad2)\\
+    $git_branch\\
+    [ ](fg:grad5)\\
+    \"\"\"
+
+    [username]
+    style_user = "bg:grad5"
+
+    [directory]
+    style = "bg:grad1"
+    format = "[ $path ]($style)"
+
+    [git_branch]
+    style = "fg:#cccccc bg:grad2"
+    """
+    try userConfig.write(to: tmp, atomically: true, encoding: .utf8)
+
+    let adapter = StarshipAdapter(knownPaletteNames: [])
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "soda-pop")!, configPath: tmp.path)
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(content.contains("style = \"fg:ink1 bg:grad1\""))       // 无 fg 的样式补上对应 ink
+    #expect(content.contains("style_user = \"fg:ink5 bg:grad5\""))
+    #expect(content.contains("style = \"fg:#cccccc bg:grad2\""))    // 已有 fg 的样式尊重用户
+    #expect(content.contains("[](fg:grad1 bg:grad2)"))              // format 里的箭头不动
+
+    // 幂等：再 apply 一次不重复叠加
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+    let second = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(second.components(separatedBy: "fg:ink1").count == 2)   // 只出现一次
+}
+
 @Test func starshipSkipsMigrationWhenTooManyHexes() throws {
     let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let hexes = (0..<12).map { String(format: "[](#%06x)", $0 * 111111 + 0x100000) }.joined(separator: "\n")
