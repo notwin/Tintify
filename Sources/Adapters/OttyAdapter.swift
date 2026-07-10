@@ -35,6 +35,34 @@ struct OttyAdapter: ToolAdapter {
 
         try ConfigWriter.replaceLine(in: config, prefix: "theme = ", newLine: "theme = \"\(themeName)\"")
         try ConfigWriter.replaceLine(in: config, prefix: "theme-dark = ", newLine: "theme-dark = \"\(themeName)\"")
+
+        // otty 不监听配置文件，写完必须通知运行中的实例重载才会换色。
+        // 仅真实 apply（无路径覆盖）时触发，测试传入 configPath 不会走到这里。
+        if configPath == nil {
+            reloadRunningApp()
+        }
+    }
+
+    /// 尽力而为地让运行中的 otty 重载配置（`otty-cli config reload`）。
+    /// fire-and-forget：不阻塞 apply，app 未运行或命令失败只记日志。
+    private func reloadRunningApp() {
+        let cli = "/Applications/Otty.app/Contents/MacOS/otty-cli"
+        guard FileManager.default.fileExists(atPath: cli) else { return }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: cli)
+        process.arguments = ["config", "reload", "-q"]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        process.terminationHandler = { p in
+            if p.terminationStatus != 0 {
+                Log.adapter.info("otty: config reload 退出码 \(p.terminationStatus)（app 可能未运行）")
+            }
+        }
+        do {
+            try process.run()
+        } catch {
+            Log.adapter.info("otty: 无法执行 otty-cli reload：\(error.localizedDescription)")
+        }
     }
 
     /// 16 色 ANSI 顺序遵循 otty 现存 .ottytheme 惯例（ansi0 用 surface1 而非 crust，
