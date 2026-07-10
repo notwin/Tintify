@@ -5,13 +5,13 @@ import Foundation
 enum ThemeCategory: String, Codable, Hashable, CaseIterable, Sendable {
     case popular, timeless, trending, original
 
-    /// UI 显示名（Task 5 接入本地化后包 L()）。
+    /// UI 显示名。
     var displayName: String {
         switch self {
-        case .popular: "热门推荐"
-        case .timeless: "经典永恒"
-        case .trending: "新锐之选"
-        case .original: "Tintify 原创"
+        case .popular: L("热门推荐")
+        case .timeless: L("经典永恒")
+        case .trending: L("新锐之选")
+        case .original: L("Tintify 原创")
         }
     }
 

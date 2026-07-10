@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Tintify",
+    defaultLocalization: "zh-Hans",
     platforms: [.macOS(.v14)],
     dependencies: [
         .package(url: "https://github.com/sindresorhus/LaunchAtLogin-Modern", from: "1.1.0"),
@@ -13,7 +14,8 @@ let package = Package(
             dependencies: [
                 .product(name: "LaunchAtLogin", package: "LaunchAtLogin-Modern"),
             ],
-            path: "Sources"
+            path: "Sources",
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "TintifyTests",

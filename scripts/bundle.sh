@@ -19,6 +19,11 @@ mkdir -p "$BUNDLE_PATH/Contents/Resources"
 # Copy executable
 cp .build/release/Tintify "$BUNDLE_PATH/Contents/MacOS/"
 
+# Copy SPM resource bundle (String Catalog) so Bundle.module resolves at runtime
+if [ -d ".build/release/Tintify_Tintify.bundle" ]; then
+    cp -r ".build/release/Tintify_Tintify.bundle" "$BUNDLE_PATH/Contents/MacOS/"
+fi
+
 # Copy Info.plist
 cp Info.plist "$BUNDLE_PATH/Contents/"
 
