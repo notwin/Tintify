@@ -142,7 +142,7 @@ struct StarshipAdapter: ToolAdapter {
     }
 
     /// 一次性把 format 中硬编码的 hex 迁移为 grad 槽位引用。幂等：
-    /// 文件里已出现 grad1 即视为已迁移。unique hex 超过 10 个不自动迁移（NSLog 留痕）。
+    /// 文件里已出现 grad1 即视为已迁移。unique hex 超过 10 个不自动迁移（日志留痕）。
     private func migrateHardcodedHexIfNeeded(in path: String) throws {
         guard FileManager.default.fileExists(atPath: path) else { return }
         let content = try String(contentsOfFile: path, encoding: .utf8)
@@ -157,7 +157,7 @@ struct StarshipAdapter: ToolAdapter {
         }
         guard !seen.isEmpty else { return }
         guard seen.count <= 10 else {
-            NSLog("[Tintify] starship: 检测到 \(seen.count) 个自定义颜色，未自动迁移 format")
+            Log.adapter.warning("starship: 检测到 \(seen.count) 个自定义颜色，未自动迁移 format")
             return
         }
 

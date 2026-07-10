@@ -38,7 +38,7 @@ final class ApplyHistoryStore: ObservableObject {
             let data = try JSONEncoder().encode(history)
             try data.write(to: storageURL, options: .atomic)
         } catch {
-            NSLog("[Tintify] 应用记录写盘失败：\(error.localizedDescription)")
+            Log.history.error("应用记录写盘失败：\(error.localizedDescription)")
         }
     }
 }

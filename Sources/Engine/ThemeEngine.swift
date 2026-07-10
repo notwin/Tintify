@@ -62,6 +62,7 @@ final class ThemeEngine {
             backupId = try backupManager.backup(files: uniquePaths)
         } catch {
             // 备份失败时绝不动用户配置——安全网失效必须显式失败
+            Log.engine.error("备份失败，已中止应用：\(error.localizedDescription)")
             let failedResults = adapters.map {
                 ToolResult(
                     toolName: $0.toolName,
@@ -99,6 +100,7 @@ final class ThemeEngine {
                     configPath: path
                 ))
             } catch {
+                Log.adapter.error("(\(adapter.toolName)) \(error.localizedDescription)")
                 toolResults.append(ToolResult(
                     toolName: adapter.toolName,
                     status: .failed,

@@ -58,7 +58,7 @@ struct EzaAdapter: ToolAdapter {
         if content.hasPrefix("# Tintify-managed eza theme") {
             try fm.removeItem(atPath: legacyConfigPath)
         } else {
-            NSLog("[Tintify] eza: 检测到 \(legacyConfigPath)，eza 实际读取的是 Application Support 路径")
+            Log.adapter.warning("eza: 检测到 \(legacyConfigPath)，eza 实际读取的是 Application Support 路径")
         }
     }
 

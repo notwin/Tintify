@@ -52,7 +52,7 @@ struct TmuxAdapter: ToolAdapter {
             try process.run()
             process.waitUntilExit()
             if process.terminationStatus != 0 {
-                NSLog("[Tintify] tmux reload failed with exit code \(process.terminationStatus)")
+                Log.adapter.warning("tmux reload failed with exit code \(process.terminationStatus)")
             }
         } catch {
             // tmux not running — expected, ignore

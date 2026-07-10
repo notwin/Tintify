@@ -18,6 +18,7 @@ struct ConfigManager {
     }
 
     private static func showError(_ message: String) {
+        Log.engine.error("\(message)")
         let alert = NSAlert()
         alert.messageText = message
         alert.alertStyle = .warning
