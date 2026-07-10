@@ -72,7 +72,8 @@ import Foundation
         #expect(theme != nil, "缺少新主题 \(id)")
         #expect(theme?.category == .original)
         #expect(theme?.compatibility == .ansiPartial)
-        #expect(theme?.toolNames["bat"] == "ansi")
+        // 原创主题的 bat/delta 走生成的 tmTheme，不再固定 ansi 回退
+        #expect(theme?.themeSource(for: .bat) == .generate(name: theme!.name))
     }
     #expect(registry.theme(id: "caramel")?.variants == ["soda-pop"])
     #expect(registry.theme(id: "soda-pop")?.variants == ["caramel"])

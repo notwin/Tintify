@@ -4,6 +4,11 @@ import Foundation
 /// Adapter for delta (git diff viewer).
 struct DeltaAdapter: ToolAdapter {
     let id: ToolID = .delta
+    let installer: TmThemeInstaller
+
+    init(installer: TmThemeInstaller = TmThemeInstaller()) {
+        self.installer = installer
+    }
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.gitconfig"
@@ -11,13 +16,31 @@ struct DeltaAdapter: ToolAdapter {
 
     /// Set delta's syntax-theme via `git config --global`.
     ///
+    /// delta 自动识别 bat 编译缓存里的自定义主题，与 bat 共用
+    /// tintify.tmTheme（install 幂等，两个适配器都调不会重复重建缓存）；
+    /// 安装失败回退 ansi。
+    ///
     /// Args:
     ///   theme: The theme to apply.
     ///   configPath: Ignored; delta uses git config commands.
     func apply(theme: Theme, configPath: String? = nil) throws {
+        let themeName: String
+        switch theme.themeSource(for: .delta) {
+        case .builtin(let name):
+            themeName = name
+        case .generate:
+            do {
+                try installer.install(theme: theme)
+                themeName = TmThemeInstaller.themeName
+            } catch {
+                Log.adapter.warning("delta: 生成主题安装失败，回退 ansi：\(error.localizedDescription)")
+                themeName = "ansi"
+            }
+        }
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-        process.arguments = ["config", "--global", "delta.syntax-theme", theme.nameForTool(toolName)]
+        process.arguments = ["config", "--global", "delta.syntax-theme", themeName]
         try process.run()
         process.waitUntilExit()
 

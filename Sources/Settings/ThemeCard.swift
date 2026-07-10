@@ -63,20 +63,13 @@ struct ThemeCard: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(L("配色预览：\(theme.name)"))
 
-                // Stars + 兼容性 + 标签
+                // Stars + 标签（bat/delta 现在也吃生成主题，ANSI 回退徽章已无意义）
                 HStack(spacing: 8) {
                     if let stars = theme.stars {
                         Label(stars, systemImage: "star.fill")
                             .font(.caption2)
                             .foregroundStyle(.yellow)
                     }
-                    Label(
-                        theme.compatibility == .full ? L("全工具兼容") : L("部分 ANSI 回退"),
-                        systemImage: theme.compatibility == .full ? "checkmark.seal.fill" : "exclamationmark.triangle.fill"
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(theme.compatibility == .full ? .green : .orange)
-
                     TagView(text: theme.appearance == .dark ? L("暗色") : L("浅色"))
                 }
 

@@ -4,6 +4,11 @@ import Foundation
 /// Adapter for the bat syntax highlighter.
 struct BatAdapter: ToolAdapter {
     let id: ToolID = .bat
+    let installer: TmThemeInstaller
+
+    init(installer: TmThemeInstaller = TmThemeInstaller()) {
+        self.installer = installer
+    }
 
     var defaultConfigPath: String {
         NSHomeDirectory() + "/.zshrc"
@@ -16,13 +21,29 @@ struct BatAdapter: ToolAdapter {
     /// Write `export BAT_THEME` into the Tintify marker block.
     ///
     /// Preserves non-BAT lines (e.g. FZF) already present in the block.
+    /// 无内置同名主题的主题走生成的 tintify.tmTheme；安装失败回退 ansi
+    /// （ansi 用终端 16 色，仍跟主题走，只是精度低）。
     ///
     /// Args:
     ///   theme: The theme to apply.
     ///   configPath: Optional override path.
     func apply(theme: Theme, configPath: String? = nil) throws {
         let path = configPath ?? defaultConfigPath
-        let batLine = "export BAT_THEME=\"\(theme.nameForTool(toolName))\""
+
+        let themeName: String
+        switch theme.themeSource(for: .bat) {
+        case .builtin(let name):
+            themeName = name
+        case .generate:
+            do {
+                try installer.install(theme: theme)
+                themeName = TmThemeInstaller.themeName
+            } catch {
+                Log.adapter.warning("bat: 生成主题安装失败，回退 ansi：\(error.localizedDescription)")
+                themeName = "ansi"
+            }
+        }
+        let batLine = "export BAT_THEME=\"\(themeName)\""
 
         // Read existing marker block content to preserve other adapters' lines.
         let existing = Self.readExistingMarkerContent(from: path)

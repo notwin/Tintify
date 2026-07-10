@@ -31,8 +31,13 @@ enum ToolDetection {
     static let binSearchPaths = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"]
 
     static func findExecutable(_ name: String) -> Bool {
-        binSearchPaths.contains {
-            FileManager.default.isExecutableFile(atPath: "\($0)/\(name)")
-        }
+        executablePath(name) != nil
+    }
+
+    /// 返回可执行文件的完整路径（Process 需要绝对路径）。
+    static func executablePath(_ name: String) -> String? {
+        binSearchPaths
+            .map { "\($0)/\(name)" }
+            .first { FileManager.default.isExecutableFile(atPath: $0) }
     }
 }

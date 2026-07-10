@@ -132,8 +132,6 @@
 
 /* ThemeCard */
 "应用" = "Apply";
-"全工具兼容" = "Full Tool Compatibility";
-"部分 ANSI 回退" = "Partial ANSI Fallback";
 "配色预览：%@" = "Color preview: %@";
 
 /* TerminalPreview */

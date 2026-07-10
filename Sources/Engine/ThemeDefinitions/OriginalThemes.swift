@@ -21,10 +21,7 @@ enum OriginalThemes {
                 surface2: "#363648", surface1: "#2c2c3e", surface0: "#232336",
                 base: "#16181a", mantle: "#111114", crust: "#0c0c0f"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "赛博朋克霓虹，纯白底上的荧光色彩爆发",
             stars: nil,
@@ -57,10 +54,7 @@ enum OriginalThemes {
                 surface2: "#383028", surface1: "#2e2820", surface0: "#26201a",
                 base: "#1c1814", mantle: "#161210", crust: "#100e0c"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "水墨文人风，竹青朱砂间的素雅沉静",
             stars: nil,
@@ -92,10 +86,7 @@ enum OriginalThemes {
                 surface2: "#303850", surface1: "#283048", surface0: "#202840",
                 base: "#141828", mantle: "#101420", crust: "#0c1018"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "北极光之夜，绿紫光晕在深蓝夜空中舞动",
             stars: nil,
@@ -127,10 +118,7 @@ enum OriginalThemes {
                 surface2: "#443d58", surface1: "#37304a", surface0: "#2e2640",
                 base: "#241b2f", mantle: "#1d1526", crust: "#16101d"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "落日沉入合成器波，赛博复古未来的高饱和霓虹",
             stars: nil,
@@ -164,10 +152,7 @@ enum OriginalThemes {
                 surface2: "#234c2f", surface1: "#1a3a24", surface0: "#12291a",
                 base: "#0b120c", mantle: "#080e09", crust: "#050a06"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "老 CRT 的单色磷光绿，从亮到暗走五档的安静",
             stars: nil,
@@ -199,10 +184,7 @@ enum OriginalThemes {
                 surface2: "#403c35", surface1: "#322f29", surface0: "#27241f",
                 base: "#191713", mantle: "#141210", crust: "#0f0d0b"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "宣纸到浓墨的灰阶，只允许一枚朱印跳出来",
             stars: nil,
@@ -236,10 +218,7 @@ enum OriginalThemes {
                 surface2: "#423a52", surface1: "#342c42", surface0: "#281f35",
                 base: "#17111f", mantle: "#120d19", crust: "#0d0913"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "丝绒夜里的宝石切面，浓而不闹",
             stars: nil,
@@ -271,10 +250,7 @@ enum OriginalThemes {
                 surface2: "#4b3c2e", surface1: "#3a2d21", surface0: "#2d2118",
                 base: "#211711", mantle: "#1a110c", crust: "#120b07"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "奶泡到浓缩的暖棕单色阶，冬夜写代码的那杯",
             stars: nil,
@@ -306,10 +282,7 @@ enum OriginalThemes {
                 surface2: "#d8d2e0", surface1: "#ece5ea", surface0: "#f5eee6",
                 base: "#fffaf0", mantle: "#f7f0e4", crust: "#efe6d8"
             ),
-            toolNames: [
-                "bat": "ansi",
-                "delta": "ansi",
-            ],
+            toolNames: [:],
             category: .original,
             description: "柠檬蜜桃西瓜葡萄苏打，高糖气泡感的浅色",
             stars: nil,
