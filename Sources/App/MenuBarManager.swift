@@ -165,6 +165,7 @@ final class MenuBarManager: NSObject {
             window.orderFrontRegardless()
             settingsWindow = window
         }
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc private func quit() {
