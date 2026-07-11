@@ -131,7 +131,6 @@
 "开始使用" = "Get Started";
 
 /* ThemeCard */
-"应用" = "Apply";
 "配色预览：%@" = "Color preview: %@";
 
 /* TerminalPreview */
@@ -207,3 +206,10 @@
 "丝绒夜里的宝石切面，浓而不闹" = "Gem facets in a velvet night — rich but never loud";
 "奶泡到浓缩的暖棕单色阶，冬夜写代码的那杯" = "A warm brown monochrome gradient from milk foam to espresso — the cup you code with on a winter night";
 "柠檬蜜桃西瓜葡萄苏打，高糖气泡感的浅色" = "Lemon, peach, watermelon, grape soda — a sugary, fizzy light theme";
+
+/* ThemeSkin */
+"✓ 使用中" = "✓ Active";
+"试穿中 · 未应用" = "Trying on · Not applied";
+"应用这套" = "Apply This";
+"重新应用" = "Reapply";
+"Esc 还原" = "Esc to revert";
