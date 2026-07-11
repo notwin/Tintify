@@ -75,51 +75,60 @@ struct ThemesPane: View {
 
     @ViewBuilder
     private func filterBar(skin: ThemeSkin) -> some View {
-        HStack(spacing: 6) {
-            ForEach(ThemeCategory.allCases, id: \.self) { category in
-                let count = registry.themes(for: category).count
-                let isSelected = selectedCategory == category
-                Button {
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        selectedCategory = category
+        // 拆两行：一行装不下「4 分类 + 搜索 + 3 深浅」，最小窗宽下最长的
+        // 「Tintify 原创」会被挤到折行，chip 高矮不齐
+        VStack(spacing: 8) {
+            HStack(spacing: 6) {
+                ForEach(ThemeCategory.allCases, id: \.self) { category in
+                    let count = registry.themes(for: category).count
+                    let isSelected = selectedCategory == category
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            selectedCategory = category
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(category.displayName)
+                                .font(.system(size: 12, weight: isSelected ? .bold : .regular))
+                            Text("\(count)")
+                                .font(.system(size: 10, weight: .medium))
+                        }
+                        .lineLimit(1)
+                        .fixedSize()
+                        .foregroundStyle(isSelected ? skin.accentInkColor : skin.textSecondaryColor)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(isSelected ? skin.accentColor : skin.cardBgColor)
+                        .clipShape(Capsule())
+                        .contentShape(Rectangle())
                     }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(category.displayName)
-                            .font(.system(size: 12, weight: isSelected ? .bold : .regular))
-                        Text("\(count)")
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                    .foregroundStyle(isSelected ? skin.accentInkColor : skin.textSecondaryColor)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(isSelected ? skin.accentColor : skin.cardBgColor)
-                    .clipShape(Capsule())
-                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+                Spacer()
             }
 
-            Spacer()
+            HStack(spacing: 6) {
+                HStack(spacing: 5) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 10))
+                        .foregroundStyle(skin.textSecondaryColor)
+                    TextField(L("搜索主题名..."), text: $searchText)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 12))
+                        .foregroundStyle(skin.textPrimaryColor)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .frame(maxWidth: 260)
+                .background(skin.elevatedBgColor)
+                .clipShape(Capsule())
 
-            HStack(spacing: 5) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 10))
-                    .foregroundStyle(skin.textSecondaryColor)
-                TextField(L("搜索主题名..."), text: $searchText)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 12))
-                    .foregroundStyle(skin.textPrimaryColor)
-                    .frame(width: 120)
+                Spacer()
+
+                appearanceChip(nil, label: L("全部"), skin: skin)
+                appearanceChip(.dark, label: L("暗色"), skin: skin)
+                appearanceChip(.light, label: L("浅色"), skin: skin)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(skin.elevatedBgColor)
-            .clipShape(Capsule())
-
-            appearanceChip(nil, label: L("全部"), skin: skin)
-            appearanceChip(.dark, label: L("暗色"), skin: skin)
-            appearanceChip(.light, label: L("浅色"), skin: skin)
         }
         .padding(.horizontal, 18)
         .padding(.top, 38)   // 透明标题栏让位
