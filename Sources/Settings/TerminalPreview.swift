@@ -5,6 +5,8 @@ import SwiftUI
 /// 结构与配色遵循设计稿「Tintify 主题模板 T1–T14」的 .term 卡片。
 struct TerminalPreview: View {
     let theme: Theme
+    var scale: CGFloat = 1
+    var embedded: Bool = false
 
     /// 五段胶囊的示意文字（dir → git → lang → docker → time）
     private static let segmentLabels = ["~/code", "main", "node", "docker", "♥ 14:32"]
@@ -15,56 +17,56 @@ struct TerminalPreview: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            // 窗口圆点：渐变前三色
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 7 * scale) {
+            HStack(spacing: 4 * scale) {
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
                         .fill(Color(hex: theme.promptSegments[i].color))
-                        .frame(width: 6, height: 6)
+                        .frame(width: 6 * scale, height: 6 * scale)
                 }
             }
 
-            // 提示符胶囊 + ls 命令
-            HStack(spacing: 6) {
+            HStack(spacing: 6 * scale) {
                 promptBar
                 Text("ls")
-                    .font(.system(size: 7, design: .monospaced))
+                    .font(.system(size: 7 * scale, design: .monospaced))
                     .foregroundStyle(Color(hex: theme.palette.text))
             }
 
-            // ls 输出：三个彩色下划线文件名
-            HStack(spacing: 7) {
+            HStack(spacing: 7 * scale) {
                 fileName(L("架构图.html"), hex: lsColors[0])
                 fileName(L("计划书.docx"), hex: lsColors[1])
                 fileName(L("PPT.pptx"), hex: lsColors[2])
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 9)
+        .padding(.horizontal, 8 * scale)
+        .padding(.vertical, 9 * scale)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: theme.palette.base))
-        .cornerRadius(6)
+        .background(embedded ? Color.clear : Color(hex: theme.palette.base))
+        .cornerRadius(embedded ? 0 : 6)
         .overlay(
-            // 浅色底的卡片需要一圈发丝边界定预览窗（设计稿同款）
             RoundedRectangle(cornerRadius: 6)
-                .stroke(Color(hex: theme.palette.text).opacity(theme.appearance == .light ? 0.15 : 0), lineWidth: 1)
+                .stroke(
+                    Color(hex: theme.palette.text)
+                        .opacity(!embedded && theme.appearance == .light ? 0.15 : 0),
+                    lineWidth: 1
+                )
         )
         .accessibilityHidden(true)
     }
 
     private var promptBar: some View {
-        HStack(spacing: -5) {
+        HStack(spacing: -5 * scale) {
             ForEach(Array(zip(Self.segmentLabels, theme.promptSegments).enumerated()), id: \.offset) { i, pair in
                 let isLast = i == theme.promptSegments.count - 1
                 Text(pair.0)
-                    .font(.system(size: 6.5, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 6.5 * scale, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color(hex: pair.1.ink))
                     .lineLimit(1)
                     .fixedSize()
-                    .padding(.leading, i == 0 ? 7 : 5)
-                    .padding(.trailing, isLast ? 7 : 9)
-                    .frame(height: 14)
+                    .padding(.leading, (i == 0 ? 7 : 5) * scale)
+                    .padding(.trailing, (isLast ? 7 : 9) * scale)
+                    .frame(height: 14 * scale)
                     .background(
                         SegmentShape(isFirst: i == 0, isLast: isLast)
                             .fill(Color(hex: pair.1.color))
@@ -77,7 +79,7 @@ struct TerminalPreview: View {
     private func fileName(_ name: String, hex: String) -> some View {
         Text(name)
             .underline()
-            .font(.system(size: 7, design: .monospaced))
+            .font(.system(size: 7 * scale, design: .monospaced))
             .foregroundStyle(Color(hex: hex))
             .lineLimit(1)
     }
