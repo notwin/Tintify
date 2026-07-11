@@ -13,6 +13,11 @@ struct OnboardingView: View {
         "one-dark", "tokyo-night", "rose-pine"
     ]
 
+    private var skin: ThemeSkin {
+        ThemeSkin(theme: ThemeRegistry.shared.theme(id: selectedThemeId)
+            ?? ThemeRegistry.shared.allThemes[0])
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             // Header
@@ -25,21 +30,23 @@ struct OnboardingView: View {
                 } else {
                     Image(systemName: "paintpalette.fill")
                         .font(.system(size: 48))
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(skin.accentColor)
                 }
                 Text(L("欢迎使用 Tintify"))
                     .font(.title.bold())
+                    .foregroundStyle(skin.textPrimaryColor)
                 Text(L("一键统一终端工具的配色主题"))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(skin.textSecondaryColor)
             }
 
-            Divider()
+            skin.borderColor.frame(height: 1)
 
             // Tool detection
             VStack(alignment: .leading, spacing: 8) {
                 Text(L("已检测到的工具"))
                     .font(.headline)
+                    .foregroundStyle(skin.textPrimaryColor)
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 6) {
                     ForEach(Array(detectedTools.keys.sorted()), id: \.self) { tool in
@@ -55,28 +62,29 @@ struct OnboardingView: View {
                                     }
                                 }
                             ))
-                            .toggleStyle(.switch)
-                            .controlSize(.small)
+                            .toggleStyle(SkinToggleStyle(skin: skin))
                             .labelsHidden()
 
                             Text(tool)
                                 .font(.caption)
+                                .foregroundStyle(skin.textPrimaryColor)
                             if !installed {
                                 Text(L("未安装"))
                                     .font(.system(size: 9))
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(skin.dangerColor)
                             }
                         }
                     }
                 }
             }
 
-            Divider()
+            skin.borderColor.frame(height: 1)
 
             // Theme selection
             VStack(alignment: .leading, spacing: 8) {
                 Text(L("选择一个主题"))
                     .font(.headline)
+                    .foregroundStyle(skin.textPrimaryColor)
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 8) {
                     ForEach(quickThemes, id: \.self) { themeId in
@@ -100,13 +108,13 @@ struct OnboardingView: View {
                                     .accessibilityHidden(true)
                                     Text(theme.name)
                                         .font(.caption.bold())
-                                        .foregroundStyle(.primary)
+                                        .foregroundStyle(skin.textPrimaryColor)
                                 }
                                 .padding(8)
-                                .background(selectedThemeId == themeId ? Color.accentColor.opacity(0.15) : Color(.controlBackgroundColor))
+                                .background(selectedThemeId == themeId ? skin.accentColor.opacity(0.18) : skin.cardBgColor)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 6)
-                                        .stroke(selectedThemeId == themeId ? Color.accentColor : Color(NSColor.separatorColor), lineWidth: selectedThemeId == themeId ? 2 : 1)
+                                        .stroke(selectedThemeId == themeId ? skin.accentColor : skin.borderColor, lineWidth: selectedThemeId == themeId ? 2 : 1)
                                 )
                                 .cornerRadius(6)
                                 .contentShape(Rectangle())
@@ -132,11 +140,12 @@ struct OnboardingView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+            .buttonStyle(SkinPrimaryButtonStyle(skin: skin))
         }
         .padding(24)
         .frame(width: 480, height: 560)
+        .background(skin.windowBgColor)
+        .animation(.easeInOut(duration: 0.2), value: selectedThemeId)
         .onAppear {
             detectTools()
         }
