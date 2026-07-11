@@ -13,9 +13,25 @@ import Foundation
     #expect(mocha!.palette.red == "#f38ba8")
 }
 
-@Test func registryHas25Themes() {
+@Test func registryHas28Themes() {
     let all = ThemeRegistry.shared.allThemes
-    #expect(all.count == 31)
+    #expect(all.count == 28)
+}
+
+@Test @MainActor func retiredThemesAreGoneAndMigrate() {
+    let registry = ThemeRegistry.shared
+    for (retired, kept) in AppSettings.retiredThemeIds {
+        #expect(registry.theme(id: retired) == nil, "已裁撤主题 \(retired) 不应还在注册表")
+        #expect(registry.theme(id: kept) != nil, "迁移目标 \(kept) 必须存在")
+        #expect(AppSettings.migratedThemeId(retired) == kept)
+    }
+    #expect(AppSettings.migratedThemeId("catppuccin-mocha") == "catppuccin-mocha")
+    // variants 不应再引用已裁撤的 id
+    for theme in registry.allThemes {
+        for v in theme.variants ?? [] {
+            #expect(AppSettings.retiredThemeIds[v] == nil, "主题 \(theme.id) 的 variants 引用了已裁撤的 \(v)")
+        }
+    }
 }
 
 @Test func darkAndLightThemesExist() {
@@ -48,7 +64,6 @@ import Foundation
     #expect(registry.theme(id: "solarized-dark")?.toolNames["ghostty"] == "Solarized Dark Patched")
     #expect(registry.theme(id: "solarized-light")?.toolNames["ghostty"] == "iTerm2 Solarized Light")
     #expect(registry.theme(id: "rose-pine")?.toolNames["ghostty"] == "Rose Pine")
-    #expect(registry.theme(id: "rose-pine-moon")?.toolNames["ghostty"] == "Rose Pine Moon")
     #expect(registry.theme(id: "rose-pine-dawn")?.toolNames["ghostty"] == "Rose Pine Dawn")
     #expect(registry.theme(id: "gruvbox-dark")?.toolNames["wezterm"] == "GruvboxDark")
     #expect(registry.theme(id: "gruvbox-light")?.toolNames["wezterm"] == "GruvboxLight")
@@ -66,7 +81,7 @@ import Foundation
 
 @Test func registryHasSixNewOriginalThemes() throws {
     let registry = ThemeRegistry.shared
-    #expect(registry.allThemes.count == 31)
+    #expect(registry.allThemes.count == 28)
     for id in ["synthwave-sunset", "phosphor-green", "ink-vermilion", "jewel-tones", "caramel", "soda-pop"] {
         let theme = registry.theme(id: id)
         #expect(theme != nil, "缺少新主题 \(id)")

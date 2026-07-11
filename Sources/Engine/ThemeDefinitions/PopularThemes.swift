@@ -1,7 +1,8 @@
 // Sources/Engine/ThemeDefinitions/PopularThemes.swift
 import Foundation
 
-/// 热门推荐主题：Catppuccin 4 + Dracula + Solarized 2
+/// 热门推荐主题：Catppuccin 2 + Dracula + Solarized 2
+/// （v1.10 裁撤 macchiato/frappe：与 mocha 强调色均距仅 12–25，同质化收敛只留家族最优）
 enum PopularThemes {
     static let all: [Theme] = [
         Theme(
@@ -17,55 +18,13 @@ enum PopularThemes {
                 base: "#1e1e2e", mantle: "#181825", crust: "#11111b"),
             toolNames: [:], category: .popular,
             description: "最受欢迎的柔和暖色方案，低对比护眼", stars: "18.8k",
-            compatibility: .full, variants: ["catppuccin-macchiato", "catppuccin-frappe", "catppuccin-latte"],
+            compatibility: .full, variants: ["catppuccin-latte"],
             promptSegments: [
                 PromptSegment(color: "#cba6f7", ink: "#11111b"),
                 PromptSegment(color: "#f5c2e7", ink: "#11111b"),
                 PromptSegment(color: "#89b4fa", ink: "#11111b"),
                 PromptSegment(color: "#94e2d5", ink: "#11111b"),
                 PromptSegment(color: "#b4befe", ink: "#11111b"),
-            ]),
-        Theme(
-            id: "catppuccin-macchiato", name: "Catppuccin Macchiato", appearance: .dark,
-            palette: Palette(
-                rosewater: "#f4dbd6", flamingo: "#f0c6c6", pink: "#f5bde6", mauve: "#c6a0f6",
-                red: "#ed8796", maroon: "#ee99a0", peach: "#f5a97f", yellow: "#eed49f",
-                green: "#a6da95", teal: "#8bd5ca", sky: "#91d7e3", sapphire: "#7dc4e4",
-                blue: "#8aadf4", lavender: "#b7bdf8",
-                text: "#cad3f5", subtext1: "#b8c0e0", subtext0: "#a5adcb",
-                overlay2: "#939ab7", overlay1: "#8087a2", overlay0: "#6e738d",
-                surface2: "#5b6078", surface1: "#494d64", surface0: "#363a4f",
-                base: "#24273a", mantle: "#1e2030", crust: "#181926"),
-            toolNames: [:], category: .popular,
-            description: "Catppuccin 的中高对比变体", stars: nil,
-            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-frappe", "catppuccin-latte"],
-            promptSegments: [
-                PromptSegment(color: "#c6a0f6", ink: "#181926"),
-                PromptSegment(color: "#f5bde6", ink: "#181926"),
-                PromptSegment(color: "#8aadf4", ink: "#181926"),
-                PromptSegment(color: "#8bd5ca", ink: "#181926"),
-                PromptSegment(color: "#b7bdf8", ink: "#181926"),
-            ]),
-        Theme(
-            id: "catppuccin-frappe", name: "Catppuccin Frappe", appearance: .dark,
-            palette: Palette(
-                rosewater: "#f2d5cf", flamingo: "#eebebe", pink: "#f4b8e4", mauve: "#ca9ee6",
-                red: "#e78284", maroon: "#ea999c", peach: "#ef9f76", yellow: "#e5c890",
-                green: "#a6d189", teal: "#81c8be", sky: "#99d1db", sapphire: "#85c1dc",
-                blue: "#8caaee", lavender: "#babbf1",
-                text: "#c6d0f5", subtext1: "#b5bfe2", subtext0: "#a5adce",
-                overlay2: "#949cbb", overlay1: "#838ba7", overlay0: "#737994",
-                surface2: "#626880", surface1: "#51576d", surface0: "#414559",
-                base: "#303446", mantle: "#292c3c", crust: "#232634"),
-            toolNames: [:], category: .popular,
-            description: "Catppuccin 的中等对比变体", stars: nil,
-            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-macchiato", "catppuccin-latte"],
-            promptSegments: [
-                PromptSegment(color: "#ca9ee6", ink: "#232634"),
-                PromptSegment(color: "#f4b8e4", ink: "#232634"),
-                PromptSegment(color: "#8caaee", ink: "#232634"),
-                PromptSegment(color: "#81c8be", ink: "#232634"),
-                PromptSegment(color: "#babbf1", ink: "#232634"),
             ]),
         Theme(
             id: "catppuccin-latte", name: "Catppuccin Latte", appearance: .light,
@@ -80,7 +39,7 @@ enum PopularThemes {
                 base: "#eff1f5", mantle: "#e6e9ef", crust: "#dce0e8"),
             toolNames: [:], category: .popular,
             description: "Catppuccin 唯一的浅色方案，柔和优雅", stars: nil,
-            compatibility: .full, variants: ["catppuccin-mocha", "catppuccin-macchiato", "catppuccin-frappe"],
+            compatibility: .full, variants: ["catppuccin-mocha"],
             promptSegments: [
                 PromptSegment(color: "#8839ef", ink: "#eff1f5"),
                 PromptSegment(color: "#ea76cb", ink: "#eff1f5"),

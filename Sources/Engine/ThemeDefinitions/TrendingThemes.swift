@@ -1,7 +1,8 @@
 // Sources/Engine/ThemeDefinitions/TrendingThemes.swift
 import Foundation
 
-/// 新锐之选主题：Tokyo Night 2 + Rosé Pine 3 + Kanagawa 3 + Everforest
+/// 新锐之选主题：Tokyo Night 2 + Rosé Pine 2 + Kanagawa 3 + Everforest
+/// （v1.10 裁撤 rose-pine-moon：与 rose-pine 前景完全相同、强调色均距仅 20，同质化收敛只留家族最优）
 enum TrendingThemes {
     static let all: [Theme] = [
         Theme(
@@ -62,7 +63,7 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Rose Pine", "wezterm": "rose-pine"],
             category: .trending,
             description: "柔和 soho 美学，松绿与玫瑰金的诗意组合", stars: "1.5k",
-            compatibility: .ansiPartial, variants: ["rose-pine-moon", "rose-pine-dawn"],
+            compatibility: .ansiPartial, variants: ["rose-pine-dawn"],
             promptSegments: [
                 PromptSegment(color: "#c4a7e7", ink: "#191724"),
                 PromptSegment(color: "#eb6f92", ink: "#191724"),
@@ -71,29 +72,6 @@ enum TrendingThemes {
                 PromptSegment(color: "#31748f", ink: "#f2eff9"),
             ],
             // 官方 eza 主题的 executable 就是 iris（rose-pine 色板没有正经的绿）
-            accent: "#c4a7e7"),
-        Theme(
-            id: "rose-pine-moon", name: "Rosé Pine Moon", appearance: .dark,
-            palette: Palette(
-                rosewater: "#ea9a97", flamingo: "#ea9a97", pink: "#eb6f92", mauve: "#c4a7e7",
-                red: "#eb6f92", maroon: "#eb6f92", peach: "#ea9a97", yellow: "#f6c177",
-                green: "#3e8fb0", teal: "#9ccfd8", sky: "#9ccfd8", sapphire: "#3e8fb0",
-                blue: "#3e8fb0", lavender: "#c4a7e7",
-                text: "#e0def4", subtext1: "#cecbe5", subtext0: "#908caa",
-                overlay2: "#6e6a86", overlay1: "#56526e", overlay0: "#44415a",
-                surface2: "#44415a", surface1: "#393552", surface0: "#2a273f",
-                base: "#232136", mantle: "#2a273f", crust: "#232136"),
-            toolNames: ["ghostty": "Rose Pine Moon", "wezterm": "rose-pine-moon"],
-            category: .trending,
-            description: "Rosé Pine 的月光变体，稍高对比度", stars: nil,
-            compatibility: .ansiPartial, variants: ["rose-pine", "rose-pine-dawn"],
-            promptSegments: [
-                PromptSegment(color: "#c4a7e7", ink: "#232136"),
-                PromptSegment(color: "#eb6f92", ink: "#232136"),
-                PromptSegment(color: "#f6c177", ink: "#232136"),
-                PromptSegment(color: "#9ccfd8", ink: "#232136"),
-                PromptSegment(color: "#3e8fb0", ink: "#e0def4"),
-            ],
             accent: "#c4a7e7"),
         Theme(
             id: "rose-pine-dawn", name: "Rosé Pine Dawn", appearance: .light,
@@ -109,7 +87,7 @@ enum TrendingThemes {
             toolNames: ["ghostty": "Rose Pine Dawn", "wezterm": "rose-pine-dawn"],
             category: .trending,
             description: "Rosé Pine 的黎明浅色，温暖优雅", stars: nil,
-            compatibility: .ansiPartial, variants: ["rose-pine", "rose-pine-moon"],
+            compatibility: .ansiPartial, variants: ["rose-pine"],
             promptSegments: [
                 PromptSegment(color: "#907aa9", ink: "#fdfaf6"),
                 PromptSegment(color: "#b4637a", ink: "#fdfaf6"),

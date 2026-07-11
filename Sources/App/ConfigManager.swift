@@ -74,7 +74,11 @@ struct ConfigManager {
         }
 
         let registry = ThemeRegistry.shared
-        for themeId in [config.currentThemeId, config.darkThemeId, config.lightThemeId] {
+        // 旧版导出的配置可能引用已裁撤的主题 id，先迁移到保留款
+        let currentThemeId = AppSettings.migratedThemeId(config.currentThemeId)
+        let darkThemeId = AppSettings.migratedThemeId(config.darkThemeId)
+        let lightThemeId = AppSettings.migratedThemeId(config.lightThemeId)
+        for themeId in [currentThemeId, darkThemeId, lightThemeId] {
             guard registry.theme(id: themeId) != nil else {
                 showError(L("导入失败：配置引用了不存在的主题 \(themeId)"))
                 return
@@ -82,13 +86,13 @@ struct ConfigManager {
         }
 
         let settings = AppSettings.shared
-        settings.darkThemeId = config.darkThemeId
-        settings.lightThemeId = config.lightThemeId
+        settings.darkThemeId = darkThemeId
+        settings.lightThemeId = lightThemeId
         settings.followSystemAppearance = config.followSystemAppearance
         settings.disabledTools = Set(config.disabledTools)
         settings.toolPaths = config.toolPaths
 
         // Apply the imported theme
-        ThemeApplicationService.apply(themeId: config.currentThemeId)
+        ThemeApplicationService.apply(themeId: currentThemeId)
     }
 }

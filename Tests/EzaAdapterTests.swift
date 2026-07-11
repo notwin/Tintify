@@ -54,7 +54,6 @@ import Foundation
     #expect(ThemeRegistry.shared.theme(id: "synthwave-sunset")!.accent == "#ff7edb")  // 热粉
     // rose-pine 家族对齐官方 eza 主题：executable = iris
     #expect(ThemeRegistry.shared.theme(id: "rose-pine")!.accent == "#c4a7e7")
-    #expect(ThemeRegistry.shared.theme(id: "rose-pine-moon")!.accent == "#c4a7e7")
     #expect(ThemeRegistry.shared.theme(id: "rose-pine-dawn")!.accent == "#907aa9")
     // 单色/多宝石主题刻意不设 accent；经典主题维持官方绿色惯例
     #expect(ThemeRegistry.shared.theme(id: "phosphor-green")!.accent == nil)

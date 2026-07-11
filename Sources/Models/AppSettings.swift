@@ -38,10 +38,22 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(onboardingCompleted, forKey: "onboardingCompleted") }
     }
 
+    /// v1.10 裁撤的主题 id → 同族保留款（存量用户设置迁移用）
+    static let retiredThemeIds: [String: String] = [
+        "catppuccin-macchiato": "catppuccin-mocha",
+        "catppuccin-frappe": "catppuccin-mocha",
+        "rose-pine-moon": "rose-pine",
+    ]
+
+    /// 已裁撤的 id 映射到保留款，其余原样返回
+    static func migratedThemeId(_ id: String) -> String {
+        retiredThemeIds[id] ?? id
+    }
+
     private init() {
-        self.currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"
-        self.darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
-        self.lightThemeId = UserDefaults.standard.string(forKey: "lightThemeId") ?? "catppuccin-latte"
+        self.currentThemeId = Self.migratedThemeId(UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha")
+        self.darkThemeId = Self.migratedThemeId(UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha")
+        self.lightThemeId = Self.migratedThemeId(UserDefaults.standard.string(forKey: "lightThemeId") ?? "catppuccin-latte")
         self.followSystemAppearance = UserDefaults.standard.object(forKey: "followSystemAppearance") as? Bool ?? true
         self.toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
         self.previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
@@ -55,9 +67,9 @@ final class AppSettings: ObservableObject {
 
     /// 从 UserDefaults 重读全部设置（CLI 等外部进程修改 defaults 后调用）。
     func reload() {
-        currentThemeId = UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha"
-        darkThemeId = UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha"
-        lightThemeId = UserDefaults.standard.string(forKey: "lightThemeId") ?? "catppuccin-latte"
+        currentThemeId = Self.migratedThemeId(UserDefaults.standard.string(forKey: "currentThemeId") ?? "catppuccin-mocha")
+        darkThemeId = Self.migratedThemeId(UserDefaults.standard.string(forKey: "darkThemeId") ?? "catppuccin-mocha")
+        lightThemeId = Self.migratedThemeId(UserDefaults.standard.string(forKey: "lightThemeId") ?? "catppuccin-latte")
         followSystemAppearance = UserDefaults.standard.object(forKey: "followSystemAppearance") as? Bool ?? true
         toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
         previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
