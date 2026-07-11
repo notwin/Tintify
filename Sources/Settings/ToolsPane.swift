@@ -4,17 +4,19 @@ import SwiftUI
 
 /// Tools pane for customizing per-tool configuration file paths.
 struct ToolsPane: View {
+    @EnvironmentObject var skinModel: SkinModel
     @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
+        let skin = skinModel.skin
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "wrench.and.screwdriver", color: .orange, title: L("工具"), subtitle: L("配置文件路径（留空使用默认路径）"))
+                PaneHeader(icon: "wrench.and.screwdriver", title: L("工具"), subtitle: L("配置文件路径（留空使用默认路径）"))
 
-                GroupBox {
+                SkinCard {
                     VStack(spacing: 0) {
                         ForEach(Array(ThemeEngine.allAdapters.enumerated()), id: \.offset) { idx, adapter in
-                            if idx > 0 { Divider() }
+                            if idx > 0 { SkinDivider() }
                             HStack(spacing: 12) {
                                 Toggle("", isOn: Binding(
                                     get: { !settings.disabledTools.contains(adapter.toolName) },
@@ -26,12 +28,13 @@ struct ToolsPane: View {
                                         }
                                     }
                                 ))
-                                .toggleStyle(.switch)
+                                .toggleStyle(SkinToggleStyle(skin: skin))
                                 .labelsHidden()
 
                                 VStack(alignment: .leading) {
                                     Text(adapter.toolName).font(.body.bold())
-                                    Text(adapter.defaultPathDescription).font(.caption).foregroundStyle(.secondary)
+                                        .foregroundStyle(skin.textPrimaryColor)
+                                    Text(adapter.defaultPathDescription).font(.caption).foregroundStyle(skin.textSecondaryColor)
                                 }
                                 .opacity(settings.disabledTools.contains(adapter.toolName) ? 0.4 : 1.0)
 
@@ -49,6 +52,7 @@ struct ToolsPane: View {
                                         }
                                     ))
                                     .textFieldStyle(.roundedBorder)
+                                    .tint(skin.accentColor)
                                     .frame(width: 200)
                                     .disabled(settings.disabledTools.contains(adapter.toolName))
 
@@ -57,7 +61,7 @@ struct ToolsPane: View {
                                        !FileManager.default.fileExists(atPath: (customPath as NSString).expandingTildeInPath) {
                                         Label(L("路径不存在"), systemImage: "exclamationmark.triangle.fill")
                                             .font(.caption2)
-                                            .foregroundStyle(.orange)
+                                            .foregroundStyle(skin.dangerColor)
                                     }
                                 }
                                 .opacity(settings.disabledTools.contains(adapter.toolName) ? 0.4 : 1.0)

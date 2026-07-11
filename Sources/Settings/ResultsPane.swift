@@ -11,7 +11,7 @@ struct ResultsPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "list.clipboard", color: .orange, title: L("应用记录"), subtitle: L("查看每次主题切换的详细结果"))
+                PaneHeader(icon: "list.clipboard", title: L("应用记录"), subtitle: L("查看每次主题切换的详细结果"))
 
                 if history.isEmpty {
                     EmptyStateView(

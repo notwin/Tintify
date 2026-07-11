@@ -14,7 +14,7 @@ struct BackupPane: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                PaneHeader(icon: "externaldrive", color: .green, title: L("备份"), subtitle: L("应用主题前自动备份，可一键还原"))
+                PaneHeader(icon: "externaldrive", title: L("备份"), subtitle: L("应用主题前自动备份，可一键还原"))
 
                 if backups.isEmpty {
                     EmptyStateView(
