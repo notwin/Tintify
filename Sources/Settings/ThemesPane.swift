@@ -1,8 +1,10 @@
 // Sources/Settings/ThemesPane.swift
 import SwiftUI
 
-/// Theme gallery pane with category tabs, search, and filter.
+/// 主题画廊：分类 chips + 搜索/过滤 + Hero 大卡 + 迷你终端网格。
+/// 点网格卡 = 试穿（只染窗口）；Hero 的「应用」才写入终端配置。
 struct ThemesPane: View {
+    @EnvironmentObject var skinModel: SkinModel
     @ObservedObject private var settings = AppSettings.shared
     private let registry = ThemeRegistry.shared
 
@@ -26,88 +28,118 @@ struct ThemesPane: View {
     }
 
     var body: some View {
+        let skin = skinModel.skin
         VStack(spacing: 0) {
-            // 分类 Tab 栏
-            HStack(spacing: 6) {
-                ForEach(ThemeCategory.allCases, id: \.self) { category in
-                    let count = registry.themes(for: category).count
-                    let isSelected = selectedCategory == category
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            selectedCategory = category
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(category.displayName)
-                                .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
-                                .foregroundStyle(isSelected ? .primary : .secondary)
-                            Text("\(count)")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(isSelected ? .white : .secondary)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 1)
-                                .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.2))
-                                .cornerRadius(4)
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(isSelected ? Color.accentColor.opacity(0.1) : Color.clear)
-                        .cornerRadius(6)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            filterBar(skin: skin)
 
-            // 搜索 + 过滤栏
-            HStack(spacing: 8) {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
-                    TextField(L("搜索主题名..."), text: $searchText)
-                        .textFieldStyle(.plain)
-                }
-                .padding(6)
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(6)
-
-                Picker("", selection: $appearanceFilter) {
-                    Text(L("全部")).tag(Theme.Appearance?.none)
-                    Text(L("暗色")).tag(Theme.Appearance?.some(.dark))
-                    Text(L("浅色")).tag(Theme.Appearance?.some(.light))
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 180)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
-
-            // 主题列表
             ScrollView {
-                if filteredThemes.isEmpty {
-                    EmptyStateView(
-                        icon: "magnifyingglass",
-                        title: L("无匹配主题"),
-                        subtitle: L("试试调整搜索词或过滤条件")
-                    )
-                } else {
-                    VStack(spacing: 12) {
-                        ForEach(filteredThemes) { theme in
-                            ThemeCard(
-                                theme: theme,
-                                isActive: theme.id == settings.currentThemeId,
-                                onApply: { theme in
-                                    ThemeApplicationService.apply(theme: theme)
+                VStack(spacing: 12) {
+                    ThemeHeroCard { theme in
+                        ThemeApplicationService.apply(theme: theme)
+                        skinModel.previewTheme = nil  // 试穿转正
+                    }
+
+                    if filteredThemes.isEmpty {
+                        EmptyStateView(
+                            icon: "magnifyingglass",
+                            title: L("无匹配主题"),
+                            subtitle: L("试试调整搜索词或过滤条件")
+                        )
+                    } else {
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 190), spacing: 10)],
+                            spacing: 10
+                        ) {
+                            ForEach(filteredThemes) { theme in
+                                ThemeGridCard(
+                                    theme: theme,
+                                    isCurrent: theme.id == settings.currentThemeId
+                                ) {
+                                    // 再点已试穿的卡 = 取消试穿；点当前主题 = 清试穿
+                                    if skinModel.previewTheme?.id == theme.id
+                                        || theme.id == settings.currentThemeId {
+                                        skinModel.previewTheme = nil
+                                    } else {
+                                        skinModel.previewTheme = theme
+                                    }
                                 }
-                            )
+                            }
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
                 }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
             }
         }
+    }
+
+    @ViewBuilder
+    private func filterBar(skin: ThemeSkin) -> some View {
+        HStack(spacing: 6) {
+            ForEach(ThemeCategory.allCases, id: \.self) { category in
+                let count = registry.themes(for: category).count
+                let isSelected = selectedCategory == category
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        selectedCategory = category
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(category.displayName)
+                            .font(.system(size: 12, weight: isSelected ? .bold : .regular))
+                        Text("\(count)")
+                            .font(.system(size: 10, weight: .medium))
+                    }
+                    .foregroundStyle(isSelected ? skin.accentInkColor : skin.textSecondaryColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(isSelected ? skin.accentColor : skin.cardBgColor)
+                    .clipShape(Capsule())
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+
+            Spacer()
+
+            HStack(spacing: 5) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 10))
+                    .foregroundStyle(skin.textSecondaryColor)
+                TextField(L("搜索主题名..."), text: $searchText)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 12))
+                    .foregroundStyle(skin.textPrimaryColor)
+                    .frame(width: 120)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(skin.elevatedBgColor)
+            .clipShape(Capsule())
+
+            appearanceChip(nil, label: L("全部"), skin: skin)
+            appearanceChip(.dark, label: L("暗色"), skin: skin)
+            appearanceChip(.light, label: L("浅色"), skin: skin)
+        }
+        .padding(.horizontal, 18)
+        .padding(.top, 38)   // 透明标题栏让位
+        .padding(.bottom, 10)
+    }
+
+    private func appearanceChip(_ value: Theme.Appearance?, label: String, skin: ThemeSkin) -> some View {
+        let isSelected = appearanceFilter == value
+        return Button {
+            appearanceFilter = value
+        } label: {
+            Text(label)
+                .font(.system(size: 11, weight: isSelected ? .bold : .regular))
+                .foregroundStyle(isSelected ? skin.accentInkColor : skin.textSecondaryColor)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 5)
+                .background(isSelected ? skin.accentColor : skin.cardBgColor)
+                .clipShape(Capsule())
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
