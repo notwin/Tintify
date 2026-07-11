@@ -140,17 +140,24 @@ final class MenuBarManager: NSObject {
 
     private var settingsWindow: NSWindow?
 
+    /// 设置窗口的皮肤状态（跨开关窗复用，重开时重置试穿）
+    private lazy var settingsSkinModel = SkinModel()
+
     @objc private func openSettings() {
+        settingsSkinModel.previewTheme = nil  // 重开窗口清试穿
         if let window = settingsWindow, window.isVisible {
             window.makeKeyAndOrderFront(nil)
             window.orderFrontRegardless()
         } else {
-            let hostingController = NSHostingController(rootView: SettingsView())
+            let hostingController = NSHostingController(
+                rootView: SettingsView().environmentObject(settingsSkinModel)
+            )
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Tintify Settings"
-            window.setContentSize(NSSize(width: 800, height: 600))
-            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-            window.minSize = NSSize(width: 700, height: 500)
+            window.setContentSize(NSSize(width: 860, height: 620))
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
+            window.titlebarAppearsTransparent = true
+            window.minSize = NSSize(width: 760, height: 560)
             window.maxSize = NSSize(width: 1200, height: 900)
             window.center()
             window.isReleasedWhenClosed = false  // 关闭时不销毁，下次能复用
@@ -158,7 +165,6 @@ final class MenuBarManager: NSObject {
             window.orderFrontRegardless()
             settingsWindow = window
         }
-        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc private func quit() {
