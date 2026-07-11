@@ -143,7 +143,7 @@ final class MenuBarManager: NSObject {
     /// 设置窗口的皮肤状态（跨开关窗复用，重开时重置试穿）
     private lazy var settingsSkinModel = SkinModel()
 
-    @objc private func openSettings() {
+    @objc func openSettings() {
         settingsSkinModel.previewTheme = nil  // 重开窗口清试穿
         if let window = settingsWindow, window.isVisible {
             window.makeKeyAndOrderFront(nil)

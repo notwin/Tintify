@@ -42,6 +42,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             showOnboarding()
         }
         menuBarManager.setup()
+        // --settings：启动即打开设置窗口（菜单栏图标被系统藏起时的直达入口）
+        if CommandLine.arguments.contains("--settings") {
+            menuBarManager.openSettings()
+        }
         UpdateManager.shared.checkForUpdate()
         appearanceMonitor = SystemAppearanceMonitor { [weak self] isDark in
             guard AppSettings.shared.followSystemAppearance else { return }
