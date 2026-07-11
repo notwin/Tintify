@@ -74,6 +74,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
+    /// 菜单栏图标被系统藏起（菜单栏满员）时的兜底入口：
+    /// 再次 open -a Tintify / 访达双击 → 直接弹设置窗口
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        menuBarManager.openSettings()
+        return false
+    }
+
     private func showOnboarding() {
         let onboardingView = OnboardingView {
             // Close onboarding window when done

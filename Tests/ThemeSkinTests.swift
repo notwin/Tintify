@@ -68,3 +68,12 @@ private func contrastRatio(_ a: String, _ b: String) -> Double {
                 "主题 \(theme.id) cardBg 与 windowBg 塌缩")
     }
 }
+
+@Test func isLightMatchesThemeAppearance() {
+    // 窗口 NSAppearance 的明暗判定必须与主题声明的深浅一致
+    for theme in ThemeRegistry.shared.allThemes {
+        let expected = theme.appearance == .light
+        #expect(ThemeSkin.isLight(hex: theme.palette.base) == expected,
+                "主题 \(theme.id) 的 base \(theme.palette.base) 明暗判定与 appearance 不符")
+    }
+}

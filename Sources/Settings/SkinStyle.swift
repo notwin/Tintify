@@ -53,6 +53,10 @@ struct WindowSkinApplier: NSViewRepresentable {
         DispatchQueue.main.async {
             guard let window = view.window else { return }
             window.titlebarAppearsTransparent = true
+            // 标题文字由系统按 NSAppearance 着色、不吃 skin，深色皮肤+浅色系统会隐身；
+            // 侧边栏已有品牌名，直接隐藏标题，同时让系统 chrome 跟随皮肤明暗
+            window.titleVisibility = .hidden
+            window.appearance = NSAppearance(named: ThemeSkin.isLight(hex: hex) ? .aqua : .darkAqua)
             window.backgroundColor = NSColor(Color(hex: hex))
         }
     }

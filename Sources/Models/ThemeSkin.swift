@@ -36,4 +36,15 @@ struct ThemeSkin: Equatable {
         success = p.green
         danger = p.red
     }
+
+    /// 底色是否偏亮（决定窗口 NSAppearance 用 aqua 还是 darkAqua）
+    static func isLight(hex: String) -> Bool {
+        let h = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        var v: UInt64 = 0
+        guard Scanner(string: h).scanHexInt64(&v) else { return false }
+        let r = Double((v & 0xFF0000) >> 16) / 255
+        let g = Double((v & 0x00FF00) >> 8) / 255
+        let b = Double(v & 0x0000FF) / 255
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.5
+    }
 }
