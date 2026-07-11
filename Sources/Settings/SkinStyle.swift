@@ -88,13 +88,14 @@ struct SkinDivider: View {
 }
 
 /// 自绘开关：轨道 accent / elevated，滑块 accentInk / textSecondary。
+/// 只画「label + 轨道」，不自带 Spacer——需要开关靠右的行由调用方自己排
+/// （样式内的贪婪 Spacer 会和行里的 Spacer 抢空间，把行内开关挤到行中间）。
 struct SkinToggleStyle: ToggleStyle {
     let skin: ThemeSkin
 
     func makeBody(configuration: Configuration) -> some View {
-        HStack {
+        HStack(spacing: 8) {
             configuration.label
-            Spacer()
             Capsule()
                 .fill(configuration.isOn ? skin.accentColor : skin.elevatedBgColor)
                 .overlay(
@@ -105,12 +106,11 @@ struct SkinToggleStyle: ToggleStyle {
                                alignment: configuration.isOn ? .trailing : .leading)
                 )
                 .frame(width: 34, height: 20)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 0.15)) { configuration.isOn.toggle() }
-                }
         }
         .contentShape(Rectangle())
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.15)) { configuration.isOn.toggle() }
+        }
     }
 }
 

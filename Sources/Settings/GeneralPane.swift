@@ -16,11 +16,16 @@ struct GeneralPane: View {
                 PaneHeader(icon: "paintpalette", title: L("通用"), subtitle: L("主题切换、外观跟随和启动设置"))
 
                 SkinCard {
-                    Toggle(L("跟随系统外观"), isOn: $settings.followSystemAppearance)
-                        .toggleStyle(SkinToggleStyle(skin: skin))
-                        .foregroundStyle(skin.textPrimaryColor)
-                        .padding(.vertical, 9)
-                        .padding(.horizontal, 12)
+                    HStack {
+                        Text(L("跟随系统外观"))
+                            .foregroundStyle(skin.textPrimaryColor)
+                        Spacer()
+                        Toggle("", isOn: $settings.followSystemAppearance)
+                            .toggleStyle(SkinToggleStyle(skin: skin))
+                            .labelsHidden()
+                    }
+                    .padding(.vertical, 9)
+                    .padding(.horizontal, 12)
 
                     SkinDivider()
 
@@ -36,11 +41,19 @@ struct GeneralPane: View {
                 }
 
                 SkinCard {
-                    LaunchAtLogin.Toggle(L("开机自动启动"))
+                    HStack {
+                        Text(L("开机自动启动"))
+                            .foregroundStyle(skin.textPrimaryColor)
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { LaunchAtLogin.isEnabled },
+                            set: { LaunchAtLogin.isEnabled = $0 }
+                        ))
                         .toggleStyle(SkinToggleStyle(skin: skin))
-                        .foregroundStyle(skin.textPrimaryColor)
-                        .padding(.vertical, 9)
-                        .padding(.horizontal, 12)
+                        .labelsHidden()
+                    }
+                    .padding(.vertical, 9)
+                    .padding(.horizontal, 12)
                 }
 
                 SkinCard {
