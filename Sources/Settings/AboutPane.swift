@@ -5,6 +5,7 @@ import SwiftUI
 
 /// About pane showing app info, supported tools, and links.
 struct AboutPane: View {
+    @EnvironmentObject var skinModel: SkinModel
     @ObservedObject private var updater = UpdateManager.shared
 
     private var appVersion: String {
@@ -25,37 +26,40 @@ struct AboutPane: View {
                     } else {
                         Image(systemName: "paintpalette.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(skinModel.skin.accentColor)
                     }
 
                     Text("Tintify")
                         .font(.title.bold())
+                        .foregroundStyle(skinModel.skin.textPrimaryColor)
 
                     Text("v\(appVersion)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(skinModel.skin.textSecondaryColor)
 
                     Text(L("macOS 终端主题管理器"))
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(skinModel.skin.textSecondaryColor)
                 }
 
                 // 更新按钮
                 UpdateButton(updater: updater)
 
-                Divider().padding(.horizontal, 40)
+                SkinDivider().padding(.horizontal, 40)
 
-                GroupBox {
+                SkinCard {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(L("支持的工具"))
                             .font(.headline)
+                            .foregroundStyle(skinModel.skin.textPrimaryColor)
                         FlowLayout(spacing: 6) {
                             ForEach(supportedTools, id: \.self) { tool in
                                 Text(tool)
                                     .font(.caption)
+                                    .foregroundStyle(skinModel.skin.textPrimaryColor)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
-                                    .background(Color.accentColor.opacity(0.1))
+                                    .background(skinModel.skin.accentColor.opacity(0.15))
                                     .cornerRadius(4)
                             }
                         }
@@ -63,7 +67,7 @@ struct AboutPane: View {
                     .padding(8)
                 }
 
-                GroupBox {
+                SkinCard {
                     VStack(spacing: 0) {
                         Button {
                             NSWorkspace.shared.open(URL(string: "https://github.com/notwin/Tintify")!)
@@ -71,7 +75,7 @@ struct AboutPane: View {
                             LinkRow(icon: "globe", title: L("GitHub 仓库"), subtitle: L("查看源代码和文档"))
                         }
                         .buttonStyle(.plain)
-                        Divider()
+                        SkinDivider()
                         Button {
                             NSWorkspace.shared.open(URL(string: "https://github.com/notwin/Tintify/issues")!)
                         } label: {
@@ -83,7 +87,7 @@ struct AboutPane: View {
 
                 Text("Copyright \u{00A9} 2026 notwin")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(skinModel.skin.textSecondaryColor.opacity(0.7))
             }
             .padding(24)
         }
@@ -135,6 +139,7 @@ struct FlowLayout: Layout {
 
 /// A row showing an icon, title, and subtitle for about page links.
 struct LinkRow: View {
+    @EnvironmentObject var skinModel: SkinModel
     let icon: String
     let title: String
     let subtitle: String
@@ -142,19 +147,20 @@ struct LinkRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .foregroundColor(.accentColor)
+                .foregroundStyle(skinModel.skin.accentColor)
                 .frame(width: 20)
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
                     .font(.body)
+                    .foregroundStyle(skinModel.skin.textPrimaryColor)
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(skinModel.skin.textSecondaryColor)
             }
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(skinModel.skin.textSecondaryColor)
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
@@ -164,6 +170,7 @@ struct LinkRow: View {
 
 /// Update button that changes appearance based on update state.
 struct UpdateButton: View {
+    @EnvironmentObject var skinModel: SkinModel
     @ObservedObject var updater: UpdateManager
 
     var body: some View {
@@ -175,19 +182,19 @@ struct UpdateButton: View {
                 } label: {
                     Label(L("检查更新"), systemImage: "arrow.clockwise")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(SkinSecondaryButtonStyle(skin: skinModel.skin))
 
             case .checking:
                 HStack(spacing: 6) {
                     ProgressView()
                         .controlSize(.small)
                     Text(L("正在检查..."))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(skinModel.skin.textSecondaryColor)
                 }
 
             case .upToDate:
                 Label(L("已是最新版本"), systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(skinModel.skin.successColor)
 
             case .available(let version):
                 Button {
@@ -195,25 +202,25 @@ struct UpdateButton: View {
                 } label: {
                     Label(L("立即更新 (v\(version))"), systemImage: "arrow.down.circle.fill")
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(SkinPrimaryButtonStyle(skin: skinModel.skin))
 
             case .downloading(let progress):
                 HStack(spacing: 6) {
                     ProgressView()
                         .controlSize(.small)
                     Text(progress)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(skinModel.skin.textSecondaryColor)
                 }
 
             case .error(let message):
                 VStack(spacing: 4) {
                     Label(message, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(skinModel.skin.dangerColor)
                     Button(L("重试")) {
                         updater.checkForUpdate()
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(SkinSecondaryButtonStyle(skin: skinModel.skin))
                     .controlSize(.small)
                 }
             }

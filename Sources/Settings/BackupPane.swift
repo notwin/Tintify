@@ -4,6 +4,7 @@ import SwiftUI
 
 /// Backup management pane listing snapshots with one-click restore.
 struct BackupPane: View {
+    @EnvironmentObject var skinModel: SkinModel
     @State private var backups: [BackupInfo] = []
     @State private var showRestoreAlert = false
     @State private var selectedBackup: BackupInfo?
@@ -12,6 +13,7 @@ struct BackupPane: View {
     private let manager = BackupManager()
 
     var body: some View {
+        let skin = skinModel.skin
         ScrollView {
             VStack(spacing: 16) {
                 PaneHeader(icon: "externaldrive", title: L("备份"), subtitle: L("应用主题前自动备份，可一键还原"))
@@ -23,24 +25,25 @@ struct BackupPane: View {
                         subtitle: L("切换主题时会自动创建备份")
                     )
                 } else {
-                    GroupBox {
+                    SkinCard {
                         VStack(spacing: 0) {
                             ForEach(Array(backups.enumerated()), id: \.element.id) { idx, backup in
-                                if idx > 0 { Divider() }
+                                if idx > 0 { SkinDivider() }
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(backup.date.friendlyString)
                                             .font(.body)
+                                            .foregroundStyle(skin.textPrimaryColor)
                                         Text(backup.id)
                                             .font(.caption.monospaced())
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(skin.textSecondaryColor)
                                     }
                                     Spacer()
                                     Button(L("还原")) {
                                         selectedBackup = backup
                                         showRestoreAlert = true
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(SkinSecondaryButtonStyle(skin: skin))
                                 }
                                 .padding(.vertical, 8)
                                 .padding(.horizontal, 12)
@@ -52,7 +55,7 @@ struct BackupPane: View {
                 if let message = restoreMessage {
                     Text(message)
                         .font(.caption)
-                        .foregroundStyle(restoreSucceeded ? .green : .red)
+                        .foregroundStyle(restoreSucceeded ? skin.successColor : skin.dangerColor)
                         .padding(.top, 4)
                 }
             }
