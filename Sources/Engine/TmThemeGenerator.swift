@@ -117,13 +117,22 @@ struct TmThemeInstaller {
     }
 
     /// 写入主题文件；内容变化才重建缓存（bat cache --build 约数百毫秒）。
+    /// 用 sentinel 文件记录「上次成功 rebuild 的内容」——仅当主题文件与 sentinel
+    /// 都匹配当前内容时才跳过 rebuild。避免首次 rebuild 失败后内容未变却静默跳过，
+    /// 导致 bat 缓存空却以为已同步而错色。
     func install(theme: Theme) throws {
         let content = TmThemeGenerator.generate(palette: theme.palette)
         let path = themesDir + "/\(Self.themeName).tmTheme"
-        if (try? String(contentsOfFile: path, encoding: .utf8)) == content { return }
+        let sentinelPath = themesDir + "/.tintify-cache-synced"
+        if (try? String(contentsOfFile: path, encoding: .utf8)) == content,
+           (try? String(contentsOfFile: sentinelPath, encoding: .utf8)) == content {
+            return
+        }
         try FileManager.default.createDirectory(atPath: themesDir, withIntermediateDirectories: true)
         try ConfigWriter.atomicWrite(content, to: path)
         try rebuildCache()
+        // rebuild 成功才写 sentinel：若 rebuild 抛错，下次 install 仍会重建
+        try ConfigWriter.atomicWrite(content, to: sentinelPath)
     }
 
     static func runBatCacheBuild() throws {

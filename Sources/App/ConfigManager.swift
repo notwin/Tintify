@@ -86,13 +86,16 @@ struct ConfigManager {
         }
 
         let settings = AppSettings.shared
+        // 先 apply 主题，成功后再写其余设置——避免 apply 全失败时留下半应用状态
+        guard let result = ThemeApplicationService.apply(themeId: currentThemeId),
+              result.successCount > 0 else {
+            showError(L("导入失败：主题应用未成功，已保留原有设置"))
+            return
+        }
         settings.darkThemeId = darkThemeId
         settings.lightThemeId = lightThemeId
         settings.followSystemAppearance = config.followSystemAppearance
         settings.disabledTools = Set(config.disabledTools)
         settings.toolPaths = config.toolPaths
-
-        // Apply the imported theme
-        ThemeApplicationService.apply(themeId: currentThemeId)
     }
 }

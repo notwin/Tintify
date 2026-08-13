@@ -222,19 +222,36 @@ struct StarshipAdapter: ToolAdapter {
         }
     }
 
-    /// 一次性把 format 中硬编码的 hex 迁移为 grad 槽位引用。幂等：
-    /// 文件里已出现 grad1 即视为已迁移。unique hex 超过 10 个不自动迁移（日志留痕）。
+    /// 一次性把硬编码 hex 迁移为 grad 槽位引用。迁移 format/style 等颜色引用中的 hex，
+    /// 但跳过 [palettes.*] 段内的定义值（用户自建 palette 和 tintify 段的 key = "#hex"）——
+    /// 全文件替换会把 palette 定义值也改成 grad 引用，破坏用户配置（v1.x 回归）。
+    /// 幂等：文件里已出现 grad1 即视为已迁移。unique hex 超过 10 个不自动迁移（日志留痕）。
     private func migrateHardcodedHexIfNeeded(in path: String) throws {
         guard FileManager.default.fileExists(atPath: path) else { return }
         let content = try String(contentsOfFile: path, encoding: .utf8)
         guard !content.contains("grad1") else { return }
 
-        let regex = try! NSRegularExpression(pattern: "#[0-9a-fA-F]{6}")
-        let range = NSRange(content.startIndex..., in: content)
+        // 负向先行断言确保只匹配完整 6 位 hex，不被 8 位 #RRGGBBAA 的前 6 位误匹配
+        let regex = try! NSRegularExpression(pattern: "#[0-9a-fA-F]{6}(?![0-9a-fA-F])")
+        let lines = content.components(separatedBy: "\n")
+        let paletteHeader = #"^\s*\[palettes\."#
+        let anyHeader = #"^\s*\["#
+
+        // 收集 hex：跳过 [palettes.*] 段内的行（palette 定义值不迁移）
         var seen: [String] = []
-        for match in regex.matches(in: content, range: range) {
-            let hex = String(content[Range(match.range, in: content)!]).lowercased()
-            if !seen.contains(hex) { seen.append(hex) }
+        var inPalette = false
+        for line in lines {
+            if line.range(of: paletteHeader, options: .regularExpression) != nil {
+                inPalette = true
+            } else if line.range(of: anyHeader, options: .regularExpression) != nil {
+                inPalette = false
+            }
+            if inPalette { continue }
+            let range = NSRange(line.startIndex..., in: line)
+            for match in regex.matches(in: line, range: range) {
+                let hex = String(line[Range(match.range, in: line)!]).lowercased()
+                if !seen.contains(hex) { seen.append(hex) }
+            }
         }
         guard !seen.isEmpty else { return }
         guard seen.count <= 10 else {
@@ -242,11 +259,23 @@ struct StarshipAdapter: ToolAdapter {
             return
         }
 
-        var migrated = content
-        for (i, hex) in seen.enumerated() {
-            migrated = migrated.replacingOccurrences(
-                of: hex, with: "grad\(min(i + 1, 5))", options: .caseInsensitive)
+        // 替换：同样跳过 [palettes.*] 段内的行
+        var migratedLines = lines
+        inPalette = false
+        for (i, line) in lines.enumerated() {
+            if line.range(of: paletteHeader, options: .regularExpression) != nil {
+                inPalette = true
+            } else if line.range(of: anyHeader, options: .regularExpression) != nil {
+                inPalette = false
+            }
+            if inPalette { continue }
+            var migrated = line
+            for (idx, hex) in seen.enumerated() {
+                migrated = migrated.replacingOccurrences(
+                    of: hex, with: "grad\(min(idx + 1, 5))", options: .caseInsensitive)
+            }
+            migratedLines[i] = migrated
         }
-        try ConfigWriter.atomicWrite(migrated, to: path)
+        try ConfigWriter.atomicWrite(migratedLines.joined(separator: "\n"), to: path)
     }
 }

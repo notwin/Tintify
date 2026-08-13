@@ -74,5 +74,6 @@ final class AppSettings: ObservableObject {
         toolPaths = UserDefaults.standard.dictionary(forKey: "toolPaths") as? [String: String] ?? [:]
         previousThemeId = UserDefaults.standard.string(forKey: "previousThemeId")
         disabledTools = Set(UserDefaults.standard.stringArray(forKey: "disabledTools") ?? [])
+        onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
     }
 }

@@ -125,3 +125,19 @@ import Foundation
         Issue.record("全兼容主题不应走生成")
     }
 }
+
+@Test func tmThemeInstallerRebuildsAgainAfterFailure() throws {
+    let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    var rebuilds = 0
+    var shouldFail = true
+    let installer = TmThemeInstaller(themesDir: tmpDir, rebuildCache: {
+        if shouldFail { shouldFail = false; throw NSError(domain: "test", code: 1) }
+        rebuilds += 1
+    })
+    let theme = ThemeRegistry.shared.theme(id: "nord")!
+    // 第一次 rebuild 失败 → install 抛错，sentinel 未写
+    do { try installer.install(theme: theme); Issue.record("rebuild 失败应使 install 抛错") } catch {}
+    // 第二次同主题：内容未变但 sentinel 缺失 → 再次 rebuild，这次成功
+    try installer.install(theme: theme)
+    #expect(rebuilds == 1)
+}

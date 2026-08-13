@@ -124,3 +124,15 @@ import Foundation
     let savedA = try String(contentsOfFile: (initialDir as NSString).appendingPathComponent(encodedA), encoding: .utf8)
     #expect(savedA == "A-pristine")                  // A 保持首版，未被第二次备份覆盖
 }
+
+@Test func backupRecordsThemeIdForRestoreSync() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    let manager = BackupManager(backupRoot: root)
+    let file = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+    try "content".write(toFile: file, atomically: true, encoding: .utf8)
+
+    let id = try manager.backup(files: [file], themeId: "nord")
+    let backups = manager.listBackups()
+    let target = try #require(backups.first { $0.id == id })
+    #expect(target.themeId == "nord")
+}

@@ -87,6 +87,7 @@ final class UpdateManager: ObservableObject {
         }
 
         Task {
+            var mountPoint: String?
             do {
                 // 1. Download DMG
                 state = .downloading(progress: L("下载中..."))
@@ -105,8 +106,8 @@ final class UpdateManager: ObservableObject {
                 }
                 try fm.moveItem(at: tempURL, to: URL(fileURLWithPath: dmgPath))
 
-                // 1b. Verify checksum (skip if release has no .sha256 file)
-                if let ok = try await verifyChecksum(dmgPath: dmgPath, dmgURL: url), !ok {
+                // 1b. Verify checksum (fail-closed：校验文件不可达或不匹配都中止)
+                if !(await verifyChecksum(dmgPath: dmgPath, dmgURL: url)) {
                     try? fm.removeItem(atPath: dmgPath)
                     Log.update.error("校验失败，已中止更新")
                     state = .error(message: L("校验失败，已中止更新"))
@@ -115,29 +116,37 @@ final class UpdateManager: ObservableObject {
 
                 // 2. Mount DMG
                 state = .downloading(progress: L("安装中..."))
-                let mountPoint = try await mountDMG(at: dmgPath)
+                mountPoint = try await mountDMG(at: dmgPath)
 
                 // 3. Replace app
-                let sourceApp = mountPoint + "/Tintify.app"
+                let sourceApp = mountPoint! + "/Tintify.app"
                 let targetApp = "/Applications/Tintify.app"
 
                 guard fm.fileExists(atPath: sourceApp) else {
-                    try await unmountDMG(at: mountPoint)
+                    try await unmountDMG(at: mountPoint!)
+                    mountPoint = nil
                     Log.update.error("DMG 中未找到 Tintify.app")
                     state = .error(message: L("DMG 中未找到 Tintify.app"))
                     return
                 }
 
-                // Atomic replace: stage the copy, then swap. If the copy fails,
-                // the old app is untouched; the final move is a same-volume rename.
+                // 原子替换：replaceItemAt 失败时原 app 仍在，不会出现「已删未恢复」窗口
                 let stagingApp = "/Applications/Tintify.app.new"
                 if fm.fileExists(atPath: stagingApp) { try? fm.removeItem(atPath: stagingApp) }
                 try fm.copyItem(atPath: sourceApp, toPath: stagingApp)
-                if fm.fileExists(atPath: targetApp) { try fm.removeItem(atPath: targetApp) }
-                try fm.moveItem(atPath: stagingApp, toPath: targetApp)
+                if fm.fileExists(atPath: targetApp) {
+                    _ = try fm.replaceItemAt(
+                        URL(fileURLWithPath: targetApp),
+                        withItemAt: URL(fileURLWithPath: stagingApp),
+                        backupItemName: nil,
+                        options: [])
+                } else {
+                    try fm.moveItem(atPath: stagingApp, toPath: targetApp)
+                }
 
                 // 4. Unmount DMG
-                try await unmountDMG(at: mountPoint)
+                try await unmountDMG(at: mountPoint!)
+                mountPoint = nil
 
                 // 5. Clean up
                 try? fm.removeItem(atPath: dmgPath)
@@ -146,6 +155,8 @@ final class UpdateManager: ObservableObject {
                 relaunch()
 
             } catch {
+                // 失败路径统一清理：卸载残留挂载点，避免泄漏
+                if let mp = mountPoint { try? await unmountDMG(at: mp) }
                 Log.update.error("更新失败：\(error.localizedDescription)")
                 state = .error(message: L("更新失败：\(error.localizedDescription)"))
             }
@@ -202,26 +213,34 @@ final class UpdateManager: ObservableObject {
         }.value
     }
 
-    /// 校验下载的 DMG。返回 nil = release 未附校验文件（跳过），否则为校验结果。
-    private func verifyChecksum(dmgPath: String, dmgURL: URL) async throws -> Bool? {
-        guard let checksumURL = URL(string: dmgURL.absoluteString + ".sha256") else { return nil }
-        let (data, response) = try await URLSession.shared.data(from: checksumURL)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200,
+    /// 校验下载的 DMG。fail-closed：校验文件不可达或不匹配都返回 false。
+    private func verifyChecksum(dmgPath: String, dmgURL: URL) async -> Bool {
+        guard let checksumURL = URL(string: dmgURL.absoluteString + ".sha256") else { return false }
+        guard let (data, response) = try? await URLSession.shared.data(from: checksumURL),
+              let http = response as? HTTPURLResponse, http.statusCode == 200,
               let text = String(data: data, encoding: .utf8),
               let expected = text.split(separator: " ").first.map({ String($0).lowercased() }) else {
-            Log.update.warning("更新：release 未附 sha256 校验文件，跳过校验")
-            return nil
+            Log.update.error("更新：无法获取 sha256 校验文件，已中止（fail-closed）")
+            return false
         }
-        let dmgData = try Data(contentsOf: URL(fileURLWithPath: dmgPath))
+        guard let dmgData = try? Data(contentsOf: URL(fileURLWithPath: dmgPath)) else { return false }
         let actual = SHA256.hash(data: dmgData).map { String(format: "%02x", $0) }.joined()
         return actual == expected
     }
 
     private func relaunch() {
+        let pid = ProcessInfo.processInfo.processIdentifier
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
-        task.arguments = ["-c", "sleep 1; open /Applications/Tintify.app"]
+        // 轮询当前 PID 是否已退出，确保旧实例终止后再 open——
+        // 否则 open 会激活仍在运行的旧实例，新版永不启动。
+        let script = """
+        for i in $(seq 1 50); do kill -0 \(pid) 2>/dev/null || break; sleep 0.1; done
+        sleep 0.3
+        open /Applications/Tintify.app
+        """
+        task.arguments = ["-c", script]
         try? task.run()
-        NSApplication.shared.terminate(nil)   // 旧实例先退，1 秒后新实例起——不再重叠
+        NSApplication.shared.terminate(nil)
     }
 }

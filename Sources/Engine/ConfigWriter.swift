@@ -279,8 +279,9 @@ enum ConfigWriter {
 
         let startIdx = lines.firstIndex { $0.hasPrefix(sectionPrefix) }
         if let start = startIdx {
+            let mask = multilineStringMask(for: lines)
             var end = start + 1
-            while end < lines.count && !lines[end].hasPrefix("[") {
+            while end < lines.count && (mask[end] || !lines[end].hasPrefix("[")) {
                 end += 1
             }
             let replacement = newContent.components(separatedBy: "\n")

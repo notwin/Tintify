@@ -68,6 +68,10 @@ struct BackupPane: View {
                 if let backup = selectedBackup {
                     do {
                         try manager.restore(backupId: backup.id)
+                        // 同步 currentThemeId 到备份对应主题，保持 UI 与终端配置一致
+                        if let themeId = backup.themeId, !themeId.isEmpty {
+                            AppSettings.shared.currentThemeId = themeId
+                        }
                         restoreMessage = L("还原成功")
                         restoreSucceeded = true
                     } catch {

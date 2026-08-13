@@ -231,3 +231,25 @@ import Foundation
     #expect(content.contains("grad1 = "))             // palette 块照写
     #expect(content.contains("#100000"))              // format 未被迁移
 }
+
+@Test func starshipMigratePreservesUserPaletteHexes() throws {
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    // format 含硬编码 hex + 用户自建 palette 段含 hex → migrate 只迁 format 的，palette 段保留
+    let userConfig = """
+    format = "[](fg:#1e1e2e)"
+
+    [palettes.my_custom]
+    red = "#ff0000"
+    blue = "#0000ff"
+    """
+    try userConfig.write(to: tmp, atomically: true, encoding: .utf8)
+
+    let adapter = StarshipAdapter(knownPaletteNames: [])
+    try adapter.apply(theme: ThemeRegistry.shared.theme(id: "nord")!, configPath: tmp.path)
+
+    let content = try String(contentsOf: tmp, encoding: .utf8)
+    #expect(content.contains("[](fg:grad1)"))           // format hex 已迁移
+    #expect(!content.contains("fg:#1e1e2e"))            // format hex 消失
+    #expect(content.contains("red = \"#ff0000\""))      // 用户 palette hex 保留
+    #expect(content.contains("blue = \"#0000ff\""))     // 用户 palette hex 保留
+}

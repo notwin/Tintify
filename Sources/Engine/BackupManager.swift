@@ -7,6 +7,7 @@ struct BackupInfo: Identifiable {
     let id: String
     let date: Date
     let path: String
+    let themeId: String?
 }
 
 /// Manages file backups with automatic pruning to keep at most 10 snapshots.
@@ -16,6 +17,13 @@ final class BackupManager {
     private let maxBackups = 10
     private static let dateFormat = "yyyyMMdd-HHmmss-SSS"
     private static let dateFormatLength = 19
+    private static func makeDateFormatter() -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = dateFormat
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        return formatter
+    }
 
     init(backupRoot: String = NSHomeDirectory() + "/.tintify/backups") {
         self.backupRoot = backupRoot
@@ -28,9 +36,8 @@ final class BackupManager {
     ///
     /// Returns:
     ///     A unique string identifier for the created backup.
-    func backup(files: [String]) throws -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = Self.dateFormat
+    func backup(files: [String], themeId: String? = nil) throws -> String {
+        let formatter = Self.makeDateFormatter()
         let backupId = formatter.string(from: Date()) + "-" + UUID().uuidString.prefix(8)
         let backupDir = (backupRoot as NSString).appendingPathComponent(backupId)
 
@@ -49,6 +56,11 @@ final class BackupManager {
         }
 
         try copyFiles(files, into: backupDir)
+        // 记录备份文件对应的主题，供还原时同步 currentThemeId
+        if let themeId {
+            let metaPath = (backupDir as NSString).appendingPathComponent(".tintify-theme")
+            try? themeId.write(toFile: metaPath, atomically: true, encoding: .utf8)
+        }
 
         prune()
         return backupId
@@ -65,25 +77,51 @@ final class BackupManager {
 
     /// Restore files from a previously created backup.
     ///
+    /// 先把全部备份文件复制到临时目录（读阶段），全部就绪后再覆盖原文件（写阶段）。
+    /// 读阶段失败不会动原文件，避免中途失败留下半还原的不一致状态。
+    ///
     /// Args:
     ///     backupId: The identifier returned by a prior call to `backup(files:)`.
     func restore(backupId: String) throws {
+        try Self.validateBackupId(backupId)
         let backupDir = (backupRoot as NSString).appendingPathComponent(backupId)
         let items = try fm.contentsOfDirectory(atPath: backupDir)
 
+        // 读阶段：全部备份文件复制到临时目录，任何失败都不动原文件
+        let staging = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+        try fm.createDirectory(atPath: staging, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(atPath: staging) }
+
+        var restores: [(staged: String, original: String)] = []
         for item in items {
             let originalPath = item.removingPercentEncoding ?? item
             let backupFile = (backupDir as NSString).appendingPathComponent(item)
+            guard fm.fileExists(atPath: backupFile) else { continue }
+            let staged = (staging as NSString).appendingPathComponent(item)
+            try fm.copyItem(atPath: backupFile, toPath: staged)
+            restores.append((staged, originalPath))
+        }
 
-            let parentDir = (originalPath as NSString).deletingLastPathComponent
+        // 写阶段：用暂存副本覆盖原文件
+        for r in restores {
+            let parentDir = (r.original as NSString).deletingLastPathComponent
             if !fm.fileExists(atPath: parentDir) {
                 try fm.createDirectory(atPath: parentDir, withIntermediateDirectories: true)
             }
-
-            if fm.fileExists(atPath: originalPath) {
-                try fm.removeItem(atPath: originalPath)
+            if fm.fileExists(atPath: r.original) {
+                try fm.removeItem(atPath: r.original)
             }
-            try fm.copyItem(atPath: backupFile, toPath: originalPath)
+            try fm.copyItem(atPath: r.staged, toPath: r.original)
+        }
+    }
+
+    /// 校验 backupId 格式，拒绝含路径分隔符/`..` 的输入以防路径穿越。
+    private static func validateBackupId(_ backupId: String) throws {
+        let valid = backupId == "initial"
+            || backupId.range(of: #"^\d{8}-\d{6}-\d{3}-[0-9A-Fa-f]{8}$"#, options: .regularExpression) != nil
+        guard valid else {
+            throw NSError(domain: "BackupManager", code: 3,
+                          userInfo: [NSLocalizedDescriptionKey: "无效的备份 ID: \(backupId)"])
         }
     }
 
@@ -94,10 +132,9 @@ final class BackupManager {
     func listBackups() -> [BackupInfo] {
         guard let items = try? fm.contentsOfDirectory(atPath: backupRoot) else { return [] }
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Self.dateFormat
+        let dateFormatter = Self.makeDateFormatter()
 
-        return items.sorted().reversed().compactMap { name in
+        return items.sorted().reversed().compactMap { name -> BackupInfo? in
             let path = (backupRoot as NSString).appendingPathComponent(name)
             var isDir: ObjCBool = false
             guard fm.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else {
@@ -117,7 +154,10 @@ final class BackupManager {
                 date = Date()
             }
 
-            return BackupInfo(id: name, date: date, path: path)
+            let themeId = try? String(
+                contentsOfFile: (path as NSString).appendingPathComponent(".tintify-theme"),
+                encoding: .utf8)
+            return BackupInfo(id: name, date: date, path: path, themeId: themeId)
         }
     }
 

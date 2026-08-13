@@ -51,7 +51,7 @@ final class ThemeEngine {
 
     /// Apply a theme to every adapter, backing up affected config files first.
     @discardableResult
-    func apply(theme: Theme) -> ApplyResult {
+    func apply(theme: Theme, backupThemeId: String? = nil) -> ApplyResult {
         let configPaths = adapters.map { adapter -> String in
             pathOverrides[adapter.toolName] ?? adapter.defaultConfigPath
         }
@@ -59,7 +59,7 @@ final class ThemeEngine {
 
         let backupId: String?
         do {
-            backupId = try backupManager.backup(files: uniquePaths)
+            backupId = try backupManager.backup(files: uniquePaths, themeId: backupThemeId)
         } catch {
             // 备份失败时绝不动用户配置——安全网失效必须显式失败
             Log.engine.error("备份失败，已中止应用：\(error.localizedDescription)")

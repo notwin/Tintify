@@ -17,7 +17,7 @@ enum ThemeApplicationService {
         let settings = AppSettings.shared
         let expandedPaths = settings.toolPaths.mapValues { ($0 as NSString).expandingTildeInPath }
         let engine = ThemeEngine(pathOverrides: expandedPaths, disabledTools: settings.disabledTools)
-        let result = engine.apply(theme: theme)
+        let result = engine.apply(theme: theme, backupThemeId: settings.currentThemeId)
 
         // 至少一个工具成功才算切换成功（语义自原 ThemeEngine 迁入）
         if result.successCount > 0 {
