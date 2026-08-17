@@ -2,7 +2,7 @@
 enum ToolID: String, CaseIterable, Codable {
     case ghostty, starship, bat, fzf, delta, eza, lazygit
     case zshSyntaxHighlighting = "zsh-syntax-highlighting"
-    case tmux, vim, wezterm, otty
+    case tmux, vim, wezterm, otty, kitty
 
     /// 官方大小写显示名（AboutPane 等 UI 用）。
     var displayName: String {
@@ -19,6 +19,7 @@ enum ToolID: String, CaseIterable, Codable {
         case .vim: "Vim"
         case .wezterm: "WezTerm"
         case .otty: "otty"
+        case .kitty: "kitty"
         }
     }
 }

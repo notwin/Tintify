@@ -26,6 +26,28 @@ extension ToolAdapter {
     }
 }
 
+/// 适配器共用的"通知运行中 app 重载"进程：fire-and-forget，
+/// 静音 stdio、不阻塞 apply，非零退出或启动失败只记日志。
+enum ReloadNotifier {
+    static func fire(executable: String, arguments: [String], logPrefix: String) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        process.terminationHandler = { p in
+            if p.terminationStatus != 0 {
+                Log.adapter.info("\(logPrefix)：退出码 \(p.terminationStatus)（app 可能未运行）")
+            }
+        }
+        do {
+            try process.run()
+        } catch {
+            Log.adapter.info("\(logPrefix)：启动失败：\(error.localizedDescription)")
+        }
+    }
+}
+
 /// 工具安装检测的共享逻辑。GUI app 的 PATH 不含 Homebrew，用固定路径探测。
 enum ToolDetection {
     static let binSearchPaths = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"]

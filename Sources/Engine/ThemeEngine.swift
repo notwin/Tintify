@@ -25,6 +25,7 @@ final class ThemeEngine {
         { VimAdapter() },
         { WezTermAdapter() },
         { OttyAdapter() },
+        { KittyAdapter() },
     ]
 
     /// UI/CLI 派生工具清单的唯一真相源。

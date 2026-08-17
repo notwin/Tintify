@@ -11,7 +11,7 @@ import Foundation
 @Test func toolIDRawValuesAreStable() {
     // 持久化键快照——改 case 名会破坏用户已存的 disabledTools/toolPaths
     let expected = ["ghostty", "starship", "bat", "fzf", "delta", "eza", "lazygit",
-                    "zsh-syntax-highlighting", "tmux", "vim", "wezterm", "otty"]
+                    "zsh-syntax-highlighting", "tmux", "vim", "wezterm", "otty", "kitty"]
     #expect(ToolID.allCases.map(\.rawValue) == expected)
 }
 

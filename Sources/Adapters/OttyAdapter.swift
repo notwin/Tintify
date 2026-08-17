@@ -48,21 +48,8 @@ struct OttyAdapter: ToolAdapter {
     private func reloadRunningApp() {
         let cli = "/Applications/Otty.app/Contents/MacOS/otty-cli"
         guard FileManager.default.fileExists(atPath: cli) else { return }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: cli)
-        process.arguments = ["config", "reload", "-q"]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        process.terminationHandler = { p in
-            if p.terminationStatus != 0 {
-                Log.adapter.info("otty: config reload 退出码 \(p.terminationStatus)（app 可能未运行）")
-            }
-        }
-        do {
-            try process.run()
-        } catch {
-            Log.adapter.info("otty: 无法执行 otty-cli reload：\(error.localizedDescription)")
-        }
+        ReloadNotifier.fire(executable: cli, arguments: ["config", "reload", "-q"],
+                            logPrefix: "otty: config reload")
     }
 
     /// 16 色 ANSI 槽位统一走 AnsiPalette（三个终端生成器共用，
